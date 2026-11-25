@@ -3827,7 +3827,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     ssDel('tgk.pkce');
     if (!saved || saved.state !== state) { toast('Login could not be verified. Try again'); return Promise.resolve(false); }
     return api('/functions/v1/auth-shopify', { method: 'POST', body: { code: code, codeVerifier: saved.verifier, nonce: saved.nonce, redirectUri: CFG.redirectUri } }).then(function (r) {
-      if (r.status !== 200 || !r.body.session) { toast(r.body && r.body.error ? r.body.error : 'Login failed'); return false; }
+      if (r.status !== 200 || !r.body.session) { toast(r.body && r.body.missing ? 'Login is not set up yet (missing: ' + r.body.missing.join(', ') + ')' : (r.body && r.body.error ? r.body.error : 'Login failed'), true); return false; }
       auth = { token: r.body.session, name: r.body.name, exp: Date.now() / 1000 + (r.body.expiresInSeconds || 43200) - 60 }; saveSession(); renderAccount();
       toast(/^Racer-\d{4}$/.test(auth.name) ? 'Signed in. Tap Change name to pick your racer name' : 'Signed in as ' + auth.name + '. Your runs now count'); return postBest();
     }).catch(function () { toast('Could not reach the login server'); return false; });
