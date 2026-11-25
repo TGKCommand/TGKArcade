@@ -5,7 +5,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TGK Daily Race</title>
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#14171a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TGK Daily Race">
+<meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -148,6 +153,20 @@ kbd{display:inline-block;min-width:22px;text-align:center;font:inherit;font-size
 #menuStreak{margin-top:4px;font-size:13px;letter-spacing:.06em;color:var(--org-hi);min-height:1em}
 #resSplits{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;font-variant-numeric:tabular-nums}
 #resSplits span{white-space:nowrap}#resSplits em{font-style:normal;color:#9aa0a6;margin-right:4px}
+#acct{margin-top:8px;display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:13px;color:var(--dim);min-height:1em}
+#acct .btn2{padding:6px 12px;font-size:13px;white-space:nowrap;flex:none}
+.acctbtns{display:flex;gap:6px;flex:none}
+#lbBtn{margin-top:8px;width:100%}
+.mode{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.2em;padding:2px 8px;margin-bottom:3px;border:1px solid var(--line);background:rgba(0,0,0,.55);pointer-events:none}
+.mode.ranked{color:var(--bar);background:var(--teal);border-color:var(--teal)}.mode.prac{color:var(--dim)}
+#resRank{margin-top:10px;font-size:15px;color:var(--dim)}#resRank.ok{color:var(--teal-hi);font-weight:700}#resRank.bad{color:var(--org-hi)}#resRank.prac{color:#e6e8ea}
+#lbList{list-style:none;counter-reset:r;margin:12px 0 0;padding:0}
+#lbList li{counter-increment:r;display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--line);font-size:16px}
+#lbList li::before{content:counter(r);width:22px;color:var(--dim);font-weight:700;text-align:right}
+#lbList li i{width:12px;height:12px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.4)}
+#lbList li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lbList li em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:700}
+#lbList li.mine{background:rgba(232,115,28,.22)}
 #resStats{margin-top:4px}#resStats.gold{color:var(--org-hi);font-weight:600}
 #banner{position:absolute;left:0;right:0;bottom:24%;text-align:center;font-size:clamp(22px,4vw,34px);font-weight:700;opacity:0;transition:opacity .15s}
 #banner.on{opacity:1}
@@ -201,11 +220,6 @@ body.touch.racing .rtop{display:none}
 #tRec{right:calc(max(14px,env(safe-area-inset-right,0px)) + min(22vw,124px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 24vh + 34px);width:min(19vw,104px);height:min(14vh,58px);font-size:14px}
 .tsmall{position:fixed;top:calc(env(safe-area-inset-top,0px) + 118px);right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:8px;pointer-events:auto}
 .tsmall button{padding:9px 14px;font-size:14px}
-.rotate{display:none}
-@media (pointer:coarse) and (orientation:portrait){
-  body.racing .rotate{display:flex;position:fixed;left:0;right:0;top:46%;justify-content:center;pointer-events:none}
-  .rotate span{background:rgba(0,0,0,.85);padding:12px 18px;font-weight:600;border:1px solid var(--line)}
-}
 @media (max-width:720px){
   #menu{align-items:flex-end}
   .mcard{margin:0;width:100%;max-height:80%;border-left:0;border-right:0;border-bottom:0}
@@ -214,6 +228,135 @@ body.touch.racing .rtop{display:none}
 }
 @media (max-height:520px){ .mcard{width:min(400px,46vw)} h1{font-size:34px} .tag,.legend,.practice{display:none} }
 @media (prefers-reduced-motion:reduce){ #countdown.pop{animation:none} .sw,#toast{transition:none} }
+
+/* ============ MOBILE: phones and tablets, portrait AND landscape ============ */
+html,body{-webkit-touch-callout:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
+.tbtn{background:rgba(20,23,26,.78);border:1px solid rgba(255,255,255,.4);color:#fff;font:600 13px var(--font);letter-spacing:.1em;text-transform:uppercase;border-radius:10px;padding:8px 12px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.tbtn:active{background:rgba(232,115,28,.85);color:var(--bar)}
+.mcols{display:block}
+.card,.mcard{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.timer .mode{margin-bottom:3px}
+
+/* ---- touch HUD, shared ---- */
+body.touch.racing .timer{top:calc(env(safe-area-inset-top,0px) + 6px)}
+body.touch.racing #hudTime{font-size:clamp(30px,8.4vw,46px)}
+body.touch.racing #hudBest{font-size:12px;margin-top:0}
+body.touch.racing #delta{font-size:clamp(16px,4.4vw,22px);margin-top:0}
+body.touch.racing .ckpanel{padding:5px 8px;min-width:0;width:116px}
+body.touch.racing .ckpanel small{font-size:9px;letter-spacing:.12em}
+body.touch.racing #ckBar i{height:8px;min-width:6px}
+body.touch.racing #gearFill{height:8px}
+body.touch.racing #hudCk,body.touch.racing #hudGear{font-size:16px;width:18px}
+body.touch.racing .row2{margin:2px 0 4px;gap:6px}
+body.touch.racing .speedbox{padding:5px 10px;min-width:84px}
+body.touch.racing #hudSpeed{font-size:clamp(32px,8vw,44px)}
+body.touch.racing .speedbox small,body.touch.racing .speedbox em{font-size:9px}
+body.touch.racing .dmg{margin-top:4px;height:4px}
+body.touch.racing .dmgl{font-size:8px;margin-top:2px}
+.tsmall{flex-direction:row;gap:6px}
+.tsmall button{padding:8px 11px;font-size:12px}
+
+/* ---- landscape phones ---- */
+body.touch.landscape.racing .tsmall{top:calc(env(safe-area-inset-top,0px) + 14px);right:calc(max(14px,env(safe-area-inset-right,0px)) + 104px)}
+body.touch.landscape.racing .ckpanel,body.touch.landscape.racing .speedbox{top:calc(env(safe-area-inset-top,0px) + 12px)}
+
+/* ---- portrait phones ---- */
+body.touch.portrait.racing .tsmall{top:calc(env(safe-area-inset-top,0px) + 10px);right:max(10px,env(safe-area-inset-right,0px))}
+body.touch.portrait.racing #tRestart{display:none}
+body.touch.portrait.racing .ckpanel,body.touch.portrait.racing .speedbox{top:calc(env(safe-area-inset-top,0px) + 124px)}
+body.touch.portrait.racing .ckpanel{left:max(10px,env(safe-area-inset-left,0px))}
+body.touch.portrait.racing .speedbox{right:max(10px,env(safe-area-inset-right,0px))}
+body.touch.portrait{--ph:clamp(84px,13vh,120px)}
+body.touch.portrait #tL,body.touch.portrait #tR{bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:clamp(62px,20vw,92px);height:var(--ph);font-size:30px}
+body.touch.portrait #tL{left:max(10px,env(safe-area-inset-left,0px))}
+body.touch.portrait #tR{left:calc(max(10px,env(safe-area-inset-left,0px)) + clamp(62px,20vw,92px) + 8px)}
+body.touch.portrait #tGas{right:max(10px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:clamp(70px,22vw,98px);height:var(--ph);font-size:19px}
+body.touch.portrait #tBrk{right:calc(max(10px,env(safe-area-inset-right,0px)) + clamp(70px,22vw,98px) + 8px);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);width:clamp(60px,19vw,86px);height:var(--ph);font-size:15px}
+body.touch.portrait #tHb{right:max(10px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px + var(--ph) + 10px);width:clamp(70px,22vw,98px);height:48px;font-size:13px}
+body.touch.portrait #tRec{left:max(10px,env(safe-area-inset-left,0px));right:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px + var(--ph) + 10px);width:clamp(62px,20vw,92px);height:44px;font-size:12px}
+body.touch.portrait #tilt{bottom:calc(env(safe-area-inset-bottom,0px) + var(--ph) + 80px)}
+body.touch.portrait #banner{bottom:calc(env(safe-area-inset-bottom,0px) + var(--ph) + 130px)}
+body.touch.portrait #toast{bottom:calc(env(safe-area-inset-bottom,0px) + var(--ph) + 100px)}
+body.touch.portrait #toast.big{bottom:42%}
+
+/* ---- menu, portrait phones: compact bottom sheet ---- */
+@media (max-width:720px) and (orientation:portrait){
+  .mcard{max-height:92%}
+  .mbody{padding:14px 18px 16px}
+  h1{font-size:34px;margin-top:6px} h1 br{display:none}
+  .tag,.seed,.legend,.foot span{display:none}
+  .brandrow .logo{width:52px;height:52px}
+  .facts{margin-top:8px} .facts b{font-size:20px}
+  #miniMap{width:104px;height:104px}
+  .course .name{font-size:18px}
+  #startBtn,#againBtn{padding:12px 16px;font-size:22px;margin-top:10px}
+  .btn2{padding:10px 12px;font-size:15px}
+  .duo{margin-top:8px} #allBtn,#lbBtn{margin-top:8px}
+  .prize{margin-top:8px;padding:8px 12px;font-size:15px}
+  .card .body{padding:16px 18px 18px}
+}
+/* ---- menu, landscape phones: two columns so every button is visible without scrolling ---- */
+@media (orientation:landscape) and (max-height:560px){
+  #menu{align-items:center;justify-content:center}
+  .mcard{width:min(800px,96vw);margin:0 auto;max-height:calc(100% - 12px)}
+  .mbody{padding:12px 18px 12px}
+  .mcols{display:flex;gap:20px;align-items:flex-start}
+  .mcol{flex:1;min-width:0}
+  h1{font-size:30px;margin-top:2px} h1 br{display:none}
+  .tag,.seed,.legend,.foot span{display:none}
+  .brandrow .logo{width:46px;height:46px;margin:-2px 0 -2px -2px}
+  .facts{margin-top:6px} .facts div{padding:5px 0} .facts b{font-size:18px}
+  .mapRow{gap:10px;margin-top:6px} #miniMap{width:92px;height:92px}
+  .course .name{font-size:16px} .course .sub{font-size:12px}
+  #startBtn,#againBtn{padding:10px 14px;font-size:20px;margin-top:0}
+  .btn2{padding:8px 10px;font-size:14px}
+  .duo{margin-top:6px;gap:6px} #allBtn,#lbBtn{margin-top:6px}
+  .prize{margin-top:6px;padding:6px 10px;font-size:13px} .prize small{display:none}
+  .best,#menuGhost,#menuStreak,#acct{font-size:11.5px;margin-top:4px}
+  .card .body{padding:12px 16px 14px} .pause h2{font-size:24px;margin-bottom:8px} .btnrow{margin-top:12px}
+}
+
+/* ---- second mobile pass (from real renders) ---- */
+.tbtn .s{display:none}
+body.touch.portrait .tbtn .w{display:none} body.touch.portrait .tbtn .s{display:inline}
+body.touch.portrait.racing .tsmall{gap:5px} body.touch.portrait.racing .tsmall button{padding:8px 11px;font-size:12px;min-width:38px}
+body.touch.portrait.racing #hudTime{font-size:clamp(28px,8vw,40px)}
+body.touch.landscape.racing .tsmall{top:calc(env(safe-area-inset-top,0px) + 12px + 80px);left:max(14px,env(safe-area-inset-left,0px));right:auto}
+body.touch.landscape.racing .tsmall button{padding:6px 9px;font-size:11px}
+#tHb,#tRec{letter-spacing:0}
+body.touch.portrait #tHb{font-size:11px}
+body.touch #countdown{font-size:clamp(56px,13vw,110px)}
+@media (max-width:720px) and (orientation:portrait){ .brandrow .shop{display:none} .brandrow{justify-content:flex-start} }
+@media (orientation:landscape) and (max-height:560px){
+  .mcard{width:min(600px,72vw);margin-left:max(10px,env(safe-area-inset-left,0px));margin-right:auto}
+  #menu{justify-content:flex-start}
+}
+
+@media (orientation:landscape) and (max-height:560px){
+  #results .card{width:min(780px,94vw)}
+  #results .body{display:flex;gap:20px;align-items:flex-start}
+  #results .rinfo{flex:1.25;min-width:0} #results .racts{flex:1;min-width:0}
+  #results .btnrow{margin-top:7px} #results .racts .btnrow:first-child{margin-top:0}
+  #resTime{font-size:clamp(40px,10vw,58px)}
+  #resBadge{font-size:12px;padding:3px 8px}
+  #resSplits{font-size:12px;margin-top:4px;gap:2px 10px}
+  .stats b{font-size:16px}
+  #lb .card{width:min(740px,94vw)}
+  #lbList{columns:2;column-gap:26px;margin-top:6px} #lbList li{break-inside:avoid;padding:5px 6px;font-size:14px}
+  #lb h2{margin-bottom:4px;font-size:22px}
+}
+
+/* ---- third mobile pass: smallest screens (from the automated real-browser test) ---- */
+body.touch.portrait.racing #hudTime{font-size:clamp(26px,7.6vw,38px)}
+body.touch.portrait.racing .tsmall button{padding:8px 9px}
+body.touch.portrait.racing .tsmall{right:max(8px,env(safe-area-inset-right,0px))}
+@media (max-width:760px){ body.touch.landscape.racing #tRestart{display:none} }
+body.touch.landscape{--pw:clamp(62px,15vw,104px)}
+body.touch.landscape #tL,body.touch.landscape #tR{width:var(--pw)}
+body.touch.landscape #tR{left:calc(max(14px,env(safe-area-inset-left,0px)) + var(--pw) + 10px)}
+body.touch.landscape #tGas,body.touch.landscape #tHb{width:calc(var(--pw) * 1.1)}
+body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc(max(14px,env(safe-area-inset-right,0px)) + var(--pw) * 1.1 + 10px)}
+@media (max-height:420px){ body.touch.landscape.racing #hudTime{font-size:34px} }
 </style>
 </head>
 <body>
@@ -224,20 +367,27 @@ body.touch.racing .rtop{display:none}
     <div class="check" aria-hidden="true"></div>
     <div class="mbody">
       <div id="mainView">
+        <div class="mcols">
+<div class="mcol">
         <div class="brandrow"><img class="logo" alt="TGK Motorsport" width="64" height="64"><a class="shop" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
-        <h1>TGK Daily<br>Race</h1>
+        <h1>TGK Daily <br>Race</h1>
         <p class="tag">ONE TRACK. ONE DAY. ONE WINNER.</p>
         <div class="facts"><div><small>DATE</small><b id="todayDate">&nbsp;</b></div><div><small>NEW MAP IN</small><b id="nextTrack">--:--:--</b></div></div>
         <div class="mapRow"><canvas id="miniMap" width="192" height="192" aria-label="Map of today’s track"></canvas><div class="course"><div class="name" id="trackName">&nbsp;</div><div class="sub" id="trackMeta"></div><div class="seed" id="trackSeed"></div></div></div>
+</div>
+<div class="mcol">
         <button id="startBtn" type="button">Race now</button>
         <div class="duo"><button type="button" class="btn2" id="garageBtn">Garage</button><a class="btn2" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
         <button type="button" class="btn2" id="allBtn">Show all races today</button>
         <div class="best" id="menuBest"></div>
         <div id="menuGhost"></div>
         <div id="menuStreak"></div>
+        <div id="acct"><span id="acctText"></span><span class="acctbtns"><button type="button" class="btn2" id="acctRename" style="display:none">Change name</button><button type="button" class="btn2" id="acctBtn"></button></span></div>
+        <button type="button" class="btn2" id="lbBtn">Today's leaderboard</button>
         <div class="prize">WIN TODAY. GET 5% OFF TGK PRODUCTS.<small>The fastest verified finisher each day earns the code.</small></div>
+</div>
+</div>
         <div class="legend"><span><kbd>W</kbd><kbd>↑</kbd> throttle</span><span><kbd>A</kbd><kbd>D</kbd> steer</span><span><kbd>Space</kbd> handbrake</span><span><kbd>R</kbd> recover</span><span><kbd>F</kbd> restart</span><span><kbd>C</kbd> camera</span></div>
-        <p class="practice">Practice mode: this build is the driving engine. Times stay on this device, and every driver gets the identical car. Verified rankings, ghosts and the daily prize come next.</p>
         <div class="foot"><span>Drag the scene to look around.</span><label>Graphics <select id="qMenu" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label></div>
       </div>
       <div id="garageView" class="hidden">
@@ -256,7 +406,7 @@ body.touch.racing .rtop{display:none}
     <button type="button" id="pRecTop"><kbd>R</kbd> Recover</button><button type="button" id="pRestartTop"><kbd>F</kbd> Restart</button><button type="button" id="pCamTop"><kbd>C</kbd> Camera</button><button type="button" id="pPauseTop"><kbd>Esc</kbd> Menu</button>
   </div>
   <div class="rtop"><a class="pill" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
-  <div class="timer"><div id="hudTime">00:00.000</div><div id="hudBest"></div><div id="delta"></div></div>
+  <div class="timer"><div id="modeBadge" class="mode prac">PRACTICE</div><div id="hudTime">00:00.000</div><div id="hudBest"></div><div id="delta"></div></div>
   <div id="split"></div>
   <div id="lights" class="hidden"><i></i><i></i><i></i></div>
   <div id="countdown"></div>
@@ -267,7 +417,6 @@ body.touch.racing .rtop{display:none}
     <small>GEAR</small><div class="row2" style="margin-bottom:0"><div id="gearFill"></div><div id="hudGear">1</div></div>
   </div>
   <div class="box speedbox"><small>SPEED</small><span id="hudSpeed">0</span><em>MPH</em><div class="dmg" id="dmgBox"><i id="dmgFill"></i></div><span class="dmgl">DAMAGE</span></div>
-  <div class="rotate"><span>Turn your phone sideways to race</span></div>
   <div class="touch-ui">
     <div class="tp" id="tL" data-bit="4" role="button" aria-label="Steer left">&#9664;</div>
     <div class="tp" id="tR" data-bit="8" role="button" aria-label="Steer right">&#9654;</div>
@@ -275,7 +424,7 @@ body.touch.racing .rtop{display:none}
     <div class="tp" id="tGas" data-bit="1" role="button" aria-label="Accelerate">GAS</div>
     <div class="tp" id="tHb" data-bit="16" role="button" aria-label="Handbrake">HANDBRAKE</div>
     <div class="tp" id="tRec" data-bit="32" role="button" aria-label="Recover to last gate">RECOVER</div>
-    <div class="tsmall"><button type="button" class="tbtn" id="tCam">Camera</button><button type="button" class="tbtn" id="tRestart">Restart</button><button type="button" class="tbtn" id="tPause">Pause</button></div>
+    <div class="tsmall"><button type="button" class="tbtn" id="tCam" aria-label="Camera"><span class="w">Camera</span><span class="s">Cam</span></button><button type="button" class="tbtn" id="tRestart" aria-label="Restart"><span class="w">Restart</span></button><button type="button" class="tbtn" id="tPause" aria-label="Pause"><span class="w">Pause</span><span class="s">II</span></button></div>
   </div>
 </section>
 <section id="ov" class="hidden" aria-label="All races today">
@@ -291,19 +440,31 @@ body.touch.racing .rtop{display:none}
 
 <section id="results" class="sheet hidden" aria-label="Race result">
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <div class="rinfo">
     <span id="resBadge"></span>
     <div id="resTime">00:00.000</div>
     <div class="stats"><div><small>Personal best</small><b id="resBest"></b></div><div><small>Previous best</small><b id="resPrev"></b></div><div><small>Change</small><b id="resDelta"></b></div></div>
     <div class="meta" id="resMeta"></div>
     <div class="meta" id="resStats"></div>
     <div id="resSplits"></div>
+    <div id="resRank"></div>
+    </div>
+    <div class="racts">
+    <div class="btnrow"><button type="button" class="btn2" id="resAction" style="display:none"></button></div>
     <div class="btnrow"><button type="button" id="againBtn">Race again</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="shareBtn">Share result</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="resAllBtn">Show all races today</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="menuBtn">Menu</button><a class="btn2" style="text-align:center;text-decoration:none;color:inherit" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
+    </div>
   </div></div>
 </section>
 
+<section id="lb" class="sheet hidden" aria-label="Today's leaderboard">
+  <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <h2>Today's leaderboard</h2><div id="lbSub" class="meta"></div><ol id="lbList"></ol>
+    <div class="btnrow"><button type="button" class="btn2" id="lbClose">Close</button></div>
+  </div></div>
+</section>
 <section id="pause" class="sheet pause hidden" aria-label="Paused">
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
     <h2>Paused</h2>
@@ -319,6 +480,14 @@ body.touch.racing .rtop{display:none}
 <div id="fatal" class="hidden"><b>This browser can’t run the 3D game.</b><span>Try a current version of Chrome, Firefox, Safari or Edge.</span><span id="fatalMsg" style="color:#a3a6ad;font-size:13px"></span></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.TGK_CONFIG = {
+  "supabaseUrl": "https://keltorhzisxuzbzdamfw.supabase.co",
+  "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlbHRvcmh6aXN4dXpiemRhbWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MjQ4NzMsImV4cCI6MjExMTIwMDg3M30.yLTUo3Qaca0fuNJHpn9Z4Mhlk09jY2shQumFAgGEXKc",
+  "authorizeUrl": "https://account.tgkmotorsports.com/authentication/oauth/authorize",
+  "clientId": "149d201c-ef2a-40a6-bb71-cb8e0915eef3",
+  "redirectUri": "https://race.tgkmotorsport.com/",
+  "scope": "openid email"
+};</script>
 <script>
 /* TGK DAILY RACE - simulation core
  * Pure JS, no DOM, no Three.js. This exact file is meant to run in the browser AND
@@ -2932,13 +3101,25 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     if (rebuild) loadWorld();
     onResize();
   }
+  var lastPortrait = null;
+  function applyOrientation() {
+    var p = window.innerHeight > window.innerWidth; document.body.classList.toggle('portrait', p); document.body.classList.toggle('landscape', !p);
+    if (lastPortrait !== null && lastPortrait !== p && state === 'racing') pauseGame();         // rotating mid-race: stop the clock instead of crashing the car
+    lastPortrait = p; return p;
+  }
+  /** a tall narrow screen has a very narrow horizontal view with the landscape field of view: widen it, and pull the camera back a little */
+  function portraitFov() { var a = window.innerWidth / window.innerHeight; return a < 1 ? Math.min(24, (1 / a - 1) * 16 + 4) : 0; }
+  function portraitPull() { var a = window.innerWidth / window.innerHeight; return a < 1 ? 1 + Math.min(0.3, (1 / a - 1) * 0.14) : 1; }
   function onResize() {
+    applyOrientation();
     var q = QUALITY[qName], dpr = window.devicePixelRatio || 1;
     renderer.setPixelRatio(Math.max(0.55, Math.min(dpr, q.pr) * prPerf));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
   }
   window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', function () { setTimeout(onResize, 120); setTimeout(onResize, 450); });      // iOS reports the new size late
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', onResize);
 
   function disposeWorld() {
     if (!world) return;
@@ -3081,20 +3262,29 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function groundAt(x, z) { return C.groundAt(track, x, z, undefined, sfTmp).gy; }
   function placeCamera(px, py, pz, lx, ly, lz) { camera.position.set(-px, py, pz); camera.lookAt(-lx, ly, lz); }
 
+  /** the menu card covers most of a phone screen: slide the 3D scene so the car shows in the strip / beside the card that is left */
+  function menuViewOffset() {
+    var w = window.innerWidth, h = window.innerHeight, portrait = h > w, small = Math.min(w, h) < 560;
+    if (!small) { clearViewOffset(); return; }
+    if (portrait) camera.setViewOffset(w, h, 0, Math.round(h * 0.40), w, h); else camera.setViewOffset(w, h, -Math.round(w * 0.26), 0, w, h);
+  }
+  function clearViewOffset() { if (camera.view && camera.view.enabled) { camera.clearViewOffset(); camera.updateProjectionMatrix(); } }
   function updateCamera(dt, v) {
     var speed = Math.hypot(sim.u, sim.v);
     if (state === 'menu') {
       if (!cam.drag) cam.az += dt * 0.25;
-      var r = 8.4, cx = v.x, cz = v.z, cy = v.y + 0.75;
+      var pSmall = window.innerHeight > window.innerWidth && window.innerWidth < 560, r = pSmall ? 17 : 8.4, cx = v.x, cz = v.z, cy = v.y + 0.75;
       var px = cx + Math.sin(cam.az) * Math.cos(cam.el) * r, pz = cz + Math.cos(cam.az) * Math.cos(cam.el) * r, py = cy + Math.sin(cam.el) * r + 0.6;
       py = Math.max(py, groundAt(px, pz) + 0.6);
-      cam.fov += (40 - cam.fov) * Math.min(1, dt * 4); camera.fov = cam.fov; camera.updateProjectionMatrix();
+      cam.fov += ((pSmall ? 58 : 40) - cam.fov) * Math.min(1, dt * 4); camera.fov = cam.fov;
+      menuViewOffset(); camera.updateProjectionMatrix();
       placeCamera(px, py, pz, cx, cy, cz); cam.init = false; return;
     }
+    clearViewOffset();
     var fx = Math.sin(v.yaw), fz = Math.cos(v.yaw);
     if (camMode === 2) {
       var bx = v.x + fx * 2.55, bz = v.z + fz * 2.55, by = v.y + 0.62;
-      var targetFov = 74 + Math.min(speed, 70) * 0.12; cam.fov += (targetFov - cam.fov) * Math.min(1, dt * 4);
+      var targetFov = Math.min(100, 74 + Math.min(speed, 70) * 0.12 + portraitFov() * 0.6); cam.fov += (targetFov - cam.fov) * Math.min(1, dt * 4);
       camera.fov = cam.fov; camera.updateProjectionMatrix();
       var sk = cam.shake * 0.05; cam.shake *= Math.exp(-8 * dt);
       placeCamera(bx + (Math.random() - 0.5) * sk, by + (Math.random() - 0.5) * sk, bz, bx + fx * 20, by + 0.25 + (sim.gx * fx + sim.gz * fz) * 10, bz + fz * 20);
@@ -3105,12 +3295,12 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     if (!cam.init) { cam.yaw = tgtYaw; cam.init = true; cam.x = v.x - Math.sin(tgtYaw) * 8; cam.z = v.z - Math.cos(tgtYaw) * 8; cam.y = v.y + 3; }
     cam.yaw += angDiff(tgtYaw, cam.yaw) * (1 - Math.exp(-5.5 * dt));
     var far = camMode === 1;
-    var dist = (far ? 10.5 : 6.6) + speed * (far ? 0.045 : 0.03), h = (far ? 3.8 : 2.35) + speed * 0.01;
+    var pp = portraitPull(), dist = ((far ? 10.5 : 6.6) + speed * (far ? 0.045 : 0.03)) * pp, h = ((far ? 3.8 : 2.35) + speed * 0.01) * (1 + (pp - 1) * 0.8);
     var dx = v.x - Math.sin(cam.yaw) * dist, dz = v.z - Math.cos(cam.yaw) * dist, dy = v.y + h;
     var kxz = 1 - Math.exp(-11 * dt), ky = 1 - Math.exp(-6 * dt);
     cam.x += (dx - cam.x) * kxz; cam.z += (dz - cam.z) * kxz; cam.y += (dy - cam.y) * ky;
     var gy = groundAt(cam.x, cam.z) + 0.9; if (cam.y < gy) cam.y = gy;
-    var targetFov = 60 + Math.min(speed, 70) * 0.17 + (far ? 4 : 0); cam.fov += (targetFov - cam.fov) * Math.min(1, dt * 3);
+    var targetFov = 60 + Math.min(speed, 70) * 0.17 + (far ? 4 : 0) + portraitFov(); cam.fov += (targetFov - cam.fov) * Math.min(1, dt * 3);
     camera.fov = cam.fov; camera.updateProjectionMatrix();
     var look = 3.5 + speed * 0.05, sh = cam.shake * 0.12; cam.shake *= Math.exp(-8 * dt);
     placeCamera(cam.x + (Math.random() - 0.5) * sh, cam.y + (Math.random() - 0.5) * sh, cam.z, v.x + fx * look, v.y + 1.15, v.z + fz * look);
@@ -3169,7 +3359,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     accum = 0; snapshot(); vis.pitch = vis.roll = vis.bob = vis.bobV = 0; vis.spin = 0;
     W.updateGates(world, 0); cam.init = false; cam.shake = 0;
     if (FX) { FX.trails.reset(); FX.smoke.clear(); }
-    repairCar(); hud.dmg = -1; hud.tilt = null; $('tilt').classList.remove('on');
+    repairCar(); hud.dmg = -1; hud.tilt = null; $('tilt').classList.remove('on'); renderAccount(); keepAwake(true);
     state = 'racing';
     $('menu').classList.add('hidden'); $('results').classList.add('hidden'); $('pause').classList.add('hidden');
     $('hud').classList.remove('hidden'); document.body.classList.add('racing');
@@ -3178,7 +3368,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     $('hudCk').textContent = '0'; buildCkBar(); paintCkBar(); hud.gear = ''; hud.ban = '';
   }
   function toMenu() {
-    state = 'menu'; sim.reset(); snapshot(); cam.init = false;
+    state = 'menu'; sim.reset(); snapshot(); cam.init = false; keepAwake(false);
     if (C.chicagoDate(Date.now()) !== raceDate) { loadDaily(); loadWorld(); sim.reset(); }
     W.updateGates(world, 0); repairCar();
     $('menu').classList.remove('hidden'); $('results').classList.add('hidden'); $('pause').classList.add('hidden'); $('hud').classList.add('hidden');
@@ -3187,6 +3377,14 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     if (ghostCar) ghostCar.group.visible = false;
   }
   function repairCar() { if (carObj && dentSig !== '') { W.applyDents(THREE, carObj, []); } dentSig = ''; }
+  var wakeLock = null;
+  function keepAwake(on) {
+    try {
+      if (on && navigator.wakeLock && !wakeLock) navigator.wakeLock.request('screen').then(function (l) { wakeLock = l; l.addEventListener('release', function () { wakeLock = null; }); }).catch(function () { });
+      else if (!on && wakeLock) { wakeLock.release(); wakeLock = null; }
+    } catch (e) { }
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && (state === 'racing' || state === 'finishing')) keepAwake(true); });
   function pauseGame() { if (state !== 'racing') return; state = 'paused'; $('pause').classList.remove('hidden'); keyBits = 0; touchCount = {}; $('qSel').value = qName; }
   function resumeGame() { if (state !== 'paused') return; state = 'racing'; $('pause').classList.add('hidden'); lastTs = performance.now(); }
 
@@ -3226,7 +3424,8 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     lastResult = { timeText: C.fmtTime(ms), dateLabel: new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase(),
       trackName: track.name, lengthText: (track.length / 1609.34).toFixed(2) + ' mi', biomeText: biomeLabel(track.biome), isPB: isPB, badge: isPB ? (prevBest ? 'New personal best' : 'First run today') : '',
       deltaText: prevBest && ms !== prevBest ? fmtDelta(ms - prevBest) + ' s' : '', deltaGood: prevBest ? ms < prevBest : false, jumps: sim.jumps, chips: chips, splits: splitsOut };
-    $('results').classList.remove('hidden'); state = 'results';
+    $('results').classList.remove('hidden'); state = 'results'; keepAwake(false);
+    renderResultsRank(bestOfLast());
     $('hud').classList.add('hidden');
   }
 
@@ -3425,6 +3624,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   }
   /** exactly what the server's submit-run function expects (no network call yet: the backend is not connected) */
   function submissionFor(run) { return { raceDate: raceDate, attempt: track.attempt, cd: run.cd || C.COUNTDOWN_TICKS, log: run.log, claimedMs: run.ms, clientCanary: C.canary(), paintHex: run.hex }; }
+  function bestOfLast() { var a = loadRuns(); return a.length ? a[a.length - 1] : null; }
   function ghostMenuLine() {
     if (store.get('tgk.ghost') === '0') return 'Ghost off';
     var s = ghostSource(); if (!s) return '';
@@ -3433,8 +3633,8 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function makeBeacon() {
     var cv = document.createElement('canvas'); cv.width = 128; cv.height = 64; var cx = cv.getContext('2d');
     if (cx) { cx.fillStyle = 'rgba(0,0,0,.55)'; cx.fillRect(8, 6, 112, 36); cx.fillStyle = '#5fd6cf'; cx.font = '700 26px Arial,sans-serif'; cx.textAlign = 'center'; cx.fillText('GHOST', 64, 33); cx.beginPath(); cx.moveTo(52, 44); cx.lineTo(76, 44); cx.lineTo(64, 60); cx.closePath(); cx.fill(); }
-    var tex = new THREE.CanvasTexture(cv), sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false }));
-    sp.scale.set(4.2, 2.1, 1); sp.position.set(0, 3.1, 0); sp.renderOrder = 5; return sp;
+    var tex = new THREE.CanvasTexture(cv), sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false, sizeAttenuation: false }));
+    sp.scale.set(0.15, 0.075, 1); sp.position.set(0, 3.1, 0); sp.renderOrder = 5; return sp;
   }
   function shiftLog(r, toCd) { var d = toCd - (r.cd || C.COUNTDOWN_TICKS); return r.log.map(function (e) { return [e[0] + d, e[1]]; }); }
   /** run the recorded inputs headlessly once: time at every 10 m of progress + at every gate (for the live delta and the splits) */
@@ -3584,6 +3784,128 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
       try { if (navigator.clipboard) navigator.clipboard.writeText(text); } catch (e2) { }
       toast('Image saved. Caption copied');
     }, 'image/png');
+  }
+
+
+  /* ---------------- online: Shopify login, ranked mode, leaderboard ----------------
+     Practice is open to everyone. A time only reaches the leaderboard if it is submitted by a logged-in TGK customer: the SERVER learns who that is from
+     Shopify (auth-shopify), never from this page, and then re-drives the run itself (submit-run). Nothing here is trusted by the server. */
+  var CFG = window.TGK_CONFIG || {};
+  var online = { configured: !!(CFG.supabaseUrl && CFG.anonKey), canLogin: !!(CFG.supabaseUrl && CFG.anonKey && CFG.authorizeUrl && CFG.clientId && CFG.redirectUri) };
+  var auth = { token: null, name: null, exp: 0 }, lastRunId = null, ssMem = {};
+  function ssGet(k) { try { return window.sessionStorage.getItem(k); } catch (e) { return Object.prototype.hasOwnProperty.call(ssMem, k) ? ssMem[k] : null; } }
+  function ssSet(k, v) { ssMem[k] = v; try { window.sessionStorage.setItem(k, v); } catch (e) { } }
+  function ssDel(k) { delete ssMem[k]; try { window.sessionStorage.removeItem(k); } catch (e) { } }
+  function loggedIn() { return !!auth.token && auth.exp > Date.now() / 1000; }
+  function loadSession() { try { var s = JSON.parse(ssGet('tgk.session') || 'null'); if (s && s.token && s.exp > Date.now() / 1000) auth = { token: s.token, name: s.name, exp: s.exp }; } catch (e) { } }
+  function saveSession() { ssSet('tgk.session', JSON.stringify(auth)); }
+  function logout() { auth = { token: null, name: null, exp: 0 }; ssDel('tgk.session'); renderAccount(); toast('Logged out. Practice mode'); }
+  function b64url(bytes) { var s = ''; for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function randomB64(n) { var a = new Uint8Array(n); window.crypto.getRandomValues(a); return b64url(a); }
+  function api(path, opts) {
+    opts = opts || {}; var h = { 'Content-Type': 'application/json', apikey: CFG.anonKey, Authorization: 'Bearer ' + (opts.token || CFG.anonKey) };
+    return window.fetch(CFG.supabaseUrl + path, { method: opts.method || 'GET', headers: h, body: opts.body ? JSON.stringify(opts.body) : undefined }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+  }
+
+  /** log in: OAuth authorization-code flow with PKCE (no secret ever lives in this page) */
+  function startLogin(postAfter) {
+    if (!online.canLogin) { toast('Login opens soon'); return Promise.resolve(); }
+    var verifier = randomB64(48), state = randomB64(16), nonce = randomB64(16), bytes = new Uint8Array(verifier.length);
+    for (var i = 0; i < verifier.length; i++) bytes[i] = verifier.charCodeAt(i);            // the verifier is plain ASCII
+    return window.crypto.subtle.digest('SHA-256', bytes).then(function (d) {
+      ssSet('tgk.pkce', JSON.stringify({ verifier: verifier, state: state, nonce: nonce, post: !!postAfter }));
+      var q = new URLSearchParams({ response_type: 'code', client_id: CFG.clientId, redirect_uri: CFG.redirectUri, scope: CFG.scope || 'openid email', state: state, nonce: nonce, code_challenge: b64url(new Uint8Array(d)), code_challenge_method: 'S256' });
+      (CFG.navigate || function (u) { window.location.assign(u); })(CFG.authorizeUrl + (CFG.authorizeUrl.indexOf('?') < 0 ? '?' : '&') + q.toString());
+    });
+  }
+  /** back from Shopify: ?code=...&state=... */
+  function handleLoginReturn(search) {
+    var p = new URLSearchParams(search || ''), code = p.get('code'), state = p.get('state');
+    if (!code || !state) return Promise.resolve(false);
+    try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { }
+    var saved = null; try { saved = JSON.parse(ssGet('tgk.pkce') || 'null'); } catch (e) { }
+    ssDel('tgk.pkce');
+    if (!saved || saved.state !== state) { toast('Login could not be verified. Try again'); return Promise.resolve(false); }
+    return api('/functions/v1/auth-shopify', { method: 'POST', body: { code: code, codeVerifier: saved.verifier, nonce: saved.nonce, redirectUri: CFG.redirectUri } }).then(function (r) {
+      if (r.status !== 200 || !r.body.session) { toast(r.body && r.body.error ? r.body.error : 'Login failed'); return false; }
+      auth = { token: r.body.session, name: r.body.name, exp: Date.now() / 1000 + (r.body.expiresInSeconds || 43200) - 60 }; saveSession(); renderAccount();
+      toast(/^Racer-\d{4}$/.test(auth.name) ? 'Signed in. Tap Change name to pick your racer name' : 'Signed in as ' + auth.name + '. Your runs now count'); return postBest();
+    }).catch(function () { toast('Could not reach the login server'); return false; });
+  }
+
+  /* ---- submitting ---- */
+  function postedKey() { return 'tgk.posted.' + raceDate + '.' + track.sig; }
+  function isPosted(run) { try { return (JSON.parse(store.get(postedKey()) || '[]')).indexOf(run.t) >= 0; } catch (e) { return false; } }
+  function markPosted(run) { var a = []; try { a = JSON.parse(store.get(postedKey()) || '[]'); } catch (e) { } if (a.indexOf(run.t) < 0) a.push(run.t); store.set(postedKey(), JSON.stringify(a.slice(-30))); }
+  function submitOnline(run) {
+    var payload = submissionFor(run);
+    return api('/functions/v1/submit-run', { method: 'POST', token: auth.token, body: payload }).then(function (r) {
+      var b = r.body || {};
+      if (r.status === 401) { auth = { token: null, name: null, exp: 0 }; ssDel('tgk.session'); renderAccount(); return { status: 'login_required' }; }
+      if (b.status === 'verified' || b.status === 'review') { markPosted(run); if (b.runId) lastRunId = b.runId; }
+      return b;
+    });
+  }
+  /** after logging in: post today's best practice run (the server re-drives its inputs, so when it was recorded does not matter) */
+  function postBest() {
+    var run = bestRun(); if (!run || isPosted(run)) return Promise.resolve(false);
+    return submitOnline(run).then(function (b) { if (b.status === 'verified') toast('Posted your best run: #' + b.rank + ' today', true); else if (b.status === 'review') toast('Your run is being checked'); else if (b.reason) toast(b.reason); return true; }).catch(function () { toast('Could not reach the leaderboard'); return false; });
+  }
+  var resRun = null;
+  function renderResultsRank(run) {
+    resRun = run; var el = $('resRank'), btn = $('resAction'); btn.style.display = 'none'; btn.onclick = null; el.className = '';
+    if (!online.configured) { el.textContent = 'Practice run. The online leaderboard opens soon.'; return; }
+    if (!loggedIn()) {
+      el.textContent = 'Practice run. Log in with your TGK account to put this time on the leaderboard.'; el.className = 'prac';
+      if (online.canLogin) { btn.textContent = 'Log in to qualify'; btn.style.display = ''; btn.onclick = function () { startLogin(true); }; }
+      return;
+    }
+    el.textContent = 'Posting your time…';
+    submitOnline(run).then(function (b) {
+      if (b.status === 'verified') { el.textContent = 'Verified. You are #' + b.rank + ' on today\'s leaderboard.'; el.className = 'ok'; }
+      else if (b.status === 'review') { el.textContent = 'Your run is being checked and will appear once it is cleared.'; el.className = 'prac'; }
+      else if (b.status === 'login_required') { el.textContent = 'Your login expired. Log in again to post this time.'; el.className = 'prac'; if (online.canLogin) { btn.textContent = 'Log in again'; btn.style.display = ''; btn.onclick = function () { startLogin(true); }; } }
+      else { el.textContent = (b.reason || b.error || 'This time was not accepted') + '.'; el.className = 'bad'; }
+    }).catch(function () { el.textContent = 'Could not reach the leaderboard. Your run is saved on this device.'; el.className = 'prac'; btn.textContent = 'Try again'; btn.style.display = ''; btn.onclick = function () { renderResultsRank(run); }; });
+  }
+
+  /* ---- leaderboard ---- */
+  function openLeaderboard() {
+    var sheet = $('lb'), list = $('lbList'), sub = $('lbSub'); sheet.classList.remove('hidden'); list.textContent = '';
+    if (!online.configured) { sub.textContent = 'The online leaderboard opens soon. Until then your times are saved on this device.'; return; }
+    sub.textContent = 'Loading…';
+    api('/rest/v1/leaderboard?select=run_id,display_name,ms,paint_hex,jumps&race_date=eq.' + encodeURIComponent(raceDate) + '&order=ms.asc&limit=10').then(function (r) {
+      var rows = Array.isArray(r.body) ? r.body : [];
+      sub.textContent = rows.length ? 'Fastest verified runs today. Log in to qualify.' : 'No verified runs yet today. Be the first.'; if (loggedIn()) sub.textContent = rows.length ? 'Fastest verified runs today.' : 'No verified runs yet today. Be the first.';
+      rows.forEach(function (row, i) {
+        var li = document.createElement('li'), dot = document.createElement('i'), nm = document.createElement('span'), tm = document.createElement('em');
+        dot.style.background = /^#[0-9a-fA-F]{6}$/.test(row.paint_hex || '') ? row.paint_hex : '#5fd6cf';
+        nm.textContent = String(row.display_name || '');                                      // textContent: a name can never inject markup
+        tm.textContent = C.fmtTime(row.ms) + (row.jumps ? '  \u2605' : '');
+        li.appendChild(dot); li.appendChild(nm); li.appendChild(tm); if (lastRunId && row.run_id === lastRunId) li.className = 'mine'; list.appendChild(li);
+      });
+    }).catch(function () { sub.textContent = 'Could not reach the leaderboard right now.'; });
+  }
+  function renameRacer() {
+    if (!loggedIn()) return;
+    var raw = window.prompt('Choose your racer name (2-16 letters, numbers, spaces). It is shown on the leaderboard.', auth.name || ''); if (raw === null) return;
+    api('/functions/v1/auth-shopify', { method: 'POST', token: auth.token, body: { action: 'rename', name: raw } }).then(function (r) {
+      if (r.status === 200 && r.body.session) { auth.token = r.body.session; auth.name = r.body.name; saveSession(); renderAccount(); toast('You are now ' + auth.name); }
+      else toast(r.body && r.body.error ? r.body.error : 'Could not change the name');
+    }).catch(function () { toast('Could not reach the server'); });
+  }
+  function renderAccount() {
+    var t = $('acctText'), b = $('acctBtn'), badge = $('modeBadge');
+    if (!online.configured) { t.textContent = 'Practice mode. The online leaderboard opens soon.'; b.style.display = 'none'; }
+    else if (loggedIn()) { t.textContent = 'Signed in as ' + auth.name + '. Your runs qualify.'; b.textContent = 'Log out'; b.style.display = ''; b.onclick = logout; }
+    else { t.textContent = 'Practice mode. Log in with your TGK account to qualify for the leaderboard.'; b.textContent = 'Log in'; b.style.display = online.canLogin ? '' : 'none'; b.onclick = function () { startLogin(false); }; }
+    var rn = $('acctRename'); rn.style.display = (online.configured && loggedIn()) ? '' : 'none'; rn.onclick = renameRacer;
+    badge.textContent = loggedIn() ? 'RANKED' : 'PRACTICE'; badge.className = 'mode ' + (loggedIn() ? 'ranked' : 'prac');
+  }
+  function initOnline() {
+    loadSession(); renderAccount();
+    $('lbBtn').addEventListener('click', openLeaderboard); $('lbClose').addEventListener('click', function () { $('lb').classList.add('hidden'); });
+    if (online.configured && /[?&]code=/.test(window.location.search)) handleLoginReturn(window.location.search);
   }
 
   /* ---------------- all races today: everyone on the track at once ---------------- */
@@ -3918,14 +4240,14 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function boot() {
     if (!window.WebGLRenderingContext) { $('fatal').classList.remove('hidden'); return; }
     try {
-      recorder.reset(); initRenderer(); loadDaily(); loadWorld(); buildSwatches(); wireUi(); bindTouch();
+      recorder.reset(); initRenderer(); loadDaily(); loadWorld(); buildSwatches(); wireUi(); bindTouch(); initOnline();
       sim.reset(); snapshot(); updateCar(0.016, 1); tickCountdown(); setInterval(tickCountdown, 1000);
       $('loading').classList.add('hidden');
       lastTs = performance.now(); requestAnimationFrame(frame);
     } catch (e) { console.error(e); $('fatal').classList.remove('hidden'); $('fatalMsg').textContent = String(e && e.message || e); }
   }
   boot();
-  window.__tgk = { submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; } };
+  window.__tgk = { online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; } };
 })();
 
 </script>
