@@ -391,12 +391,117 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
   .ovbar #ovCamPack,.ovbar #ovCamLead,.ovbar #ovCamOver,.ovbar #ovS1,.ovbar #ovS2,.ovbar #ovS4{display:none}
   .ovbar .cmp{display:block} #ovMark{display:none}
 }
+
+/* ---- help/legal pages, settings, top bar, past races ---- */
+.links{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:12px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.links a{color:#b5b8bd;text-decoration:none;min-height:36px;display:inline-flex;align-items:center}.links a:hover{color:#fff}
+#topbar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:calc(env(safe-area-inset-right,0px) + 10px);display:flex;gap:8px;z-index:6}
+#topbar button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(20,23,26,.72);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+#topbar button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#topbar button:hover,#topbar button:focus-visible{border-color:var(--teal)}
+#infoSheet .body,#settingsSheet .body,#pastSheet .body{max-height:calc(100vh - 120px);max-height:calc(100dvh - 120px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#infoBody h3{margin:16px 0 2px;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-hi)}
+#infoBody p,#infoBody li{font-size:14px;line-height:1.5;color:#d6d8dc;margin:6px 0}#infoBody ul{padding-left:18px;margin:6px 0}#infoBody a{color:var(--teal-hi)}
+#infoBody kbd{display:inline-block;min-width:1.5em;padding:0 5px;text-align:center;border:1px solid var(--line);border-bottom-width:2px;font:600 12px var(--font)}
+#infoBody .upd{color:var(--dim);font-size:12px;margin-top:18px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}.srow span{flex:1}
+.srow select,.srow .btn2{min-height:40px;font-size:14px;width:auto}
+#pastBar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--org);color:var(--bar);padding:8px 12px;margin:10px 0;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+#pastBar button{background:var(--bar);color:#fff;border:0;padding:8px 10px;min-height:40px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+#pastList{list-style:none;margin:10px 0 0;padding:0}
+#pastList li{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:11px 8px;border-bottom:1px solid var(--line);cursor:pointer;min-height:48px}
+#pastList li.open{background:rgba(44,188,180,.12)}
+#pastList .d{width:112px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}#pastList .w{flex:1;color:#b5b8bd;font-size:14px;min-width:120px}
+#pastList .act{flex-basis:100%;display:none;gap:8px}#pastList li.open .act{display:flex}
+#pastList .act button{flex:1;min-height:44px;padding:8px 10px;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+#pastList .act button.go{background:var(--org);color:var(--bar);border:0;font-weight:700}
+#pastList .empty{cursor:default;color:var(--dim)}
+#infoClose,#setClose,#pastClose{min-height:44px}
+@media (orientation:landscape) and (max-height:430px) and (max-width:700px){ #tbFull{display:none!important} }
+@media (orientation:landscape) and (max-height:480px){#topbar{flex-direction:column;gap:6px;top:calc(env(safe-area-inset-top,0px) + 8px);right:calc(env(safe-area-inset-right,0px) + 8px)}}
+
+/* ---- menu fit pass: the whole menu on one screen, no scrolling ---- */
+.legend,.foot{display:none!important}
+h1 br{display:none}
+.prize{cursor:pointer}.prize small{display:none}
+.duo .btn2{margin-top:0!important}
+#acct.in .acctbtns{display:none}
+.links{margin-top:8px;padding-top:4px;gap:0 12px;font-size:11px;letter-spacing:.06em}.links a{min-height:34px}
+.brandrow .shop{display:inline-flex!important}
+.brandrow{justify-content:space-between!important}
+@media (min-width:721px) and (min-height:761px){
+  .mbody{padding:14px 24px 12px}
+  h1{font-size:clamp(36px,3.4vw,46px);margin-top:4px;line-height:.9}
+  .tag{margin-top:6px;font-size:12px}
+  .brandrow .logo{width:48px;height:48px;margin:-2px 0 -2px -2px}
+  .facts{margin-top:10px}.facts div{padding:6px 0}.facts b{font-size:21px}
+  .mapRow{margin-top:10px}#miniMap{width:104px;height:104px}
+  #startBtn{padding:13px 20px;font-size:22px;margin-top:12px}
+  .duo{margin-top:8px}.duo .btn2{padding:10px 8px;font-size:14px}
+  .best{margin-top:8px;font-size:13px}#menuGhostRow{margin-top:3px}#menuStreak{margin-top:2px}#acct{margin-top:6px}
+  .prize{margin-top:8px;padding:8px 12px;font-size:14px}
+}
+/* wide but short windows (most laptops): two columns so nothing needs scrolling; the car stays visible on the right */
+@media (min-width:721px) and (min-height:561px) and (max-height:760px){
+  #menu{justify-content:flex-start}
+  .mcard{width:min(780px,66vw);margin-left:clamp(12px,4vw,64px);margin-right:auto;max-height:calc(100% - 16px)}
+  .mbody{padding:12px 20px 8px}
+  .mcols{display:flex;gap:22px;align-items:flex-start}.mcol{flex:1;min-width:0}
+  h1{font-size:38px;margin-top:2px;line-height:.9}
+  .tag{margin-top:6px;font-size:12px}
+  .brandrow .logo{width:46px;height:46px;margin:-2px 0 -2px -2px}
+  .facts{margin-top:10px}.facts div{padding:6px 0}.facts b{font-size:20px}
+  .mapRow{margin-top:10px}#miniMap{width:96px;height:96px}
+  #startBtn{padding:12px 18px;font-size:21px;margin-top:0}
+  .duo{margin-top:8px}.duo .btn2{padding:10px 8px;font-size:14px}
+  .best{margin-top:8px;font-size:13px}#menuGhostRow{margin-top:3px}#menuStreak{margin-top:2px}#acct{margin-top:6px}
+  .prize{margin-top:8px;padding:8px 12px;font-size:14px}
+}
+
+/* small portrait phones: drop the map thumbnail (name and stats stay) and tighten spacing */
+@media (max-width:720px) and (orientation:portrait) and (max-height:760px){
+  #miniMap{display:none}
+  .mbody{padding:10px 16px 8px}
+  .brandrow .logo{width:40px;height:40px}
+  h1{font-size:30px;margin-top:2px}
+  .facts{margin-top:6px}.facts div{padding:4px 0}.facts b{font-size:18px}
+  .mapRow{margin-top:6px}.course .name{font-size:17px}
+  #startBtn{padding:10px 14px;font-size:20px;margin-top:8px}
+  .duo{margin-top:6px;gap:6px}.duo .btn2{padding:8px 8px;font-size:14px;min-height:44px}
+  .best,#menuGhost,#menuStreak,#acct{font-size:12px}.best{margin-top:6px}
+  .prize{margin-top:6px;padding:6px 10px;font-size:13px}
+  .links{margin-top:4px;padding-top:2px;gap:0 10px}.links a{min-height:34px}
+}
+/* short landscape screens (phones on their side): everything tightened, thumbnail dropped */
+@media (orientation:landscape) and (max-height:440px){
+  #miniMap{display:none}
+  .mbody{padding:8px 14px 4px}.mcols{gap:14px}
+  .brandrow .logo{width:34px;height:34px;margin:0}
+  h1{font-size:24px;margin-top:0}
+  .facts{margin-top:4px}.facts div{padding:3px 0}.facts b{font-size:16px}.facts small{font-size:10px}
+  .mapRow{margin-top:4px}.course .name{font-size:15px}.course .sub{font-size:11px}
+  #startBtn{padding:8px 12px;font-size:18px}
+  .btn2{padding:6px 8px;font-size:13px}.duo{margin-top:5px;gap:5px}.duo .btn2{min-height:40px}
+  .best,#menuGhost,#menuStreak,#acct{font-size:11px;margin-top:2px}#menuGhostRow{margin-top:2px}
+  .prize{margin-top:5px;padding:5px 8px;font-size:12px}
+  .links{margin-top:2px;padding-top:0;gap:0 10px;font-size:10px}.links a{min-height:30px}
+}
+@media (orientation:landscape) and (max-height:360px){ .prize{display:none} }
+@media (orientation:landscape) and (max-height:360px){ .mbody{padding:6px 12px 0}.facts div{padding:2px 0}.links a{min-height:26px}.duo .btn2{min-height:38px}#startBtn{padding:7px 12px} }
+@media (orientation:landscape) and (max-height:340px){ .brandrow{display:none}.facts small{display:none}.facts b{font-size:15px}h1{font-size:22px}.mapRow{margin-top:2px}.course .sub{display:none}.best{margin-top:2px}#menuGhostRow{display:none}.links a{min-height:24px} }
+@media (orientation:landscape) and (max-height:340px){ #acct{display:none} }   /* the account icon in the top bar logs in */
 </style>
 </head>
 <body>
 <canvas id="gl" aria-label="TGK Daily Race 3D view"></canvas>
 
 <section id="menu" aria-label="Today’s race">
+  <div id="topbar" role="toolbar" aria-label="Game menu">
+    <button type="button" id="tbFull" aria-label="Fullscreen" title="Fullscreen" style="display:none"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button type="button" id="tbHelp" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01"/></svg></button>
+    <button type="button" id="tbSettings" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    <button type="button" id="tbAcct" aria-label="Account" title="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+  </div>
   <div class="mcard">
     <div class="check" aria-hidden="true"></div>
     <div class="mbody">
@@ -410,19 +515,20 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
         <div class="mapRow"><canvas id="miniMap" width="192" height="192" aria-label="Map of today’s track"></canvas><div class="course"><div class="name" id="trackName">&nbsp;</div><div class="sub" id="trackMeta"></div><div class="seed" id="trackSeed"></div></div></div>
 </div>
 <div class="mcol">
+        <div id="pastBar" class="hidden"><span id="pastText"></span><button type="button" id="pastBack">Back to today</button></div>
         <button id="startBtn" type="button">Race now</button>
-        <div class="duo"><button type="button" class="btn2" id="garageBtn">Garage</button><a class="btn2" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
-        <button type="button" class="btn2" id="allBtn">Show all races today</button>
+        <div class="duo"><button type="button" class="btn2" id="garageBtn">Garage</button><button type="button" class="btn2" id="pastBtn">Past races</button></div>
+        <div class="duo"><button type="button" class="btn2" id="allBtn">All races today</button><button type="button" class="btn2" id="lbBtn">Leaderboard</button></div>
         <div class="best" id="menuBest"></div>
         <div id="menuGhostRow"><span id="menuGhost"></span> <button type="button" class="linkbtn" id="ghostClear" style="display:none">Use my own</button></div>
         <div id="menuStreak"></div>
         <div id="acct"><span id="acctText"></span><span class="acctbtns"><button type="button" class="btn2" id="acctRename" style="display:none">Change name</button><button type="button" class="btn2" id="acctBtn"></button></span></div>
-        <button type="button" class="btn2" id="lbBtn">Today's leaderboard</button>
         <div class="prize">WIN TODAY. GET 5% OFF TGK PRODUCTS.<small>The fastest verified finisher each day earns the code.</small></div>
 </div>
 </div>
         <div class="legend"><span><kbd>W</kbd><kbd>↑</kbd> throttle</span><span><kbd>A</kbd><kbd>D</kbd> steer</span><span><kbd>Space</kbd> handbrake</span><span><kbd>R</kbd> recover</span><span><kbd>F</kbd> restart</span><span><kbd>C</kbd> camera</span></div>
-        <div class="foot"><span>Drag the scene to look around.</span><label>Sound <select id="sndMenu" aria-label="Sound volume"><option value="off">Off</option><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select></label> <label>Graphics <select id="qMenu" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label></div>
+        <div class="foot"><span>Drag the scene to look around.</span></div>
+        <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#about">About</a><a href="#support">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></nav>
       </div>
       <div id="garageView" class="hidden">
         <div class="paint-head"><b>Garage</b><span id="paintName"></span></div>
@@ -448,7 +554,7 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
     <small>CHECKPOINT</small><div class="row2"><div id="ckBar"></div><div id="hudCk">0</div></div>
     <small>GEAR</small><div class="row2" style="margin-bottom:0"><div id="gearFill"></div><div id="hudGear">1</div></div>
   </div>
-  <div class="box speedbox"><small>SPEED</small><span id="hudSpeed">0</span><em>MPH</em><div class="dmg" id="dmgBox"><i id="dmgFill"></i></div><span class="dmgl">DAMAGE</span></div>
+  <div class="box speedbox"><small>SPEED</small><span id="hudSpeed">0</span><em id="hudUnit">MPH</em><div class="dmg" id="dmgBox"><i id="dmgFill"></i></div><span class="dmgl">DAMAGE</span></div>
   <div class="touch-ui">
     <div class="tp" id="tL" data-bit="4" role="button" aria-label="Steer left">&#9664;</div>
     <div class="tp" id="tR" data-bit="8" role="button" aria-label="Steer right">&#9654;</div>
@@ -500,9 +606,39 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
     <div class="btnrow"><button type="button" id="nameSave">Save name</button><button type="button" class="btn2" id="nameCancel">Later</button></div>
   </div></div>
 </section>
+<section id="infoSheet" class="sheet hidden" role="dialog" aria-labelledby="infoTitle">
+  <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <h2 id="infoTitle"></h2><div id="infoBody"></div>
+    <div class="btnrow"><button type="button" class="btn2" id="infoClose">Close</button></div>
+  </div></div>
+</section>
+<section id="settingsSheet" class="sheet hidden" role="dialog" aria-label="Settings">
+  <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <h2>Settings</h2>
+    <div class="srow" id="setAcctRow"><span id="setAcctText"></span><button type="button" class="btn2" id="setName" style="display:none">Name</button><button type="button" class="btn2" id="setLogin"></button></div>
+    <div class="srow"><span>Sound</span><select id="sndMenu" aria-label="Sound volume"><option value="off">Off</option><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select></div>
+    <div class="srow"><span>Graphics</span><select id="qMenu" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+    <div class="srow"><span>Speed unit</span><select id="unitsSel" aria-label="Speed unit"><option value="mph">mph</option><option value="kmh">km/h</option></select></div>
+    <div class="srow"><span>Camera shake</span><select id="shakeSel" aria-label="Camera shake"><option value="1">On</option><option value="0">Off</option></select></div>
+    <div class="srow" id="hapticRow"><span>Vibration</span><select id="hapticSel" aria-label="Vibration"><option value="1">On</option><option value="0">Off</option></select></div>
+    <div class="srow"><span>Ghost</span><select id="setGhost" aria-label="Ghost"><option value="1">On</option><option value="0">Off</option></select></div>
+    <div class="srow"><span>Fast restart (1 s lights)</span><select id="setQuick" aria-label="Fast restart"><option value="1">On</option><option value="0">Off</option></select></div>
+    <div class="srow" id="fullRow" style="display:none"><span>Fullscreen</span><button type="button" class="btn2" id="setFull">Toggle</button></div>
+    <div class="srow"><span>Saved times and settings on this device</span><button type="button" class="btn2" id="setReset">Erase</button></div>
+    <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a><a href="#support">Support</a></nav>
+    <div class="btnrow"><button type="button" class="btn2" id="setClose">Close</button></div>
+  </div></div>
+</section>
+<section id="pastSheet" class="sheet hidden" role="dialog" aria-label="Past races">
+  <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <h2>Past races</h2><div class="meta">Practice on a recent course. Only today's race counts for the leaderboard and the prize. Tap a day to play it.</div>
+    <ol id="pastList"></ol>
+    <div class="btnrow"><button type="button" class="btn2" id="pastClose">Close</button></div>
+  </div></div>
+</section>
 <section id="lb" class="sheet hidden" aria-label="Today's leaderboard">
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
-    <h2>Today's leaderboard</h2><div id="lbSub" class="meta"></div><ol id="lbList"></ol><div id="lbHint"></div>
+    <h2 id="lbTitle">Today's leaderboard</h2><div id="lbSub" class="meta"></div><ol id="lbList"></ol><div id="lbHint"></div>
     <div class="btnrow"><button type="button" class="btn2" id="lbClose">Close</button></div>
   </div></div>
 </section>
@@ -510,7 +646,8 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
     <h2>Paused</h2>
     <div class="btnrow"><button type="button" class="btn2" id="resumeBtn">Resume</button><button type="button" class="btn2" id="pRestart">Restart</button></div>
-    <div class="btnrow"><button type="button" class="btn2" id="pCam">Change camera</button><button type="button" class="btn2" id="pMenu">Quit to menu</button></div>
+    <div class="btnrow"><button type="button" class="btn2" id="pCam">Change camera</button><button type="button" class="btn2" id="pSettings">Settings</button></div>
+    <div class="btnrow"><button type="button" class="btn2" id="pMenu">Quit to menu</button></div>
     <div class="row"><span>Ghost of your best run</span><select id="ghostSel" aria-label="Ghost"><option value="1">On</option><option value="0">Off</option></select></div>
     <div class="row"><span>Fast restart (1 s lights)</span><select id="quickSel" aria-label="Fast restart"><option value="1">On</option><option value="0">Off</option></select></div>
     <div class="row"><span>Sound</span><select id="sndSel" aria-label="Sound volume"><option value="off">Off</option><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select></div>
@@ -528,7 +665,10 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
   "authorizeUrl": "https://account.tgkmotorsports.com/authentication/oauth/authorize",
   "clientId": "149d201c-ef2a-40a6-bb71-cb8e0915eef3",
   "redirectUri": "https://race.tgkmotorsport.com/",
-  "scope": "openid email"
+  "scope": "openid email",
+  "supportEmail": "",
+  "supportUrl": "",
+  "launchDate": ""
 };</script>
 <script>
 /* TGK DAILY RACE - simulation core
@@ -3255,6 +3395,106 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
 
 </script>
 <script>
+/* TGK DAILY RACE - help, rules and legal pages.
+ * Plain text kept apart from the game code so it can be read, reviewed (by a lawyer, for Terms / Privacy / Prize rules) and edited on its own.
+ * Each page is { title, html(cfg) }. The HTML is static; the only dynamic values are the support address / link from TGK_CONFIG, validated below.
+ * These are DRAFTS written to match what the game actually does today. Have them reviewed before launching a prize. */
+var TGKPages = (function () {
+  'use strict';
+  var UPDATED = 'November 25, 2026';
+  function mail(cfg) { var m = cfg && cfg.supportEmail; return (typeof m === 'string' && /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(m)) ? m : ''; }
+  function url(cfg) { var u = cfg && cfg.supportUrl; return (typeof u === 'string' && /^https:\/\/[^\s"'<>]+$/.test(u)) ? u : 'https://tgkmotorsport.com'; }
+  function contact(cfg) {
+    var m = mail(cfg), u = url(cfg);
+    return '<a href="' + u + '" target="_blank" rel="noopener">' + (u === 'https://tgkmotorsport.com' ? 'tgkmotorsport.com' : 'our support page') + '</a>' + (m ? ' or <a href="mailto:' + m + '">' + m + '</a>' : '');
+  }
+  var stamp = '<p class="upd">Last updated ' + UPDATED + '</p>';
+
+  var how = { title: 'How to play', html: function () { return '' +
+    '<h3>The idea</h3><p>Every day at midnight (Chicago time) there is one new track. Everyone races the same course in the same car. Drive through every gate in order and cross the finish line. The fastest verified time of the day wins the prize.</p>' +
+    '<h3>Controls</h3><ul>' +
+    '<li><b>Keyboard:</b> <kbd>W</kbd> or <kbd>&uarr;</kbd> gas &middot; <kbd>S</kbd> or <kbd>&darr;</kbd> brake and reverse &middot; <kbd>A</kbd> <kbd>D</kbd> or <kbd>&larr;</kbd> <kbd>&rarr;</kbd> steer &middot; <kbd>Space</kbd> handbrake &middot; <kbd>R</kbd> recover &middot; <kbd>F</kbd>, <kbd>Backspace</kbd> or <kbd>Enter</kbd> restart &middot; <kbd>C</kbd> camera &middot; <kbd>Esc</kbd> pause &middot; <kbd>M</kbd> sound</li>' +
+    '<li><b>Touch:</b> the arrows steer, GAS and BRAKE (hold BRAKE to reverse), HANDBRAKE, the camera button and RESET.</li></ul>' +
+    '<h3>Racing tips</h3><ul>' +
+    '<li>The car can roll if you slide and steer the wrong way. Steer into the slide and ease off the gas.</li>' +
+    '<li>Trees and rocks damage the car. Water drags you down and can sink you.</li>' +
+    '<li>Look for hidden rock jumps. A ramp can skip a whole stretch of road and save seconds, but you still have to land on the road.</li>' +
+    '<li>Your ghost shows your best run (a par lap on your first run). Gate splits show how you compare with it.</li></ul>' +
+    '<h3>Practice and ranked</h3><p>Anyone can practice as often as they like. To appear on the leaderboard and be eligible for the daily prize, log in with your TGK customer account. Only your best run of the day counts, and every run is checked before it is ranked (see Fair play).</p>' +
+    '<h3>Watch and race other drivers</h3><p>Tap a name on the leaderboard to watch that run or race their ghost. <b>Show all races today</b> replays every verified run of the day at once.</p>' +
+    '<h3>Past races</h3><p>You can practice on recent courses from <b>Past races</b>. Only today\'s race counts for the leaderboard and the prize.</p>'; } };
+
+  var fair = { title: 'Fair play', html: function (cfg) { return '' +
+    '<h3>Same car, same rules</h3><p>Every driver has the identical car with the same grip, power, weight and handling. Paint, decals and accessories are cosmetic only and never change how the car drives.</p>' +
+    '<h3>Your time is never taken on trust</h3><p>When you finish a ranked run, the game sends the controls you pressed, not your time. Our server replays those controls on the same course and only accepts the run if it produces exactly the time you claim. A time cannot be edited, and a run cannot be faked without driving it.</p>' +
+    '<h3>What is not allowed</h3><ul>' +
+    '<li>Bots, macros, scripts, input injection or any tool that drives for you, and inputs no human could press.</li>' +
+    '<li>Modified game files, tampered requests, or any attempt to submit a run that was not driven on the course of the day.</li>' +
+    '<li>Using more than one account to collect the prize, or letting someone else use your account to win it.</li>' +
+    '<li>Racer names that are offensive or that impersonate TGK or other people.</li></ul>' +
+    '<h3>What happens if you cheat</h3><p>Runs that fail the check are rejected. Accounts that try to cheat can be removed from the leaderboards or banned, and prizes can be withheld. Some runs are held for a manual review before they appear. Decisions about rankings and prizes are final.</p>' +
+    '<h3>Report a problem</h3><p>If you think a result is not legitimate, or your own run was wrongly rejected, contact us at ' + contact(cfg) + '.</p>' + stamp; } };
+
+  var rules = { title: 'Daily prize rules', html: function (cfg) { return '' +
+    '<p><b>Sponsor:</b> TGK Motorsport ("TGK"). This is a contest of skill. No purchase is necessary to enter or to win.</p>' +
+    '<h3>How to enter</h3><p>Log in to the game with a free TGK customer account and complete a ranked run of the daily course. Practice runs, and runs on past races, do not count.</p>' +
+    '<h3>The daily winner</h3><p>Each day runs from midnight to midnight Chicago time. The eligible player with the fastest verified time for that day is the winner. If two players have exactly the same time, the one who posted it first wins. Only verified runs count (see Fair play).</p>' +
+    '<h3>The prize</h3><p>The prize is a one-time code for 5% off TGK products, valid for 7 days after it is issued. It has no cash value, cannot be sold or transferred, and may be subject to exclusions that are shown with the code.</p>' +
+    '<h3>How winners are confirmed</h3><p>Every winning run is held for review before a prize is issued. After approval, the code is sent to the email address on the winner\'s TGK customer account. If TGK cannot confirm a win, or the winner cannot be reached, TGK may select the next eligible player.</p>' +
+    '<h3>Eligibility</h3><p>You must be at least 18 years old (or the age of majority where you live), or have a parent or guardian\'s permission to accept the prize, and have a TGK customer account in good standing. TGK employees and their immediate families are not eligible. Void where prohibited by law.</p>' +
+    '<h3>Disqualification and changes</h3><p>TGK may disqualify anyone who cheats, tampers with the game or breaks these rules, and may modify, suspend or end the contest at any time if it cannot run as intended.</p>' +
+    '<h3>Questions</h3><p>Contact ' + contact(cfg) + '.</p>' + stamp; } };
+
+  var terms = { title: 'Terms of use', html: function (cfg) { return '' +
+    '<p>These terms apply to TGK Daily Race (the "Game"), provided by TGK Motorsport ("TGK", "we"). By playing you agree to them. If you do not agree, please do not use the Game.</p>' +
+    '<h3>Who can play</h3><p>You must be at least 13 years old. If you are under the age of majority where you live, you should have a parent or guardian\'s permission. Prize eligibility has extra conditions, set out in the Daily prize rules.</p>' +
+    '<h3>Accounts</h3><p>You can practice without an account. To be ranked you log in with your TGK customer account through Shopify. You are responsible for activity on your account and for keeping your login secure.</p>' +
+    '<h3>Acceptable use</h3><p>Play fairly (see Fair play). Do not cheat, interfere with the Game or its servers, scrape or overload the service, reverse engineer it to gain an unfair advantage, or use it for anything unlawful.</p>' +
+    '<h3>Your content</h3><p>Your racer name, and any decals or designs you create, may be shown to other players, for example on leaderboards and in replays. You keep ownership, and you give TGK permission to display them in the Game. You must not use content that is offensive, unlawful, or that you do not have the right to use. We may remove content and change names that break these terms.</p>' +
+    '<h3>Our property</h3><p>The Game, the TGK name, logos and artwork belong to TGK or its licensors. You may play the Game, but may not copy or sell it or use TGK\'s marks except as the Game allows.</p>' +
+    '<h3>Rankings, prizes and removal</h3><p>Rankings and prizes are decided as described in Fair play and the Daily prize rules. We may remove runs, reset rankings, suspend or end accounts, or change or stop the Game or any feature at any time, particularly to deal with cheating or technical problems.</p>' +
+    '<h3>No warranty</h3><p>The Game is provided "as is" and "as available". We do not promise it will be uninterrupted or error free, or that your device will run it well.</p>' +
+    '<h3>Limit of liability</h3><p>To the extent the law allows, TGK is not liable for indirect or consequential losses arising from your use of the Game, and our total liability for any claim relating to the Game is limited to US $50. Nothing here limits liability that cannot be limited by law.</p>' +
+    '<h3>Changes and law</h3><p>We may update these terms; using the Game after a change means you accept it. These terms are governed by the laws of the state where TGK Motorsport is based, without regard to conflict-of-law rules.</p>' +
+    '<h3>Contact</h3><p>' + contact(cfg) + '.</p>' + stamp; } };
+
+  var privacy = { title: 'Privacy', html: function (cfg) { return '' +
+    '<p>This explains what TGK Daily Race collects and why. We do not sell your data and we do not use advertising or tracking cookies.</p>' +
+    '<h3>If you only practice</h3><p>Nothing is sent to our servers. Your times, settings and garage are saved in your browser (local storage) on your device. You can erase them from Settings.</p>' +
+    '<h3>If you log in</h3><ul>' +
+    '<li><b>From Shopify:</b> a private identifier for your customer account and, if you have one on your account, your first name (used only as your starting racer name). The login asks for permission to see your email, but the Game\'s database does <b>not</b> store your email address.</li>' +
+    '<li><b>Your racer name</b> is public. It appears on leaderboards and with your replays.</li>' +
+    '<li><b>Your ranked runs:</b> the controls you pressed, your final time, the date, your car colour and whether the run passed verification. Other players can replay a verified run. We also keep a log of attempts (your account, time and outcome) to prevent abuse.</li>' +
+    '<li><b>Prizes:</b> if you win, TGK uses the email address already on your TGK customer account to send the code.</li>' +
+    '<li>Your login session is kept only for the open browser tab and for a limited time.</li></ul>' +
+    '<h3>Technical data</h3><p>Like any website, the services that host the Game receive your IP address and browser details when you connect. We use this for security and to prevent abuse.</p>' +
+    '<h3>Who else is involved</h3><ul><li>Shopify handles your TGK account login.</li><li>Supabase stores the leaderboard data.</li><li>GitHub Pages hosts the Game.</li><li>Google Fonts and cdnjs (Cloudflare) deliver a font and a 3D library, so they see your IP address when the page loads.</li></ul>' +
+    '<h3>How long we keep it</h3><p>Ranked runs and leaderboard history are kept so that past races, ghosts and winners can be shown. You can ask us to delete your data or your account at any time.</p>' +
+    '<h3>Your choices</h3><p>You can ask to see, correct or delete the data we hold about you by contacting ' + contact(cfg) + '. If you are in a region with specific privacy rights (such as the EU, the UK or California), you have the rights the law gives you.</p>' +
+    '<h3>Children</h3><p>The Game is not meant for children under 13, and we do not knowingly collect their data.</p>' +
+    '<h3>Changes</h3><p>If we change what we collect we will update this page.</p>' + stamp; } };
+
+  var about = { title: 'About', html: function (cfg) { return '' +
+    '<h3>TGK Motorsport</h3><p>TGK Motorsport builds performance parts for European cars, with a focus on Audi, VW and BMW. TGK Daily Race is our way of saying thanks to the people who drive them: one track a day, one winner a day.</p>' +
+    '<p><a href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></p>' +
+    '<h3>The game</h3><p>The Game runs entirely in your browser. Every driver has the same car and the same physics, so it comes down to your driving. Ranked times are checked by replaying your controls on our server.</p>' +
+    '<p>Questions or feedback? ' + contact(cfg) + '.</p>'; } };
+
+  var support = { title: 'Support', html: function (cfg) { return '' +
+    '<h3>Get help</h3><p>Contact TGK at ' + contact(cfg) + '. Tell us what you were doing and what device and browser you use.</p>' +
+    '<h3>Common questions</h3>' +
+    '<p><b>I can\'t log in.</b> Use the same email as your TGK customer account. If you have never bought from TGK you can still create a free account at tgkmotorsport.com. If login fails, try again in a new tab.</p>' +
+    '<p><b>My time is not on the leaderboard.</b> Only runs made while you are logged in on today\'s race count. A run can be held briefly for review. Past races are practice only.</p>' +
+    '<p><b>My run was rejected.</b> The server replays your controls and must get exactly your time. A rejected run usually means the game was modified or the connection altered the data. Reload and run again.</p>' +
+    '<p><b>Can I change my racer name?</b> Yes, once every 24 hours, from Settings or the account button. Names must be 2 to 16 letters, numbers or spaces and unique.</p>' +
+    '<p><b>There is no sound.</b> Check Settings, the M key, and (on iPhone) the silent switch.</p>' +
+    '<p><b>Report a cheater or delete my data.</b> Contact us using the details above.</p>'; } };
+
+  return { how: how, fair: fair, rules: rules, terms: terms, privacy: privacy, about: about, support: support, updated: UPDATED };
+})();
+
+</script>
+<script>
 /* TGK DAILY RACE - game client (Phase 2: driving engine, practice mode) */
 (function () {
   'use strict';
@@ -3344,8 +3584,9 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   }
 
   /* ---------------- daily track ---------------- */
-  function loadDaily() {
-    raceDate = C.chicagoDate(Date.now());
+  var pastDate = null;      // set while practising an old course: practice only, never ranked, never counts toward the streak or the prize
+  function loadDaily(forDate) {
+    var todayD = C.chicagoDate(Date.now()); pastDate = (forDate && /^\d{4}-\d{2}-\d{2}$/.test(forDate) && forDate < todayD) ? forDate : null; raceDate = pastDate || todayD;
     var hint = parseInt(store.get('tgk.attempt.' + raceDate), 10);
     track = C.generateTrack(raceDate, hint > 0 ? { attempt: hint } : undefined);
     store.set('tgk.attempt.' + raceDate, String(track.attempt || 0));
@@ -3354,8 +3595,8 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
     $('trackName').textContent = track.name;
     $('trackMeta').textContent = (track.length / 1609.34).toFixed(2) + ' mi \u00b7 ' + track.checkpoints.length + ' gates \u00b7 ' + biomeLabel(track.biome) + (track.ramps.length ? ' \u00b7 ' + track.ramps.length + ' hidden shortcut' + (track.ramps.length > 1 ? 's' : '') : '');
     $('trackSeed').textContent = 'Seed ' + track.seedStr + (track.attempt ? ' (sub-seed ' + track.attempt + ')' : '');
-    var d = new Date(Date.now());
-    $('todayDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }).format(d).toUpperCase();
+    $('todayDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase();
+    renderPastUi();
     drawMiniMap();
     var pb = getPB(); $('menuBest').textContent = pb ? 'Your best today ' + C.fmtTime(pb) : 'No time set yet today'; renderStreak(); renderGhostLine();
   }
@@ -3465,6 +3706,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   }
   function clearViewOffset() { if (camera.view && camera.view.enabled) { camera.clearViewOffset(); camera.updateProjectionMatrix(); } }
   function updateCamera(dt, v) {
+    if (!shakeOn) cam.shake = 0;
     var speed = Math.hypot(sim.u, sim.v);
     if (state === 'menu') {
       if (!cam.drag) cam.az += dt * 0.25;
@@ -3548,7 +3790,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   function paintCkBar() { var k = $('ckBar').children; for (var i = 0; i < k.length; i++) k[i].classList.toggle('on', i < sim.nextCk); }
 
   function startRace(quick) {
-    if (C.chicagoDate(Date.now()) !== raceDate && state === 'menu') { loadDaily(); loadWorld(); }
+    if (!pastDate && C.chicagoDate(Date.now()) !== raceDate && state === 'menu') { loadDaily(); loadWorld(); }
     sim.cdTicks = (quick === true && store.get('tgk.quick') !== '0') ? 120 : C.COUNTDOWN_TICKS;
     sim.reset(); recorder.reset(); runGates = []; setupGhost(); var ghostMsg = null; if (ghost && quick !== true) ghostMsg = (ghost.ext ? 'Racing ' + ghost.name + '\'s ghost ' + C.fmtTime(ghost.trace.ms) : (ghost.par ? 'Racing the par ghost ' + C.fmtTime(ghost.trace.ms) : 'Racing your best ' + C.fmtTime(ghost.trace.ms))); $('delta').textContent = ''; $('split').classList.remove('on'); keyBits = keyBits & ~B.RECOVER; lastBits = 0;
     accum = 0; snapshot(); vis.pitch = vis.roll = vis.bob = vis.bobV = 0; vis.spin = 0;
@@ -3564,7 +3806,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   }
   function toMenu() {
     clearNotices(); state = 'menu'; sim.reset(); snapshot(); cam.init = false; keepAwake(false);
-    if (C.chicagoDate(Date.now()) !== raceDate) { loadDaily(); loadWorld(); sim.reset(); }
+    if (!pastDate && C.chicagoDate(Date.now()) !== raceDate) { loadDaily(); loadWorld(); sim.reset(); }
     W.updateGates(world, 0); repairCar();
     $('menu').classList.remove('hidden'); $('results').classList.add('hidden'); $('pause').classList.add('hidden'); $('hud').classList.add('hidden');
     document.body.classList.remove('racing');
@@ -3603,7 +3845,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
       else sp += '<span><em>' + lab + '</em>' + (gm / 1000).toFixed(2) + '</span>';
     });
     $('resSplits').innerHTML = sp;
-    markDay(); renderStreak();
+    if (!pastDate) markDay(); renderStreak();
     var st = [];
     if (sim.jumps) st.push(sim.jumps + (sim.jumps === 1 ? ' rock jump' : ' rock jumps') + ' (' + Math.round(sim.skipped) + ' m skipped)');
     var sk = streakInfo(); if (sk.n > 1) st.push(sk.n + '-day streak');
@@ -3653,6 +3895,121 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
                  grounded: gnd, offroad: sim.offroad, wet: sim.wet, slip: Math.max(lat, hbk, brk * 0.8, launch * 0.9), damage: sim.damage, warn: aL > 0.34 && sim.grounded, active: true });
   }
 
+  /* ---------------- help and legal pages, settings, top bar, past races ---------------- */
+  var CFGX = window.TGK_CONFIG || {};
+  var unitsKmh = store.get('tgk.units') === 'kmh', shakeOn = store.get('tgk.shake') !== '0', hapticsOn = store.get('tgk.haptics') !== '0';
+  var PAGE_IDS = ['how', 'fair', 'rules', 'terms', 'privacy', 'about', 'support'];
+  function dayLabel(d, long) { return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: long ? 'long' : 'short', month: 'short', day: 'numeric' }).format(new Date(d + 'T12:00:00Z')); }
+  function dayShort(d) { return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(d + 'T12:00:00Z')).toUpperCase(); }
+  function renderPastUi() {
+    var p = !!pastDate, lab = dayShort(raceDate);
+    $('pastBar').classList.toggle('hidden', !p); if (p) $('pastText').textContent = 'Past race \u00b7 ' + lab + ' \u00b7 practice only';
+    var pz = document.querySelector('.prize'); if (pz) pz.classList.toggle('hidden', p);
+    $('allBtn').textContent = p ? 'All races this day' : 'All races today';
+    $('lbTitle').textContent = p ? 'Leaderboard \u00b7 ' + lab : 'Today\'s leaderboard';
+  }
+  function openPage(id) {
+    var P = window.TGKPages && TGKPages[id]; if (!P || typeof P.html !== 'function') return;
+    $('infoTitle').textContent = P.title; $('infoBody').innerHTML = P.html(CFGX); $('infoBody').parentNode.scrollTop = 0;
+    $('settingsSheet').classList.add('hidden'); $('infoSheet').classList.remove('hidden');
+    try { if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id); } catch (e) { }
+  }
+  function closePage() { $('infoSheet').classList.add('hidden'); try { if (PAGE_IDS.indexOf(location.hash.slice(1)) >= 0) history.replaceState(null, '', location.pathname + location.search); } catch (e) { } }
+  function routeHash() {
+    var h = location.hash.slice(1);
+    if (PAGE_IDS.indexOf(h) >= 0) { if (state === 'menu' || state === 'results' || state === 'paused') openPage(h); }
+    else if (!$('infoSheet').classList.contains('hidden')) $('infoSheet').classList.add('hidden');
+  }
+  /* settings */
+  function syncSettingsUi() {
+    $('unitsSel').value = unitsKmh ? 'kmh' : 'mph'; $('shakeSel').value = shakeOn ? '1' : '0'; $('hapticSel').value = hapticsOn ? '1' : '0';
+    $('setGhost').value = store.get('tgk.ghost') === '0' ? '0' : '1'; $('setQuick').value = store.get('tgk.quick') === '0' ? '0' : '1';
+    $('hudUnit').textContent = unitsKmh ? 'KM/H' : 'MPH'; syncSoundUi(); $('qMenu').value = qName;
+    var onl = online.configured, li = loggedIn();
+    $('setAcctRow').style.display = onl ? '' : 'none';
+    $('setAcctText').textContent = li ? 'Signed in as ' + auth.name : 'Not logged in. Practice mode.';
+    $('setLogin').textContent = li ? 'Log out' : 'Log in'; $('setLogin').style.display = (li || online.canLogin) ? '' : 'none'; $('setName').style.display = li ? '' : 'none';
+    $('hapticRow').style.display = navigator.vibrate ? '' : 'none';
+  }
+  function openSettings() { syncSettingsUi(); $('infoSheet').classList.add('hidden'); $('settingsSheet').classList.remove('hidden'); $('settingsSheet').querySelector('.body').scrollTop = 0; }
+  function closeSettings() { $('settingsSheet').classList.add('hidden'); }
+  var fsOk = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  function toggleFull() { try { var el = document.documentElement; if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document); else (el.requestFullscreen || el.webkitRequestFullscreen).call(el); } catch (e) { } }
+  function eraseLocal() {
+    try { Object.keys(localStorage).filter(function (k) { return /^tgk\./.test(k); }).forEach(function (k) { localStorage.removeItem(k); }); } catch (e) { }
+    try { Object.keys(sessionStorage).filter(function (k) { return /^tgk\./.test(k); }).forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) { }
+    location.reload();
+  }
+  /* past races */
+  var pastCache = null;
+  function pastDays() {
+    var out = [], d = C.chicagoDate(Date.now()), min = /^\d{4}-\d{2}-\d{2}$/.test(CFGX.launchDate || '') ? CFGX.launchDate : null;
+    for (var i = 0; i < 30; i++) { d = prevDay(d); if (min && d < min) break; out.push(d); }
+    return out;
+  }
+  function fetchWinners(days) {
+    if (!online.configured || !days.length) return Promise.resolve({});
+    if (pastCache && Date.now() - pastCache.t < 60000) return Promise.resolve(pastCache.map);
+    return api('/rest/v1/rpc/past_winners', { method: 'POST', body: { p_from: days[days.length - 1], p_to: days[0] } }).then(function (r) {
+      var map = {}; if (r.status === 200 && Array.isArray(r.body)) r.body.forEach(function (w) { if (w && /^\d{4}-\d{2}-\d{2}$/.test(w.race_date) && Number.isInteger(w.ms)) map[w.race_date] = { name: String(w.display_name || 'Racer').slice(0, 24), ms: w.ms, id: String(w.run_id || ''), n: Number(w.racers) || 0 }; });
+      pastCache = { t: Date.now(), map: map }; return map;
+    }).catch(function () { return {}; });
+  }
+  function playDay(d, ghostId) {
+    $('pastSheet').classList.add('hidden');
+    var L = $('loading'), sp = L.querySelector('span'), old = sp.textContent; sp.textContent = 'Generating the course\u2026'; L.classList.remove('hidden');
+    setTimeout(function () {                                  // let the overlay paint first: building a course takes a moment
+      try { loadDaily(d); loadWorld(); sim.reset(); snapshot(); } finally { L.classList.add('hidden'); sp.textContent = old; }
+      if (ghostId) fetchRun(ghostId).then(function (run) {
+        if (buildGhostTrace(run).ms !== run.ms) throw new Error('does not replay');
+        ghostPick = run; store.set(pickKey(), JSON.stringify(run)); renderGhostLine(); toast('You will race ' + run.name + '\'s ghost ' + C.fmtTime(run.ms), true);
+      }).catch(function () { toast('Could not load that ghost'); });
+      else toast(pastDate ? 'Past race \u00b7 practice only' : 'Back to today');
+    }, 60);
+  }
+  function openPast() {
+    var days = pastDays(), list = $('pastList'); list.innerHTML = '';
+    if (!days.length) { var e = document.createElement('li'); e.className = 'empty'; e.textContent = 'Past races appear here after the first day.'; list.appendChild(e); }
+    var rows = days.map(function (d) {
+      var li = document.createElement('li'), ds = document.createElement('span'), w = document.createElement('span'); ds.className = 'd'; ds.textContent = dayLabel(d); w.className = 'w'; w.textContent = online.configured ? 'Loading\u2026' : 'Practice course';
+      li.appendChild(ds); li.appendChild(w); li._d = d; list.appendChild(li);
+      li.addEventListener('click', function (ev) {
+        if (ev.target.tagName === 'BUTTON') return; var was = li.classList.contains('open'); [].forEach.call(list.children, function (x) { x.classList.remove('open'); }); if (was) return;
+        var act = li.querySelector('.act'); if (act) act.parentNode.removeChild(act); act = document.createElement('div'); act.className = 'act';
+        var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn2 go'; b1.textContent = 'Race this day'; b1.addEventListener('click', function () { playDay(d); }); act.appendChild(b1);
+        if (li._w && li._w.id) { var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'btn2'; b2.textContent = 'Race the winner'; b2.addEventListener('click', function () { playDay(d, li._w.id); }); act.appendChild(b2); }
+        li.appendChild(act); li.classList.add('open');
+      });
+      return li;
+    });
+    $('pastSheet').classList.remove('hidden'); $('pastSheet').querySelector('.body').scrollTop = 0;
+    fetchWinners(days).then(function (map) { rows.forEach(function (li) { var x = map[li._d]; li._w = x || null; li.querySelector('.w').textContent = x ? x.name + ' \u00b7 ' + C.fmtTime(x.ms) + (x.n ? ' \u00b7 ' + x.n + (x.n === 1 ? ' racer' : ' racers') : '') : (online.configured ? 'No ranked runs' : 'Practice course'); }); });
+  }
+  function wirePages() {
+    window.addEventListener('hashchange', routeHash);
+    window.addEventListener('keydown', function (e) {           // Escape closes an open page or sheet before it does anything else
+      if (e.key !== 'Escape' && e.code !== 'Escape') return;
+      var open = ['infoSheet', 'settingsSheet', 'pastSheet'].filter(function (id) { return !$(id).classList.contains('hidden'); });
+      if (!open.length) return; e.stopImmediatePropagation(); e.preventDefault();
+      if (open.indexOf('infoSheet') >= 0) closePage(); $('settingsSheet').classList.add('hidden'); $('pastSheet').classList.add('hidden');
+    }, true);
+    $('infoClose').addEventListener('click', closePage); $('setClose').addEventListener('click', closeSettings); $('pastClose').addEventListener('click', function () { $('pastSheet').classList.add('hidden'); });
+    $('tbHelp').addEventListener('click', function () { openPage('how'); }); $('tbSettings').addEventListener('click', openSettings); $('tbAcct').addEventListener('click', openSettings);
+    $('pSettings').addEventListener('click', openSettings);
+    var pz = document.querySelector('.prize'); if (pz) pz.addEventListener('click', function () { openPage('rules'); });
+    $('pastBtn').addEventListener('click', openPast); $('pastBack').addEventListener('click', function () { playDay(C.chicagoDate(Date.now())); });
+    if (fsOk) { $('tbFull').style.display = ''; $('fullRow').style.display = ''; $('tbFull').addEventListener('click', toggleFull); $('setFull').addEventListener('click', toggleFull); }
+    $('unitsSel').addEventListener('change', function () { unitsKmh = $('unitsSel').value === 'kmh'; store.set('tgk.units', unitsKmh ? 'kmh' : 'mph'); hud.speed = null; $('hudUnit').textContent = unitsKmh ? 'KM/H' : 'MPH'; });
+    $('shakeSel').addEventListener('change', function () { shakeOn = $('shakeSel').value === '1'; store.set('tgk.shake', shakeOn ? '1' : '0'); });
+    $('hapticSel').addEventListener('change', function () { hapticsOn = $('hapticSel').value === '1'; store.set('tgk.haptics', hapticsOn ? '1' : '0'); if (hapticsOn) { try { navigator.vibrate && navigator.vibrate(20); } catch (e) { } } });
+    $('setGhost').addEventListener('change', function () { store.set('tgk.ghost', $('setGhost').value); $('ghostSel').value = $('setGhost').value; renderGhostLine(); });
+    $('setQuick').addEventListener('change', function () { store.set('tgk.quick', $('setQuick').value); $('quickSel').value = $('setQuick').value; });
+    $('setLogin').addEventListener('click', function () { closeSettings(); $('acctBtn').click(); }); $('setName').addEventListener('click', function () { closeSettings(); $('acctRename').click(); });
+    var armed = null; $('setReset').addEventListener('click', function () { if (armed) { clearTimeout(armed); armed = null; eraseLocal(); return; } $('setReset').textContent = 'Tap again to erase'; armed = setTimeout(function () { armed = null; $('setReset').textContent = 'Erase'; }, 4000); });
+    document.addEventListener('fullscreenchange', function () { $('tbFull').setAttribute('aria-pressed', String(!!document.fullscreenElement)); });
+    syncSettingsUi();
+  }
+
   function handleEvents(ev) {
     if (ev.go) { goFlash = 0.9; $('countdown').textContent = 'GO'; sfx('go'); if (pendingGhostToast) { toast(pendingGhostToast); pendingGhostToast = null; } }
     if (ev.ckpt) {
@@ -3669,7 +4026,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
     if (ev.launch) { cam.shake = Math.min(3, cam.shake + 0.6); sfx('launch'); }
     if (ev.jump > 0) { sfx('jump'); var jr = null; track.ramps.forEach(function (r) { if (!jr || Math.abs(track.S[r.j] - sim.s) < Math.abs(track.S[jr.j] - sim.s)) jr = r; }); jumpGainS = jr && jr.gain > 0 ? jr.gain : 0;
       toast('ROCK JUMP!  ' + Math.round(ev.jump) + ' m skipped' + (jumpGainS ? '  \u00b7  about ' + jumpGainS.toFixed(1) + ' s faster' : ''), true); cam.shake = Math.min(3, cam.shake + 1.2); }
-    if (ev.save) { sfx('save'); var big = ev.save > 0.45; toast(big ? 'SAVED IT!' : 'Caught it', big); cam.shake = Math.min(3, cam.shake + 0.5); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { } }
+    if (ev.save) { sfx('save'); var big = ev.save > 0.45; toast(big ? 'SAVED IT!' : 'Caught it', big); cam.shake = Math.min(3, cam.shake + 0.5); try { if (hapticsOn && navigator.vibrate) navigator.vibrate(30); } catch (e) { } }
     if (ev.drown) { cam.init = false; sfx('drown'); toast('Sunk! Back on the road'); }
     else if (ev.recovered) { cam.init = false; sfx('recover'); toast(ev.oob ? 'Out of bounds. Back on the road' : 'Back on track'); }
     if (ev.finished) { state = 'finishing'; finishAt = performance.now(); $('countdown').textContent = 'FINISH'; goFlash = 1.4; }
@@ -3677,7 +4034,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   function worldPt(lx, lz) { var s = Math.sin(sim.yaw), c = Math.cos(sim.yaw); return { x: sim.x + lx * c + lz * s, z: sim.z - lx * s + lz * c }; }
   function onCrash(mag) {
     cam.shake = Math.min(3.5, cam.shake + mag * 0.14);
-    try { if (navigator.vibrate && mag > 6) navigator.vibrate(Math.min(120, 20 + mag * 4)); } catch (e) { }
+    try { if (hapticsOn && navigator.vibrate && mag > 6) navigator.vibrate(Math.min(120, 20 + mag * 4)); } catch (e) { }
     var li = sim.lastImpact, p = li ? worldPt(li.x, li.z) : { x: sim.x, z: sim.z }, sx = Math.sin(sim.yaw), cz = Math.cos(sim.yaw), vx = sim.u * sx, vz = sim.u * cz;
     if (FX && mag > 3) {
       var n = Math.min(26, 5 + Math.round(mag * 1.1)); for (var i = 0; i < n; i++) FX.smoke.emit(p.x, sim.y + 0.4 + Math.random() * 0.5, p.z, vx * 0.3, vz * 0.3, 1, 'spark');
@@ -3718,8 +4075,8 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
     if (t !== hud.t) { $('hudTime').textContent = t; hud.t = t; }
     var gd = ghostDelta(), gtxt2 = gd === null ? '' : fmtDelta(gd);
     if (gtxt2 !== hud.delta) { var de = $('delta'); de.textContent = gtxt2; de.className = gd === null ? '' : (gd <= 0 ? 'good' : 'bad'); hud.delta = gtxt2; }
-    var mph = Math.round(sim.speedMph());
-    if (mph !== hud.speed) { $('hudSpeed').textContent = mph; hud.speed = mph; }
+    var mph = Math.round(sim.speedMph()), shownSpd = unitsKmh ? Math.round(sim.speedMph() * 1.609344) : mph;
+    if (shownSpd !== hud.speed) { $('hudSpeed').textContent = shownSpd; hud.speed = shownSpd; }
     var gi = 1; while (gi < 6 && mph >= GEARS[gi]) gi++;
     var gtxt = sim.u < -0.5 ? 'R' : String(gi);
     if (gtxt !== hud.gear) { $('hudGear').textContent = gtxt; hud.gear = gtxt; }
@@ -3923,7 +4280,9 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   }
   function setBeaconText(sp, txt) {
     var cv = sp.material.map.image, cx = cv.getContext && cv.getContext('2d'); if (!cx) return;
-    cx.clearRect(0, 0, 128, 64); cx.fillStyle = 'rgba(0,0,0,.55)'; cx.fillRect(8, 6, 112, 36); cx.fillStyle = '#5fd6cf'; cx.font = '700 26px Arial,sans-serif'; cx.textAlign = 'center'; cx.fillText(txt, 64, 33);
+    cx.clearRect(0, 0, 128, 64); cx.fillStyle = 'rgba(0,0,0,.55)'; cx.fillRect(8, 6, 112, 36); cx.fillStyle = '#5fd6cf'; var fsz = 26; cx.font = '700 26px Arial,sans-serif'; cx.textAlign = 'center';
+    while (fsz > 9 && cx.measureText(txt).width > 100) { fsz--; cx.font = '700 ' + fsz + 'px Arial,sans-serif'; }       // long driver names shrink to fit the label instead of being cut off
+    cx.fillText(txt, 64, 33);
     cx.beginPath(); cx.moveTo(52, 44); cx.lineTo(76, 44); cx.lineTo(64, 60); cx.closePath(); cx.fill(); sp.material.map.needsUpdate = true;
   }
   function stepGhost() {
@@ -3960,8 +4319,8 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   function prevDay(d) { var t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() - 1); return t.toISOString().slice(0, 10); }
   function markDay() { var a = loadDays(); if (a.indexOf(raceDate) < 0) { a.push(raceDate); store.set('tgk.days', JSON.stringify(a.slice(-90))); } }
   function streakInfo() {
-    var set = {}; loadDays().forEach(function (d) { set[d] = 1; }); if (loadRuns().length) set[raceDate] = 1;
-    var d = raceDate, n = 0, today = !!set[d]; if (!today) d = prevDay(d); while (set[d] && n < 400) { n++; d = prevDay(d); }
+    var base = C.chicagoDate(Date.now()), set = {}; loadDays().forEach(function (d) { set[d] = 1; }); if (!pastDate && loadRuns().length) set[base] = 1;
+    var d = base, n = 0, today = !!set[d]; if (!today) d = prevDay(d); while (set[d] && n < 400) { n++; d = prevDay(d); }
     return { n: n, today: today };
   }
   function renderGhostLine() { $('ghostClear').style.display = ghostPick ? '' : 'none'; $('ghostClear').onclick = function () { clearPick(false); }; var t = ghostMenuLine() + (persisted ? '' : ' \u00b7 this view cannot save between visits'); $('menuGhost').textContent = t; }
@@ -4089,6 +4448,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   function isPosted(run) { try { return (JSON.parse(store.get(postedKey()) || '[]')).indexOf(run.t) >= 0; } catch (e) { return false; } }
   function markPosted(run) { var a = []; try { a = JSON.parse(store.get(postedKey()) || '[]'); } catch (e) { } if (a.indexOf(run.t) < 0) a.push(run.t); store.set(postedKey(), JSON.stringify(a.slice(-30))); }
   function submitOnline(run) {
+    if (pastDate) return Promise.resolve({ status: 'error', reason: 'Past races are practice only' });
     var payload = submissionFor(run);
     return api('/functions/v1/submit-run', { method: 'POST', token: auth.token, body: payload }).then(function (r) {
       var b = r.body || {};
@@ -4099,12 +4459,14 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   }
   /** after logging in: post today's best practice run (the server re-drives its inputs, so when it was recorded does not matter) */
   function postBest() {
+    if (pastDate) return Promise.resolve();
     var run = bestRun(); if (!run || isPosted(run)) return Promise.resolve(false);
     return submitOnline(run).then(function (b) { if (b.status === 'verified') toast('Posted your best run: #' + b.rank + ' today', true); else if (b.status === 'review') toast('Your run is being checked'); else if (b.reason) toast(b.reason); return true; }).catch(function () { toast('Could not reach the leaderboard'); return false; });
   }
   var resRun = null;
   function renderResultsRank(run) {
     resRun = run; var el = $('resRank'), btn = $('resAction'); btn.style.display = 'none'; btn.onclick = null; el.className = '';
+    if (pastDate) { el.textContent = 'Past race: practice only. Only today\'s race counts for the leaderboard and the prize.'; el.className = 'prac'; return; }
     if (!online.configured) { el.textContent = 'Practice run. The online leaderboard opens soon.'; return; }
     if (!loggedIn()) {
       el.textContent = 'Practice run. Log in with your TGK account to put this time on the leaderboard.'; el.className = 'prac';
@@ -4186,10 +4548,10 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
     }).catch(function () { toast('Could not reach the server'); });
   }
   function renderAccount() {
-    var t = $('acctText'), b = $('acctBtn'), badge = $('modeBadge');
+    var t = $('acctText'), b = $('acctBtn'), badge = $('modeBadge'); $('acct').classList.toggle('in', online.configured && loggedIn());       // logged in: the buttons live in Settings, the menu keeps one line
     if (!online.configured) { t.textContent = 'Practice mode. The online leaderboard opens soon.'; b.style.display = 'none'; }
     else if (loggedIn()) { t.textContent = 'Signed in as ' + auth.name + '. Your runs qualify.'; b.textContent = 'Log out'; b.style.display = ''; b.onclick = logout; }
-    else { t.textContent = 'Practice mode. Log in with your TGK account to qualify for the leaderboard.'; b.textContent = 'Log in'; b.style.display = online.canLogin ? '' : 'none'; b.onclick = function () { startLogin(false); }; }
+    else { t.textContent = 'Practice mode. Log in to qualify for the leaderboard.'; b.textContent = 'Log in'; b.style.display = online.canLogin ? '' : 'none'; b.onclick = function () { startLogin(false); }; }
     var rn = $('acctRename'); rn.style.display = (online.configured && loggedIn()) ? '' : 'none'; rn.onclick = function () { openNameDialog(false); };
     badge.textContent = loggedIn() ? 'RANKED' : 'PRACTICE'; badge.className = 'mode ' + (loggedIn() ? 'ranked' : 'prac');
   }
@@ -4289,7 +4651,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
     ov = { real: [], swarm: null, tick: 0, accum: 0, speed: 1, paused: false, ready: false, loading: false, Hfit: Hfit, cx: (bb.x0 + bb.x1) / 2, cz: (bb.z0 + bb.z1) / 2,
            view: { mode: 'pack', az: 0.55, el: 0.68, D: 300, tx: 0, ty: 0, tz: 0, init: false, panX: 0, panZ: 0 }, goal: { el: 0.68, D: 300 }, listT: 0, vec: new THREE.Vector3(),
            mesh: null, lead: null, meanS: 0, buildId: 0, tmp: {}, ent: [], zoomMul: 1, free: null, freeT: 0 };
-    ov.watch = watchRun;
+    ov.watch = watchRun; $('ovBanner').querySelector('b').innerHTML = 'EVERY TGK DAILY RACE<br>FROM ' + (pastDate ? dayShort(raceDate) : 'TODAY');
     $('ov').classList.remove('showlist'); ov.free = computeFree(); refitTrack(); setOvMode('pack'); buildOverview();
   }
   /** the part of the screen the panels do not cover: the camera centres and fits the action inside it */
@@ -4365,7 +4727,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
     }).catch(function () { if (!ov || ov.buildId !== id) return; ov.loading = false; ov.ready = true; ov.failed = true; ovHeadline(); });
   }
   function ovHeadline() {
-    if (ov.watch) { $('ovCount').textContent = String(ov.watch.name).toUpperCase() + '  \u00b7  ' + C.fmtTime(ov.watch.ms); $('ovSub').textContent = 'Verified run from today\'s leaderboard, replayed exactly'; $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date()).toUpperCase().replace(',', ''); return; }
+    if (ov.watch) { $('ovCount').textContent = String(ov.watch.name).toUpperCase() + '  \u00b7  ' + C.fmtTime(ov.watch.ms); $('ovSub').textContent = 'Verified run from today\'s leaderboard, replayed exactly'; $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase().replace(',', ''); return; }
     var sw = ov.swarm, shown = sw.cars.length, jc = sw.cars.filter(function (c) { return c.jumped; }).length, sub;
     if (online.configured) {
       $('ovCount').textContent = shown.toLocaleString('en-US') + (shown === 1 ? ' RACE TODAY' : ' RACES TODAY');
@@ -4377,7 +4739,7 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
       sub = 'Your runs on this device. Log in to see the real field.';
     }
     $('ovSub').textContent = sub;
-    $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date()).toUpperCase().replace(',', '');
+    $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase().replace(',', '');
   }
   function swarmLoad() {       // a few runs per frame so the page stays responsive
     var sw = ov.swarm, t0 = Date.now(), cap = 8;
@@ -4539,8 +4901,8 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   function pad(n) { return String(n).padStart(2, '0'); }
   function tickCountdown() {
     var ms = C.msUntilChicagoMidnight(Date.now()), s = Math.max(0, Math.floor(ms / 1000));
-    $('nextTrack').textContent = pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s % 3600 / 60)) + ':' + pad(s % 60);
-    if (state === 'menu' && C.chicagoDate(Date.now()) !== raceDate) { loadDaily(); loadWorld(); sim.reset(); snapshot(); }
+    $('nextTrack').textContent = pastDate ? 'PRACTICE' : pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s % 3600 / 60)) + ':' + pad(s % 60);
+    if (!pastDate && state === 'menu' && C.chicagoDate(Date.now()) !== raceDate) { loadDaily(); loadWorld(); sim.reset(); snapshot(); }
   }
   function wireUi() {
     $('startBtn').addEventListener('click', startRace);
@@ -4575,14 +4937,14 @@ if (typeof module !== 'undefined') module.exports = TGKAudio;
   function boot() {
     if (!window.WebGLRenderingContext) { $('fatal').classList.remove('hidden'); return; }
     try {
-      recorder.reset(); initRenderer(); loadDaily(); loadWorld(); buildSwatches(); wireUi(); bindTouch(); initOnline();
+      recorder.reset(); initRenderer(); loadDaily(); loadWorld(); buildSwatches(); wireUi(); wirePages(); bindTouch(); initOnline();
       sim.reset(); snapshot(); updateCar(0.016, 1); tickCountdown(); setInterval(tickCountdown, 1000);
-      $('loading').classList.add('hidden');
+      $('loading').classList.add('hidden'); routeHash();
       lastTs = performance.now(); requestAnimationFrame(frame);
     } catch (e) { console.error(e); $('fatal').classList.remove('hidden'); $('fatalMsg').textContent = String(e && e.message || e); }
   }
   boot();
-  window.__tgk = { dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; } };
+  window.__tgk = { cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; } };
 })();
 
 </script>
