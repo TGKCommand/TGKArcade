@@ -147,7 +147,6 @@ kbd{display:inline-block;min-width:22px;text-align:center;font:inherit;font-size
 #tilt i{position:absolute;top:-5px;width:4px;height:18px;margin-left:-2px;background:#fff;border-radius:2px;box-shadow:0 0 4px #000}
 #delta{font-size:clamp(20px,3.2vw,30px);font-weight:700;font-variant-numeric:tabular-nums;margin-top:3px;min-height:1.2em;text-shadow:0 2px 10px rgba(0,0,0,.7)}
 #delta.good,.good{color:var(--teal-hi)}#delta.bad,.bad{color:var(--org-hi)}
-#split{position:fixed;left:50%;top:27%;transform:translate(-50%,-8px);font-size:clamp(22px,4.6vw,40px);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none;text-shadow:0 2px 14px rgba(0,0,0,.8)}
 #split.on{opacity:1;transform:translate(-50%,0)}#split small{display:block;font-size:.4em;letter-spacing:.2em;color:#cfd3d6;text-align:center}
 #menuGhost{margin-top:6px;font-size:13px;letter-spacing:.04em;color:var(--teal-hi);min-height:1em}
 #menuStreak{margin-top:4px;font-size:13px;letter-spacing:.06em;color:var(--org-hi);min-height:1em}
@@ -168,18 +167,27 @@ kbd{display:inline-block;min-width:22px;text-align:center;font:inherit;font-size
 #lbList li em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:700}
 #lbList li.mine{background:rgba(232,115,28,.22)}
 #resStats{margin-top:4px}#resStats.gold{color:var(--org-hi);font-weight:600}
-#banner{position:absolute;left:0;right:0;bottom:24%;text-align:center;font-size:clamp(22px,4vw,34px);font-weight:700;opacity:0;transition:opacity .15s}
-#banner.on{opacity:1}
 #banner span{background:var(--org);color:var(--bar);padding:8px 20px;display:inline-block}
+/* ---- notification lane: gate split, toasts and warnings stack here, under the timer and above the road, never over the car ---- */
+:root{--lane:136px}              /* a fallback: the game measures the timer and side panels and sets the real value (placeLane) */
+body.touch.landscape #lane{max-width:46vw;gap:5px}
+body.touch.landscape #split{font-size:20px}
+body.touch.landscape #toast,body.touch.landscape #toast.big{font-size:15px;padding:5px 12px;letter-spacing:.03em}
+body.touch.landscape #banner{font-size:15px}body.touch.landscape #banner span{padding:5px 14px}
+#lane{position:fixed;z-index:90;left:50%;top:var(--lane);transform:translateX(-50%);width:max-content;max-width:min(94vw,880px);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+#lane>*{opacity:0;transition:opacity .18s;text-align:center;max-width:100%}
+#lane>*:not(.on){position:absolute;left:50%;transform:translateX(-50%);visibility:hidden;transition:opacity .18s,visibility 0s .18s}
+#lane>.on{opacity:1}
+#split{font-size:clamp(22px,4.6vw,40px);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+#toast{background:rgba(0,0,0,.8);padding:8px 16px;font-weight:600}
+#toast.big{font-size:clamp(18px,3vw,28px);letter-spacing:.05em;color:var(--org-hi);background:rgba(20,23,26,.82);border:1px solid rgba(245,147,74,.6);padding:10px 20px}
+#banner{font-size:clamp(18px,3vw,28px);font-weight:700}
 #countdown{position:absolute;left:0;right:0;top:30%;text-align:center;font-size:clamp(90px,22vw,200px);font-weight:700;font-style:italic;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.6)}
 #countdown.pop{animation:pop .5s ease-out}
 @keyframes pop{from{transform:scale(1.35);opacity:.2}to{transform:scale(1);opacity:1}}
 #lights{position:absolute;left:0;right:0;top:calc(30% - 54px);display:flex;justify-content:center;gap:14px}
 #lights i{width:28px;height:28px;border-radius:50%;background:#2a2a2a;border:2px solid #555}
 #lights i.on{background:var(--org-hi);border-color:#fff;box-shadow:0 0 18px var(--org)}
-#toast{position:fixed;left:50%;bottom:34%;transform:translate(-50%,10px);background:rgba(0,0,0,.8);padding:8px 16px;font-weight:600;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none}
-#toast.on{opacity:1;transform:translate(-50%,0)}
-#toast.big{bottom:46%;font-size:clamp(20px,4.4vw,34px);letter-spacing:.06em;color:var(--org-hi);background:rgba(20,23,26,.82);border:1px solid rgba(245,147,74,.6);padding:12px 22px}
 
 /* ------- results / pause ------- */
 .sheet{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.62);padding:16px}
@@ -275,8 +283,6 @@ body.touch.portrait #tBrk{right:calc(max(10px,env(safe-area-inset-right,0px)) + 
 body.touch.portrait #tHb{right:max(10px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px + var(--ph) + 10px);width:clamp(70px,22vw,98px);height:48px;font-size:13px}
 body.touch.portrait #tRec{left:max(10px,env(safe-area-inset-left,0px));right:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px + var(--ph) + 10px);width:clamp(62px,20vw,92px);height:44px;font-size:12px}
 body.touch.portrait #tilt{bottom:calc(env(safe-area-inset-bottom,0px) + var(--ph) + 80px)}
-body.touch.portrait #banner{bottom:calc(env(safe-area-inset-bottom,0px) + var(--ph) + 130px)}
-body.touch.portrait #toast{bottom:calc(env(safe-area-inset-bottom,0px) + var(--ph) + 100px)}
 body.touch.portrait #toast.big{bottom:42%}
 
 /* ---- menu, portrait phones: compact bottom sheet ---- */
@@ -357,6 +363,34 @@ body.touch.landscape #tR{left:calc(max(14px,env(safe-area-inset-left,0px)) + var
 body.touch.landscape #tGas,body.touch.landscape #tHb{width:calc(var(--pw) * 1.1)}
 body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc(max(14px,env(safe-area-inset-right,0px)) + var(--pw) * 1.1 + 10px)}
 @media (max-height:420px){ body.touch.landscape.racing #hudTime{font-size:34px} }
+
+/* ---- racer name, leaderboard row actions, ghost pick ---- */
+.linkbtn{background:none;border:0;color:var(--teal-hi);text-decoration:underline;font:inherit;font-size:inherit;padding:2px 4px;cursor:pointer}
+#menuGhostRow{margin-top:6px;font-size:13px;min-height:1em}#menuGhostRow #menuGhost{margin:0}
+#nameInput{width:100%;margin-top:14px;padding:13px 14px;font:600 20px var(--font);color:#fff;background:#0b0d0f;border:1px solid var(--line);border-radius:0;outline:none}
+#nameInput:focus{border-color:var(--teal)}
+#nameHint{min-height:1.4em;margin-top:8px;font-size:14px;color:var(--org-hi)}
+#nameSave{flex:2;border:0;background:var(--org);color:var(--bar);font-weight:700;font-size:20px;letter-spacing:.08em;text-transform:uppercase;padding:13px 16px}
+#nameSave:disabled{opacity:.5}
+#lbList li{flex-wrap:wrap;cursor:pointer}
+#lbList li.open{background:rgba(44,188,180,.12)}
+#lbList li .lbact{flex-basis:100%;display:none;gap:8px;margin:8px 0 4px 32px}
+#lbList li.open .lbact{display:flex}
+#lbList li .lbact button{flex:1;min-height:44px;padding:8px 10px;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+#lbList li .lbact button.go{background:var(--org);color:var(--bar);border:0;font-weight:700}
+#lbHint{font-size:12px;color:var(--dim);margin-top:8px}
+@media (orientation:landscape) and (max-height:560px){ #nameInput{margin-top:8px;padding:9px 12px;font-size:18px} #nameSave{font-size:17px;padding:10px 14px} #lbList li .lbact{margin-left:24px} }
+
+/* ---- replay view on phones: slim banner, standings behind a button, one row of controls ---- */
+.ovbar .cmp{display:none}
+@media (max-width:720px),(max-height:560px){
+  #ovBanner{max-width:none;padding:7px 12px 6px} #ovBanner b,#ovBanner small{display:none} #ovBanner #ovCount{margin-top:0;font-size:15px} #ovBanner #ovClock{font-size:22px}
+  .ovside{display:none} #ov.showlist .ovside{display:flex;top:auto;right:max(8px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 74px);width:min(270px,72vw);max-height:44%}
+  .ovbar{flex-wrap:nowrap;justify-content:space-between;width:calc(100% - 16px);max-width:560px;gap:4px;padding:5px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+  .ovbar button{flex:1 1 0;min-width:0;min-height:44px;padding:6px 3px;font-size:13px;white-space:nowrap}
+  .ovbar #ovCamPack,.ovbar #ovCamLead,.ovbar #ovCamOver,.ovbar #ovS1,.ovbar #ovS2,.ovbar #ovS4{display:none}
+  .ovbar .cmp{display:block} #ovMark{display:none}
+}
 </style>
 </head>
 <body>
@@ -380,7 +414,7 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
         <div class="duo"><button type="button" class="btn2" id="garageBtn">Garage</button><a class="btn2" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
         <button type="button" class="btn2" id="allBtn">Show all races today</button>
         <div class="best" id="menuBest"></div>
-        <div id="menuGhost"></div>
+        <div id="menuGhostRow"><span id="menuGhost"></span> <button type="button" class="linkbtn" id="ghostClear" style="display:none">Use my own</button></div>
         <div id="menuStreak"></div>
         <div id="acct"><span id="acctText"></span><span class="acctbtns"><button type="button" class="btn2" id="acctRename" style="display:none">Change name</button><button type="button" class="btn2" id="acctBtn"></button></span></div>
         <button type="button" class="btn2" id="lbBtn">Today's leaderboard</button>
@@ -388,7 +422,7 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
 </div>
 </div>
         <div class="legend"><span><kbd>W</kbd><kbd>↑</kbd> throttle</span><span><kbd>A</kbd><kbd>D</kbd> steer</span><span><kbd>Space</kbd> handbrake</span><span><kbd>R</kbd> recover</span><span><kbd>F</kbd> restart</span><span><kbd>C</kbd> camera</span></div>
-        <div class="foot"><span>Drag the scene to look around.</span><label>Graphics <select id="qMenu" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label></div>
+        <div class="foot"><span>Drag the scene to look around.</span><label>Sound <select id="sndMenu" aria-label="Sound volume"><option value="off">Off</option><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select></label> <label>Graphics <select id="qMenu" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label></div>
       </div>
       <div id="garageView" class="hidden">
         <div class="paint-head"><b>Garage</b><span id="paintName"></span></div>
@@ -407,10 +441,8 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
   </div>
   <div class="rtop"><a class="pill" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
   <div class="timer"><div id="modeBadge" class="mode prac">PRACTICE</div><div id="hudTime">00:00.000</div><div id="hudBest"></div><div id="delta"></div></div>
-  <div id="split"></div>
   <div id="lights" class="hidden"><i></i><i></i><i></i></div>
   <div id="countdown"></div>
-  <div id="banner"><span></span></div>
   <div id="tilt"><i id="tiltMark"></i></div>
   <div class="box ckpanel" id="hudCkBox">
     <small>CHECKPOINT</small><div class="row2"><div id="ckBar"></div><div id="hudCk">0</div></div>
@@ -433,10 +465,10 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
   <button type="button" class="pill ovback" id="ovBack">Back</button>
   <div id="ovMark"><b id="ovDate"></b><span>TGKMOTORSPORT.COM</span></div>
   <div class="ovside"><div id="ovList"></div>
-    <div class="ovopts"><label>Crowd <select id="ovCrowd" aria-label="Simulated drivers"><option value="0">My runs only</option><option value="50">50 drivers</option><option value="150" selected>150 drivers</option><option value="300">300 drivers</option><option value="600">600 drivers</option></select></label><small>Simulated drivers are for the practice build. Real players replace them when the leaderboard goes live.</small></div></div>
-  <div class="ovbar"><button type="button" id="ovCamPack" class="on">Pack cam</button><button type="button" id="ovCamLead">Leader</button><button type="button" id="ovCamOver">Overhead</button><button type="button" id="ovZout" aria-label="Zoom out">&minus;</button><button type="button" id="ovZin" aria-label="Zoom in">+</button><button type="button" id="ovS1" class="on">1x</button><button type="button" id="ovS2">2x</button><button type="button" id="ovS4">4x</button><button type="button" id="ovPause">Pause</button><button type="button" id="ovRestart">Replay</button></div>
+</div>
+  <div class="ovbar"><button type="button" id="ovCamPack" class="on">Pack cam</button><button type="button" id="ovCamLead">Leader</button><button type="button" id="ovCamOver">Overhead</button><button type="button" id="ovZout" aria-label="Zoom out">&minus;</button><button type="button" id="ovZin" aria-label="Zoom in">+</button><button type="button" id="ovS1" class="on">1x</button><button type="button" id="ovS2">2x</button><button type="button" id="ovS4">4x</button><button type="button" id="ovPause">Pause</button><button type="button" id="ovListBtn" class="cmp">Top</button><button type="button" id="ovCamCycle" class="cmp" aria-label="Camera">Pack</button><button type="button" id="ovSpeedCycle" class="cmp">1x</button><button type="button" id="ovRestart">Replay</button></div>
 </section>
-<div id="toast" role="status"></div>
+<div id="lane" aria-live="polite"><div id="split"></div><div id="toast" role="status"></div><div id="banner"><span></span></div></div>
 
 <section id="results" class="sheet hidden" aria-label="Race result">
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
@@ -459,9 +491,18 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
   </div></div>
 </section>
 
+<section id="nameSheet" class="sheet hidden" aria-label="Choose your racer name">
+  <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <h2>Your racer name</h2>
+    <div class="meta">Shown on the leaderboard. 2 to 16 letters, numbers or spaces. Names are unique, and you can change yours once a day.</div>
+    <input id="nameInput" type="text" maxlength="16" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Racer name" placeholder="e.g. Turbo Jon">
+    <div id="nameHint"></div>
+    <div class="btnrow"><button type="button" id="nameSave">Save name</button><button type="button" class="btn2" id="nameCancel">Later</button></div>
+  </div></div>
+</section>
 <section id="lb" class="sheet hidden" aria-label="Today's leaderboard">
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
-    <h2>Today's leaderboard</h2><div id="lbSub" class="meta"></div><ol id="lbList"></ol>
+    <h2>Today's leaderboard</h2><div id="lbSub" class="meta"></div><ol id="lbList"></ol><div id="lbHint"></div>
     <div class="btnrow"><button type="button" class="btn2" id="lbClose">Close</button></div>
   </div></div>
 </section>
@@ -472,6 +513,7 @@ body.touch.landscape #tBrk,body.touch.landscape #tRec{width:var(--pw);right:calc
     <div class="btnrow"><button type="button" class="btn2" id="pCam">Change camera</button><button type="button" class="btn2" id="pMenu">Quit to menu</button></div>
     <div class="row"><span>Ghost of your best run</span><select id="ghostSel" aria-label="Ghost"><option value="1">On</option><option value="0">Off</option></select></div>
     <div class="row"><span>Fast restart (1 s lights)</span><select id="quickSel" aria-label="Fast restart"><option value="1">On</option><option value="0">Off</option></select></div>
+    <div class="row"><span>Sound</span><select id="sndSel" aria-label="Sound volume"><option value="off">Off</option><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select></div>
     <div class="row"><span>Graphics</span><select id="qSel" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
   </div></div>
 </section>
@@ -3059,6 +3101,158 @@ var TGKFX = (function () {
 })();
 if (typeof module !== 'undefined') module.exports = TGKFX;
 
+/* TGK DAILY RACE - procedural sound. Everything is synthesised with the Web Audio API (no sample files), so the game stays one small file and the
+ * engine responds continuously to speed, throttle and gear. Works on a live AudioContext and on an OfflineAudioContext (used to render previews / tests).
+ * create(ctx) -> { update(state, now), event(name, mag, now, extra), setVolume(v), setMuted(m), setActive(on), unlock(), debug() }  */
+var TGKAudio = (function () {
+  'use strict';
+  var GEARS = [0, 28, 52, 76, 98, 118, 999];
+  function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function noiseBuf(ctx, secs, seed) { var n = Math.floor(ctx.sampleRate * secs), b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0), s = seed || 1; for (var i = 0; i < n; i++) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; d[i] = (s / 2147483648) - 1; } return b; }
+  function tanhCurve(k) { var n = 1024, c = new Float32Array(n); for (var i = 0; i < n; i++) { var x = i * 2 / (n - 1) - 1; c[i] = Math.tanh(k * x) / Math.tanh(k); } return c; }
+
+  function create(ctx) {
+    var master = ctx.createGain(), comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.22;
+    var trim = ctx.createGain(); trim.gain.value = 0.82;                                   // headroom: a crash on top of a screaming engine must not clip
+    master.connect(comp); comp.connect(trim); trim.connect(ctx.destination);
+    var vol = 0.8, muted = false, active = false, T = function () { return ctx.currentTime; };
+    master.gain.value = vol;
+    var bus = ctx.createGain(); bus.gain.value = 0; bus.connect(master);                 // continuous sounds (engine, tyres, wind): faded out when not racing
+    var sfx = ctx.createGain(); sfx.gain.value = 1; sfx.connect(master);                  // one-shots: always available
+    function setM() { master.gain.setTargetAtTime(muted ? 0 : vol, T(), muted ? 0.006 : 0.04); }
+
+    var engL = g(1), surfL = g(1), windL = g(1); engL.connect(bus); surfL.connect(bus); windL.connect(bus);          // layer mixers (also let tests measure each sound alone)
+    var NB = noiseBuf(ctx, 3, 12345), NB2 = noiseBuf(ctx, 3, 987654);
+    function noiseSrc(off, buf) { var s = ctx.createBufferSource(); s.buffer = buf || NB; s.loop = true; s.start(0, off || 0); return s; }
+    function osc(type, f) { var o = ctx.createOscillator(); o.type = type; o.frequency.value = f; o.start(); return o; }
+    function g(v) { var x = ctx.createGain(); x.gain.value = v; return x; }
+    function bp(f, q) { var b = ctx.createBiquadFilter(); b.type = 'bandpass'; b.frequency.value = f; b.Q.value = q; return b; }
+    function lpf(f, q) { var b = ctx.createBiquadFilter(); b.type = 'lowpass'; b.frequency.value = f; b.Q.value = q || 0.7; return b; }
+    function hpf(f) { var b = ctx.createBiquadFilter(); b.type = 'highpass'; b.frequency.value = f; return b; }
+
+    /* ---------- engine: cross-plane V8 (4 firing pulses per revolution) ---------- */
+    var oA = osc('sawtooth', 60), oB = osc('square', 30), oC = osc('sawtooth', 120), oD = osc('sine', 15);
+    var gA = g(0.5), gB = g(0.34), gC = g(0.2), gD = g(0.34);
+    var shaper = ctx.createWaveShaper(); shaper.curve = tanhCurve(2.6); shaper.oversample = '2x';
+    var eLP = lpf(800, 0.9), eGain = g(0), eDuck = g(1);
+    [[oA, gA], [oB, gB], [oC, gC], [oD, gD]].forEach(function (p) { p[0].connect(p[1]); p[1].connect(shaper); });
+    shaper.connect(eLP); eLP.connect(eGain); eGain.connect(eDuck); eDuck.connect(engL);
+    var lope = osc('sine', 30), lopeG = g(0); lope.connect(lopeG); lopeG.connect(eGain.gain);            // the uneven V8 burble: amplitude wobble at half the firing rate
+    var rough = osc('sine', 9), roughG = g(0); rough.connect(roughG); roughG.connect(eGain.gain);          // damaged engine: misfire shudder
+    var roar = noiseSrc(0.4), roarBP = bp(500, 0.8), roarG = g(0); roar.connect(roarBP); roarBP.connect(roarG); roarG.connect(eDuck);
+    var tur = osc('sine', 2500), turG = g(0), turBP = bp(3000, 4); tur.connect(turBP); turBP.connect(turG); turG.connect(eDuck);   // turbo whistle
+
+    /* ---------- tyres, surface, wind, water ---------- */
+    var sq = noiseSrc(0.9), sq1 = bp(2100, 7), sq2 = bp(2500, 5), sqG = g(0); sq.connect(sq1); sq.connect(sq2); sq1.connect(sqG); sq2.connect(sqG); sqG.connect(surfL);
+    var sqT = osc('sawtooth', 1250), sqTbp = bp(2400, 2.5), sqTG = g(0), sqVib = osc('sine', 13), sqVibG = g(45); sqVib.connect(sqVibG); sqVibG.connect(sqT.frequency); sqT.connect(sqTbp); sqTbp.connect(sqTG); sqTG.connect(surfL);   // the squealing whine
+    var gv = noiseSrc(1.3, NB2), gvBP = bp(900, 0.7), gvLP = lpf(2600), gvG = g(0); gv.connect(gvBP); gvBP.connect(gvLP); gvLP.connect(gvG); gvG.connect(surfL);
+    var rd = noiseSrc(0.2), rdLP = lpf(160, 0.8), rdG = g(0); rd.connect(rdLP); rdLP.connect(rdG); rdG.connect(surfL);
+    var wd = noiseSrc(1.9, NB2), wdLP = lpf(900, 0.5), wdG = g(0); wd.connect(wdLP); wdLP.connect(wdG); wdG.connect(windL);
+    var wt = noiseSrc(0.6), wtBP = bp(1100, 0.6), wtG = g(0); wt.connect(wtBP); wtBP.connect(wtG); wtG.connect(surfL);
+
+    var S = { rpm: 850, load: 0, gear: 1, shiftAt: -9, warnAt: -9, popAt: -9, t: 0, lastUpd: -1, boost: 0, mph: 0 };
+    function set(p, v, now, tc) { p.setTargetAtTime(v, now, tc || 0.03); }
+
+    function update(st, now) {
+      now = now === undefined ? T() : now;
+      var dt = S.lastUpd < 0 ? 0.033 : clamp(now - S.lastUpd, 0.005, 0.2); S.lastUpd = now;
+      var mph = Math.abs(st.mph || 0), spd = Math.abs(st.speed || mph / 2.237), thr = clamp(st.throttle || 0, 0, 1), onGround = st.grounded !== false, off = clamp(st.offroad || 0, 0, 1);
+      // gear + rpm
+      var gear = 1; while (gear < 6 && mph >= GEARS[gear]) gear++;
+      if (gear !== S.gear) { var up = gear > S.gear; if (up && thr > 0.3) S.shiftAt = now; if (!up) S.popAt = now; if (S.mph > 20) event(up ? 'shiftUp' : 'shiftDown', thr, now); S.gear = gear; }
+      var frac = gear < 6 ? clamp((mph - GEARS[gear - 1]) / (GEARS[gear] - GEARS[gear - 1]), 0, 1) : clamp((mph - GEARS[5]) / 70, 0, 1);
+      var lo = gear === 1 ? 1050 : (gear === 6 ? 3900 : 3200), hi = gear < 6 ? 6500 : 5800, target = lerp(lo, hi, frac);
+      if (st.reverse) target = 950 + mph * 120;
+      else if (!onGround) target = thr > 0.1 ? 6600 : 2200;
+      else if (mph < 6) target = lerp(850, 4300, thr);                         // standing: clutch slip, revs rise with the pedal
+      if (thr < 0.1 && onGround && mph >= 6) target *= 0.93;                    // lifting: engine braking
+      var k = thr > 0.1 ? 9 : 5; S.rpm += (target - S.rpm) * (1 - Math.exp(-dt * k));
+      S.load += ((thr > 0.1 ? thr : (mph < 6 ? 0.12 : 0.06)) - S.load) * (1 - Math.exp(-dt * 10)); S.mph = mph;
+      var rpm = S.rpm, load = S.load, f = rpm / 60 * 4, damage = clamp(st.damage || 0, 0, 1);
+      var on = active && st.active !== false ? 1 : 0;
+      var lvl = (0.16 + 0.46 * Math.pow(load, 0.8)) * (0.72 + 0.28 * rpm / 6500) * (1 - 0.12 * damage);
+      var tcF = 0.03;
+      set(oA.frequency, f, now, tcF); set(oB.frequency, f * 0.5, now, tcF); set(oC.frequency, f * 2.003, now, tcF); set(oD.frequency, f * 0.25, now, tcF); set(lope.frequency, f * 0.5, now, tcF);
+      set(eLP.frequency, (300 + rpm * 0.28 + load * (800 + rpm * 0.25)) * (1 - 0.3 * damage), now, 0.04);
+      var shift = now - S.shiftAt < 0.09 ? 0.6 : 1; set(eDuck.gain, shift, now, 0.012);
+      var limiter = (rpm > 6420 && thr > 0.5) ? (0.62 + 0.38 * (Math.floor(now * 22) % 2)) : 1;            // rev limiter bounce
+      set(eGain.gain, lvl * limiter * on, now, 0.03);
+      set(lopeG.gain, lvl * (0.28 - 0.14 * clamp(rpm / 6500, 0, 1)) * on, now, 0.05);
+      set(roughG.gain, lvl * 0.5 * damage * on, now, 0.1); set(rough.frequency, 7 + damage * 5, now, 0.1);
+      set(roarBP.frequency, 450 + rpm * 0.22, now, 0.05); set(roarG.gain, load * 0.16 * (0.5 + rpm / 13000) * on, now, 0.05);
+      S.boost += (thr * clamp((rpm - 2200) / 3200, 0, 1) - S.boost) * (1 - Math.exp(-dt * 2.2));
+      set(tur.frequency, 1700 + S.boost * 3600, now, 0.06); set(turBP.frequency, 1700 + S.boost * 3600, now, 0.06); set(turG.gain, Math.pow(S.boost, 2) * 0.05 * on, now, 0.06);
+      if (thr < 0.1 && rpm > 4200 && onGround && on && Math.sin(now * 53.3) > 0.985 && now - S.popAt > 0.09) { S.popAt = now; event('pop', clamp((rpm - 4200) / 2300, 0.3, 1), now); }   // sport-exhaust crackle on the overrun
+      // tyres + surface
+      var slip = clamp(st.slip || 0, 0, 1), gnd = onGround ? 1 : 0;
+      set(sq1.frequency, 1700 + Math.min(spd, 55) * 16, now, 0.06); set(sq2.frequency, 2050 + Math.min(spd, 55) * 20, now, 0.06);
+      var sqA = Math.pow(slip, 1.2) * (1 - off * 0.85) * gnd * on;
+      set(sqG.gain, sqA * 2.6, now, 0.04); set(sqTG.gain, sqA * 0.16, now, 0.04); set(sqT.frequency, 1150 + Math.min(spd, 55) * 9 + slip * 120, now, 0.06);
+      set(gvG.gain, (off * clamp(spd / 35, 0, 1) * 1.3 + off * slip * 0.5) * gnd * on, now, 0.06); set(gvBP.frequency, 500 + spd * 14, now, 0.1);
+      set(rdG.gain, (1 - off) * Math.pow(clamp(spd / 60, 0, 1), 1.1) * 1.0 * gnd * on, now, 0.08); set(rdLP.frequency, 110 + spd * 3, now, 0.1);
+      set(wdG.gain, Math.pow(clamp(spd / 70, 0, 1), 2) * 0.9 * on, now, 0.08); set(wdLP.frequency, 450 + spd * 24, now, 0.1);
+      set(wtG.gain, clamp(st.wet || 0, 0, 1) * clamp(spd / 25, 0, 1) * 1.1 * gnd * on, now, 0.06);
+      set(bus.gain, on, now, 0.12);
+      // tipping warning: a soft tick
+      if (st.warn && on && now - S.warnAt > 0.26) { S.warnAt = now; event('tick', 1, now); }
+    }
+
+    /* ---------- one-shots ---------- */
+    function env(gainNode, now, peak, atk, dec) { gainNode.gain.setValueAtTime(0.0001, now); gainNode.gain.linearRampToValueAtTime(peak, now + atk); gainNode.gain.exponentialRampToValueAtTime(0.0001, now + atk + dec); }
+    function burst(now, o) {                                                    // filtered noise burst
+      var s = ctx.createBufferSource(); s.buffer = NB; var f = ctx.createBiquadFilter(); f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f, now); if (o.f2) f.frequency.exponentialRampToValueAtTime(o.f2, now + o.atk + o.dec); f.Q.value = o.q || 1;
+      var gn = g(0); env(gn, now, o.peak, o.atk, o.dec); s.connect(f); f.connect(gn); gn.connect(o.dest || sfx); s.start(now, (o.off || 0) % 2); s.stop(now + o.atk + o.dec + 0.05); return gn;
+    }
+    function tone(now, o) {
+      var os = ctx.createOscillator(); os.type = o.type || 'sine'; os.frequency.setValueAtTime(o.f, now); if (o.f2) os.frequency.exponentialRampToValueAtTime(o.f2, now + o.atk + o.dec);
+      var gn = g(0); env(gn, now, o.peak, o.atk, o.dec); os.connect(gn); gn.connect(o.dest || sfx); os.start(now); os.stop(now + o.atk + o.dec + 0.05);
+    }
+    function thud(now, m, low) { tone(now, { f: low ? 95 : 140, f2: 32, peak: 0.95 * m, atk: 0.004, dec: 0.32 }); burst(now, { type: 'lowpass', f: 700, q: 0.5, peak: 0.6 * m, atk: 0.002, dec: 0.16, off: now * 7 }); }
+    function event(name, mag, now, extra) {
+      now = now === undefined ? T() : now; mag = mag === undefined ? 1 : mag; var m;
+      switch (name) {
+        case 'crash': {
+          m = clamp(0.25 + mag / 26, 0.25, 1); var tree = extra && extra.kind === 'tree';
+          thud(now, m, !tree); burst(now, { f: tree ? 700 : 1700, f2: tree ? 300 : 700, q: 0.9, peak: 0.55 * m, atk: 0.002, dec: tree ? 0.22 : 0.3, off: now * 13 });
+          if (!tree) for (var i = 0; i < 3 + Math.floor(m * 3); i++) tone(now + 0.012 + i * 0.03 + (i * 7 % 5) * 0.004, { f: 900 + ((i * 937) % 2400), type: 'square', peak: 0.08 * m, atk: 0.001, dec: 0.05 });      // metal tinks
+          else burst(now + 0.03, { f: 2200, q: 3, peak: 0.3 * m, atk: 0.001, dec: 0.05, off: now * 5 });                                                                                            // wood crack
+          if (m > 0.7) for (var j = 0; j < 5; j++) tone(now + 0.04 + j * 0.022, { f: 3500 + ((j * 1319) % 3000), peak: 0.05, atk: 0.001, dec: 0.12 });                                                // glass
+          break; }
+        case 'land': m = clamp(mag / 20, 0.15, 1); thud(now, m * 0.9, true); break;
+        case 'roll': for (var r = 0; r < 4; r++) { var mm = 0.8 - r * 0.17; thud(now + r * 0.36, mm, r % 2 === 0); burst(now + r * 0.36, { f: 1500, f2: 500, q: 1, peak: 0.28 * mm, atk: 0.002, dec: 0.22, off: now * 3 + r }); } break;
+        case 'splash': m = clamp(mag / 30, 0.2, 1); burst(now, { type: 'highpass', f: 500, f2: 3000, q: 0.5, peak: 0.55 * m, atk: 0.01, dec: 0.55, off: now * 9 }); tone(now, { f: 220, f2: 70, peak: 0.3 * m, atk: 0.01, dec: 0.3 }); break;
+        case 'gate': tone(now, { f: 988, peak: 0.22, atk: 0.003, dec: 0.38 }); tone(now, { f: 1976, peak: 0.1, atk: 0.003, dec: 0.28 }); break;
+        case 'finish': [523.25, 659.25, 783.99, 1046.5].forEach(function (fr, i) { tone(now + i * 0.11, { f: fr, type: 'triangle', peak: 0.2, atk: 0.005, dec: 0.5 }); tone(now + i * 0.11, { f: fr * 2, peak: 0.06, atk: 0.005, dec: 0.4 }); }); break;
+        case 'beep': tone(now, { f: 440, type: 'square', peak: 0.12, atk: 0.003, dec: 0.16 }); break;
+        case 'go': tone(now, { f: 880, type: 'square', peak: 0.16, atk: 0.003, dec: 0.5 }); tone(now, { f: 1320, peak: 0.08, atk: 0.003, dec: 0.4 }); break;
+        case 'launch': burst(now, { f: 300, f2: 2600, q: 0.8, peak: 0.35, atk: 0.25, dec: 0.5, off: now * 4 }); break;
+        case 'jump': [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function (fr, i) { tone(now + i * 0.07, { f: fr, type: 'triangle', peak: 0.17, atk: 0.004, dec: 0.45 }); }); break;
+        case 'save': tone(now, { f: 660, f2: 990, peak: 0.2, atk: 0.005, dec: 0.18 }); tone(now + 0.11, { f: 990, f2: 1320, peak: 0.18, atk: 0.005, dec: 0.22 }); break;
+        case 'drown': burst(now, { type: 'lowpass', f: 900, f2: 150, q: 0.7, peak: 0.5, atk: 0.05, dec: 0.9, off: now * 6 }); break;
+        case 'recover': burst(now, { f: 800, f2: 3000, q: 0.8, peak: 0.25, atk: 0.12, dec: 0.25, off: now * 2 }); break;
+        case 'tick': tone(now, { f: 900, type: 'square', peak: 0.045, atk: 0.002, dec: 0.045 }); break;
+        case 'ui': tone(now, { f: 700, peak: 0.07, atk: 0.002, dec: 0.05 }); break;
+        case 'pop': burst(now, { f: 1100 + (now * 777 % 900), q: 1.4, peak: 0.28 * clamp(mag, 0.3, 1), atk: 0.001, dec: 0.045, off: now * 17, dest: bus }); break;
+        case 'shiftUp': burst(now + 0.05, { f: 2400, f2: 900, q: 2, peak: 0.12, atk: 0.005, dec: 0.16, off: now * 11, dest: bus }); break;       // blow-off "psh"
+        case 'shiftDown': burst(now, { f: 1400, q: 1.5, peak: 0.1, atk: 0.003, dec: 0.07, off: now * 12, dest: bus }); break;
+      }
+    }
+    return {
+      update: update, event: event,
+      setVolume: function (v) { vol = clamp(v, 0, 1); setM(); }, setMuted: function (m) { muted = !!m; setM(); },
+      setLayer: function (n, v) { ({ engine: engL, surface: surfL, wind: windL }[n] || { gain: { value: 0 } }).gain.value = v; },
+      setActive: function (on) { active = !!on; if (!on) set(bus.gain, 0, T(), 0.08); },
+      unlock: function () { try { if (ctx.state === 'suspended' && ctx.resume) ctx.resume(); var b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); } catch (e) { } setM(); },
+      debug: function () { return { rpm: Math.round(S.rpm), load: +S.load.toFixed(2), gear: S.gear, boost: +S.boost.toFixed(2), active: active, muted: muted, vol: vol }; },
+      nodes: { master: master, bus: bus, eGain: eGain, sqG: sqG, gvG: gvG, rdG: rdG, wdG: wdG, wtG: wtG, oA: oA }
+    };
+  }
+  return { create: create, GEARS: GEARS };
+})();
+if (typeof module !== 'undefined') module.exports = TGKAudio;
+
 </script>
 <script>
 /* TGK DAILY RACE - game client (Phase 2: driving engine, practice mode) */
@@ -3111,7 +3305,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function portraitFov() { var a = window.innerWidth / window.innerHeight; return a < 1 ? Math.min(24, (1 / a - 1) * 16 + 4) : 0; }
   function portraitPull() { var a = window.innerWidth / window.innerHeight; return a < 1 ? 1 + Math.min(0.3, (1 / a - 1) * 0.14) : 1; }
   function onResize() {
-    applyOrientation();
+    applyOrientation(); placeLane();
     var q = QUALITY[qName], dpr = window.devicePixelRatio || 1;
     renderer.setPixelRatio(Math.max(0.55, Math.min(dpr, q.pr) * prPerf));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -3155,7 +3349,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     var hint = parseInt(store.get('tgk.attempt.' + raceDate), 10);
     track = C.generateTrack(raceDate, hint > 0 ? { attempt: hint } : undefined);
     store.set('tgk.attempt.' + raceDate, String(track.attempt || 0));
-    track.sig = trackSig(); sim = new C.Sim(track); dentSig = '';
+    track.sig = trackSig(); loadPick(); sim = new C.Sim(track); dentSig = '';
     recorder.reset();
     $('trackName').textContent = track.name;
     $('trackMeta').textContent = (track.length / 1609.34).toFixed(2) + ' mi \u00b7 ' + track.checkpoints.length + ' gates \u00b7 ' + biomeLabel(track.biome) + (track.ramps.length ? ' \u00b7 ' + track.ramps.length + ' hidden shortcut' + (track.ramps.length > 1 ? 's' : '') : '');
@@ -3228,6 +3422,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     if (e.repeat) return;
     if (e.code === 'KeyF' || e.code === 'Backspace' || (e.code === 'Enter' && state !== 'menu' && state !== 'overview')) { if (state === 'racing' || state === 'finishing' || state === 'results' || state === 'paused') { startRace(true); e.preventDefault(); } }
     else if (e.code === 'KeyC') cycleCamera();
+    else if (e.code === 'KeyM') { setSound(soundLevel === 'off' ? 'med' : 'off'); toast(soundLevel === 'off' ? 'Sound off' : 'Sound on'); }
     else if (e.code === 'Escape') { if (state === 'racing') pauseGame(); else if (state === 'paused') resumeGame(); else if (state === 'overview') closeOverview(); }
     else if (e.code === 'Enter' && state === 'menu') startRace();
   });
@@ -3355,7 +3550,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function startRace(quick) {
     if (C.chicagoDate(Date.now()) !== raceDate && state === 'menu') { loadDaily(); loadWorld(); }
     sim.cdTicks = (quick === true && store.get('tgk.quick') !== '0') ? 120 : C.COUNTDOWN_TICKS;
-    sim.reset(); recorder.reset(); runGates = []; setupGhost(); if (ghost && quick !== true) toast(ghost.par ? 'Racing the par ghost ' + C.fmtTime(ghost.trace.ms) : 'Racing your best ' + C.fmtTime(ghost.trace.ms)); $('delta').textContent = ''; $('split').classList.remove('on'); keyBits = keyBits & ~B.RECOVER; lastBits = 0;
+    sim.reset(); recorder.reset(); runGates = []; setupGhost(); var ghostMsg = null; if (ghost && quick !== true) ghostMsg = (ghost.ext ? 'Racing ' + ghost.name + '\'s ghost ' + C.fmtTime(ghost.trace.ms) : (ghost.par ? 'Racing the par ghost ' + C.fmtTime(ghost.trace.ms) : 'Racing your best ' + C.fmtTime(ghost.trace.ms))); $('delta').textContent = ''; $('split').classList.remove('on'); keyBits = keyBits & ~B.RECOVER; lastBits = 0;
     accum = 0; snapshot(); vis.pitch = vis.roll = vis.bob = vis.bobV = 0; vis.spin = 0;
     W.updateGates(world, 0); cam.init = false; cam.shake = 0;
     if (FX) { FX.trails.reset(); FX.smoke.clear(); }
@@ -3365,10 +3560,10 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     $('hud').classList.remove('hidden'); document.body.classList.add('racing');
     hud.t = ''; hud.cd = ''; $('countdown').textContent = '';
     $('hudBest').textContent = getPB() ? 'Best ' + C.fmtTime(getPB()) : 'No time yet';
-    $('hudCk').textContent = '0'; buildCkBar(); paintCkBar(); hud.gear = ''; hud.ban = '';
+    $('hudCk').textContent = '0'; buildCkBar(); paintCkBar(); hud.gear = ''; clearNotices(); pendingGhostToast = ghostMsg;
   }
   function toMenu() {
-    state = 'menu'; sim.reset(); snapshot(); cam.init = false; keepAwake(false);
+    clearNotices(); state = 'menu'; sim.reset(); snapshot(); cam.init = false; keepAwake(false);
     if (C.chicagoDate(Date.now()) !== raceDate) { loadDaily(); loadWorld(); sim.reset(); }
     W.updateGates(world, 0); repairCar();
     $('menu').classList.remove('hidden'); $('results').classList.add('hidden'); $('pause').classList.add('hidden'); $('hud').classList.add('hidden');
@@ -3385,10 +3580,11 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     } catch (e) { }
   }
   document.addEventListener('visibilitychange', function () { if (!document.hidden && (state === 'racing' || state === 'finishing')) keepAwake(true); });
-  function pauseGame() { if (state !== 'racing') return; state = 'paused'; $('pause').classList.remove('hidden'); keyBits = 0; touchCount = {}; $('qSel').value = qName; }
+  function pauseGame() { if (state !== 'racing') return; state = 'paused'; clearNotices(); $('pause').classList.remove('hidden'); keyBits = 0; touchCount = {}; $('qSel').value = qName; }
   function resumeGame() { if (state !== 'paused') return; state = 'racing'; $('pause').classList.add('hidden'); lastTs = performance.now(); }
 
   function showResults() {
+    clearNotices();
     var ms = sim.finishMs, prevBest = getPB(), isPB = !prevBest || ms < prevBest;
     if (isPB) store.set(pbKey(), String(ms));
     saveRun(ms);
@@ -3429,24 +3625,53 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     $('hud').classList.add('hidden');
   }
 
+
+  /* ---------------- sound (procedural Web Audio; see audio.js) ---------------- */
+  var aud = null, actx = null, soundLevel = store.get('tgk.sound') || 'med';
+  var SND = { off: 0, low: 0.35, med: 0.7, high: 1 };
+  function soundVol() { return SND[soundLevel] === undefined ? 0.7 : SND[soundLevel]; }
+  /** browsers only allow sound after a tap / key press, and iOS can suspend it again: keep unlocking on every gesture */
+  function initAudio() {
+    if (aud) { try { if (actx && actx.state !== 'running') aud.unlock(); } catch (e) { } return; }
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC || !window.TGKAudio) return;
+    try { actx = new AC(); aud = TGKAudio.create(actx); aud.setVolume(soundVol()); aud.setMuted(soundLevel === 'off'); aud.unlock(); } catch (e) { aud = null; }
+  }
+  ['pointerdown', 'keydown', 'touchend', 'click'].forEach(function (n) { window.addEventListener(n, initAudio, { passive: true }); });
+  function syncSoundUi() { ['sndSel', 'sndMenu'].forEach(function (id) { var el = $(id); if (el) el.value = soundLevel; }); }
+  function setSound(level) { if (SND[level] === undefined) level = 'med'; soundLevel = level; store.set('tgk.sound', level); if (aud) { aud.setVolume(soundVol()); aud.setMuted(level === 'off'); if (level !== 'off') aud.event('ui', 1); } syncSoundUi(); }
+  function sfx(name, mag, extra) { if (aud) { try { aud.event(name, mag, undefined, extra); } catch (e) { } } }
+  document.addEventListener('visibilitychange', function () { try { if (!actx) return; if (document.hidden) actx.suspend(); else actx.resume(); } catch (e) { } });
+  function updateAudio() {
+    if (!aud) return;
+    var racing = (state === 'racing' || state === 'finishing') && !document.hidden; aud.setActive(racing);
+    if (!racing) return;
+    var au = Math.abs(sim.u), gnd = sim.grounded && !sim.rolled, sl = Math.abs(sim.v) / Math.max(4, au);
+    var lat = (gnd && au > 5) ? C.clamp((sl - 0.13) / 0.32, 0, 1) : 0, brk = (gnd && sim.u > 8 && sim.ax < -13) ? C.clamp((-sim.ax - 13) / 8, 0, 1) : 0;
+    var hbk = (gnd && (lastBits & B.HB) && au > 4) ? 1 : 0, launch = (gnd && sim.ax > 7.2 && au < 10) ? C.clamp((sim.ax - 7.2) / 2.5, 0, 1) * (1 - au / 10) : 0;
+    var aL = sim.rolled ? 0 : Math.abs(sim.lean);
+    aud.update({ mph: sim.speedMph(), speed: Math.hypot(sim.u, sim.v), throttle: ((lastBits & B.THR) && !(lastBits & B.BRK) && !sim.rolled && sim.phase !== 'finished') ? 1 : 0, reverse: sim.u < -0.5,
+                 grounded: gnd, offroad: sim.offroad, wet: sim.wet, slip: Math.max(lat, hbk, brk * 0.8, launch * 0.9), damage: sim.damage, warn: aL > 0.34 && sim.grounded, active: true });
+  }
+
   function handleEvents(ev) {
-    if (ev.go) { goFlash = 0.9; $('countdown').textContent = 'GO'; }
+    if (ev.go) { goFlash = 0.9; $('countdown').textContent = 'GO'; sfx('go'); if (pendingGhostToast) { toast(pendingGhostToast); pendingGhostToast = null; } }
     if (ev.ckpt) {
       W.updateGates(world, sim.nextCk);
       $('hudCk').textContent = sim.nextCk; paintCkBar(); if (!ev.finished) flashCk();
       runGates.push(ev.finished ? sim.finishMs : sim.timeMs()); if (!ev.finished) showSplit(sim.nextCk - 1, sim.timeMs());
+      sfx(ev.finished ? 'finish' : 'gate');
     }
     if (ev.hit > 2) cam.shake = Math.min(3, cam.shake + ev.hit * 0.12);
-    if (ev.land > 2) { vis.bobV -= ev.land * 0.6; cam.shake = Math.min(3, cam.shake + ev.land * 0.1); }
-    if (ev.rolled) cam.shake = Math.min(3, cam.shake + 2);
-    if (ev.crash > 2) onCrash(ev.crash);
-    if (ev.splash) { cam.shake = Math.min(3, cam.shake + 0.4); vis.bobV -= 1.2; splashBurst(ev.splash); }
-    if (ev.launch) cam.shake = Math.min(3, cam.shake + 0.6);
-    if (ev.jump > 0) { var jr = null; track.ramps.forEach(function (r) { if (!jr || Math.abs(track.S[r.j] - sim.s) < Math.abs(track.S[jr.j] - sim.s)) jr = r; }); jumpGainS = jr && jr.gain > 0 ? jr.gain : 0;
+    if (ev.land > 2) { vis.bobV -= ev.land * 0.6; cam.shake = Math.min(3, cam.shake + ev.land * 0.1); sfx('land', ev.land); }
+    if (ev.rolled) { cam.shake = Math.min(3, cam.shake + 2); sfx('roll'); }
+    if (ev.crash > 2) { onCrash(ev.crash); if (!(ev.land > 11)) sfx('crash', ev.crash, { kind: sim.lastImpact && !sim.lastImpact.rock ? 'tree' : 'rock' }); }
+    if (ev.splash) { cam.shake = Math.min(3, cam.shake + 0.4); vis.bobV -= 1.2; splashBurst(ev.splash); sfx('splash', ev.splash); }
+    if (ev.launch) { cam.shake = Math.min(3, cam.shake + 0.6); sfx('launch'); }
+    if (ev.jump > 0) { sfx('jump'); var jr = null; track.ramps.forEach(function (r) { if (!jr || Math.abs(track.S[r.j] - sim.s) < Math.abs(track.S[jr.j] - sim.s)) jr = r; }); jumpGainS = jr && jr.gain > 0 ? jr.gain : 0;
       toast('ROCK JUMP!  ' + Math.round(ev.jump) + ' m skipped' + (jumpGainS ? '  \u00b7  about ' + jumpGainS.toFixed(1) + ' s faster' : ''), true); cam.shake = Math.min(3, cam.shake + 1.2); }
-    if (ev.save) { var big = ev.save > 0.45; toast(big ? 'SAVED IT!' : 'Caught it', big); cam.shake = Math.min(3, cam.shake + 0.5); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { } }
-    if (ev.drown) { cam.init = false; toast('Sunk! Back on the road'); }
-    else if (ev.recovered) { cam.init = false; toast(ev.oob ? 'Out of bounds. Back on the road' : 'Back on track'); }
+    if (ev.save) { sfx('save'); var big = ev.save > 0.45; toast(big ? 'SAVED IT!' : 'Caught it', big); cam.shake = Math.min(3, cam.shake + 0.5); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { } }
+    if (ev.drown) { cam.init = false; sfx('drown'); toast('Sunk! Back on the road'); }
+    else if (ev.recovered) { cam.init = false; sfx('recover'); toast(ev.oob ? 'Out of bounds. Back on the road' : 'Back on track'); }
     if (ev.finished) { state = 'finishing'; finishAt = performance.now(); $('countdown').textContent = 'FINISH'; goFlash = 1.4; }
   }
   function worldPt(lx, lz) { var s = Math.sin(sim.yaw), c = Math.cos(sim.yaw); return { x: sim.x + lx * c + lz * s, z: sim.z - lx * s + lz * c }; }
@@ -3467,10 +3692,28 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     for (var i = 0; i < n; i++) FX.smoke.emit(sim.x + sx * 1.2, sim.y + 0.2, sim.z + cz * 1.2, sim.u * sx, sim.u * cz, 1, 'water');
   }
   var ckTimer = 0; function flashCk() { var el = $('hudCkBox'); el.classList.add('flash'); clearTimeout(ckTimer); ckTimer = setTimeout(function () { el.classList.remove('flash'); }, 450); }
-  var toastTimer = 0;
+  /** The notification lane starts just under whatever the HUD occupies on THIS screen: the timer block (with the live delta line), and in portrait also the two side panels. */
+  var laneTick = 0;
+  function placeLane() {
+    var top = 16, hudEl = $('hud');
+    if (!hudEl.classList.contains('hidden')) {
+      var tm = hudEl.querySelector('.timer'); if (tm) top = Math.max(top, tm.getBoundingClientRect().bottom + 8);
+      if (document.body.classList.contains('touch') && document.body.classList.contains('portrait')) ['.ckpanel', '.speedbox'].forEach(function (s) { var e = hudEl.querySelector(s); if (e) top = Math.max(top, e.getBoundingClientRect().bottom + 8); });
+    }
+    document.documentElement.style.setProperty('--lane', Math.round(top) + 'px');
+  }
+  var toastTimer = 0, pendingGhostToast = null;
+  /** hide every notification and forget what the HUD thinks is showing, so a restart / menu / pause can never leave a stale 'Rolled!' behind */
+  function clearNotices() {
+    placeLane();
+    var b = $('banner'); b.classList.remove('on'); if (b.firstChild) b.firstChild.textContent = ''; hud.ban = null;
+    $('tilt').classList.remove('on', 'hot'); hud.tilt = null;
+    $('split').classList.remove('on'); clearTimeout(splitTimer); $('toast').classList.remove('on'); clearTimeout(toastTimer); pendingGhostToast = null;
+  }
   function toast(msg, big) { var t = $('toast'); t.textContent = msg; t.classList.toggle('big', !!big); t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, big ? 2600 : 1400); }
 
   function updateHud() {
+    if ((laneTick++ & 15) === 0) placeLane();
     var t = C.fmtTime(sim.phase === 'finished' ? sim.finishMs : sim.timeMs());
     if (t !== hud.t) { $('hudTime').textContent = t; hud.t = t; }
     var gd = ghostDelta(), gtxt2 = gd === null ? '' : fmtDelta(gd);
@@ -3489,7 +3732,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     if (ban !== hud.ban) { $('banner').firstChild.textContent = ban; $('banner').classList.toggle('on', !!ban); hud.ban = ban; }
     if (sim.phase === 'countdown') {
       var left = Math.ceil((sim.cdTicks - sim.tick) / 120); var s = left > 0 ? String(left) : '';
-      if (s !== hud.cd) { $('countdown').textContent = s; hud.cd = s; $('countdown').classList.remove('pop'); void $('countdown').offsetWidth; $('countdown').classList.add('pop'); }
+      if (s !== hud.cd) { if (s !== '') sfx('beep'); $('countdown').textContent = s; hud.cd = s; $('countdown').classList.remove('pop'); void $('countdown').offsetWidth; $('countdown').classList.add('pop'); }
       var lights = $('lights').children; for (var i = 0; i < 3; i++) lights[i].classList.toggle('on', (3 - left) >= i && left > 0);
       $('lights').classList.remove('hidden');
     } else {
@@ -3521,7 +3764,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     updateCar(dt, alpha);
     updateGhost(dt, alpha);
     updateCamera(dt, view);
-    updateFx(dt);
+    updateFx(dt); updateAudio();
     if (state === 'racing' || state === 'finishing') updateHud();
     renderer.render(scene, camera);
     // adaptive resolution: keep frame time steady
@@ -3616,8 +3859,13 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     parCache = { key: raceDate, run: s.phase === 'finished' ? { ms: s.finishMs, log: log, cd: C.COUNTDOWN_TICKS, t: 0, par: true } : null };
     return parCache.run;
   }
+  var ghostPick = null, watchRun = null;
+  function pickKey() { return 'tgk.ghostpick.' + raceDate + '.' + track.sig; }
+  function loadPick() { ghostPick = null; try { var p = JSON.parse(store.get(pickKey()) || 'null'); if (p && p.ext && Array.isArray(p.log) && Number.isInteger(p.ms)) ghostPick = p; } catch (e) { } }
+  function clearPick(silent) { ghostPick = null; try { store.set(pickKey(), 'null'); } catch (e) { } if (!silent) { toast('Back to your own ghost'); } renderGhostLine(); }
   function ghostSource() {
     if (store.get('tgk.ghost') === '0') return null;
+    if (ghostPick) { if (buildGhostTrace(ghostPick).ms === ghostPick.ms) return ghostPick; ghostPick = null; toast('That run no longer matches today\'s course. Using your own ghost'); }
     var runs = loadRuns().slice().sort(function (a, b) { return a.ms - b.ms; });
     for (var i = 0; i < runs.length && i < 3; i++) { var r = runs[i]; if (r.log && r.log.length && buildGhostTrace(r).ms === r.ms) return r; }     // only a run that replays to its recorded time on THIS course
     return parRun();
@@ -3628,6 +3876,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function ghostMenuLine() {
     if (store.get('tgk.ghost') === '0') return 'Ghost off';
     var s = ghostSource(); if (!s) return '';
+    if (s.ext) return 'Ghost: ' + s.name + '\'s run ' + C.fmtTime(s.ms);
     return s.par ? 'Ghost ready: par lap ' + C.fmtTime(s.ms) + '. Beat it to set your own' : 'Ghost ready: your best ' + C.fmtTime(s.ms);
   }
   function makeBeacon() {
@@ -3667,9 +3916,10 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     var trace = buildGhostTrace(run);
     if (trace.ms < 0) { ghost = null; if (ghostCar) ghostCar.group.visible = false; return; }
     var gs = new C.Sim(track); gs.cdTicks = sim.cdTicks; gs.reset();
-    ghost = { par: !!run.par, run: run, trace: trace, sim: gs, log: shiftLog(run, sim.cdTicks), li: 0, bits: 0, prev: { x: gs.x, y: gs.y, z: gs.z, yaw: gs.yaw }, spin: 0 };
+    ghost = { par: !!run.par, ext: !!run.ext, name: run.name || '', run: run, trace: trace, sim: gs, log: shiftLog(run, sim.cdTicks), li: 0, bits: 0, prev: { x: gs.x, y: gs.y, z: gs.z, yaw: gs.yaw }, spin: 0 };
     if (!ghostCar) ghostCar = makeGhostCar();
-    ghostCar.group.visible = true; setBeaconText(ghostCar.beacon, ghost.par ? 'PAR' : 'BEST');
+    W.setPaint(ghostCar, run.ext ? run.hex : '#5fd6cf', { rough: 0.4, metal: 0.1, coat: 0 });
+    ghostCar.group.visible = true; setBeaconText(ghostCar.beacon, run.ext ? String(run.name || 'GHOST').toUpperCase().slice(0, 10) : (ghost.par ? 'PAR' : 'BEST'));
   }
   function setBeaconText(sp, txt) {
     var cv = sp.material.map.image, cx = cv.getContext && cv.getContext('2d'); if (!cx) return;
@@ -3714,7 +3964,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     var d = raceDate, n = 0, today = !!set[d]; if (!today) d = prevDay(d); while (set[d] && n < 400) { n++; d = prevDay(d); }
     return { n: n, today: today };
   }
-  function renderGhostLine() { var t = ghostMenuLine() + (persisted ? '' : ' \u00b7 this view cannot save between visits'); $('menuGhost').textContent = t; }
+  function renderGhostLine() { $('ghostClear').style.display = ghostPick ? '' : 'none'; $('ghostClear').onclick = function () { clearPick(false); }; var t = ghostMenuLine() + (persisted ? '' : ' \u00b7 this view cannot save between visits'); $('menuGhost').textContent = t; }
   function renderStreak() { var s = streakInfo(); $('menuStreak').textContent = s.n ? s.n + (s.n === 1 ? ' day' : ' days') + ' in a row' + (s.today ? '' : ' \u00b7 race today to keep it going') : ''; }
 
 
@@ -3829,7 +4079,8 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     return api('/functions/v1/auth-shopify', { method: 'POST', body: { code: code, codeVerifier: saved.verifier, nonce: saved.nonce, redirectUri: CFG.redirectUri } }).then(function (r) {
       if (r.status !== 200 || !r.body.session) { toast(r.body && r.body.missing ? 'Login is not set up yet (missing: ' + r.body.missing.join(', ') + ')' : (r.body && r.body.error ? r.body.error : 'Login failed'), true); return false; }
       auth = { token: r.body.session, name: r.body.name, exp: Date.now() / 1000 + (r.body.expiresInSeconds || 43200) - 60 }; saveSession(); renderAccount();
-      toast(/^Racer-\d{4}$/.test(auth.name) ? 'Signed in. Tap Change name to pick your racer name' : 'Signed in as ' + auth.name + '. Your runs now count'); return postBest();
+      if (/^Racer-\d{4}$/.test(auth.name)) { toast('Signed in. Choose your racer name'); openNameDialog(true); } else toast('Signed in as ' + auth.name + '. Your runs now count');
+      return postBest();
     }).catch(function () { toast('Could not reach the login server'); return false; });
   }
 
@@ -3842,7 +4093,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     return api('/functions/v1/submit-run', { method: 'POST', token: auth.token, body: payload }).then(function (r) {
       var b = r.body || {};
       if (r.status === 401) { auth = { token: null, name: null, exp: 0 }; ssDel('tgk.session'); renderAccount(); return { status: 'login_required' }; }
-      if (b.status === 'verified' || b.status === 'review') { markPosted(run); if (b.runId) lastRunId = b.runId; }
+      if (b.status === 'verified' || b.status === 'review') { markPosted(run); if (b.runId) lastRunId = b.runId; dayCache = null; }
       return b;
     });
   }
@@ -3870,10 +4121,31 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   }
 
   /* ---- leaderboard ---- */
+  /** validate a run that came from the server before the game ever replays it */
+  function validRun(row, id) {
+    if (!row || !Array.isArray(row.inputs) || row.inputs.length < 1 || row.inputs.length > 6000) return null;
+    if (row.cd_ticks !== 120 && row.cd_ticks !== 360) return null; if (!Number.isInteger(row.ms) || row.ms < 10000 || row.ms > 180000) return null;
+    var log = []; for (var i = 0; i < row.inputs.length; i++) { var e = row.inputs[i]; if (!Array.isArray(e) || e.length !== 2 || !Number.isInteger(e[0]) || !Number.isInteger(e[1]) || e[1] < 0 || e[1] > 63) return null; log.push([e[0], e[1]]); }
+    return { ms: row.ms, log: log, cd: row.cd_ticks, hex: /^#[0-9a-fA-F]{6}$/.test(row.paint_hex || '') ? row.paint_hex : '#5fd6cf', name: String(row.display_name || 'Racer').slice(0, 24), t: 'ext-' + id, ext: true, id: id };
+  }
+  function fetchRun(id) {
+    return api('/rest/v1/rpc/get_ghost', { method: 'POST', body: { p_run_id: id } }).then(function (r) { var run = Array.isArray(r.body) ? validRun(r.body[0], id) : null; if (!run) throw new Error('bad run'); return run; });
+  }
+  function buildRowActions(li, row) {
+    var box = document.createElement('div'); box.className = 'lbact';
+    function btn(label, cls, fn) { var b = document.createElement('button'); b.type = 'button'; b.className = 'btn2 ' + (cls || ''); b.textContent = label; b.addEventListener('click', function (e) { e.stopPropagation(); b.disabled = true; var old = b.textContent; b.textContent = 'Loading…'; fn().catch(function () { toast('Could not load that run'); }).then(function () { b.disabled = false; b.textContent = old; }); }); box.appendChild(b); }
+    btn('Watch run', '', function () { return fetchRun(row.run_id).then(function (run) { $('lb').classList.add('hidden'); startWatch(run); }); });
+    btn('Race this ghost', 'go', function () { return fetchRun(row.run_id).then(function (run) {
+      if (buildGhostTrace(run).ms !== run.ms) throw new Error('does not replay');
+      ghostPick = run; store.set(pickKey(), JSON.stringify(run)); $('lb').classList.add('hidden'); renderGhostLine(); toast('You will race ' + run.name + '\'s ghost ' + C.fmtTime(run.ms), true);
+    }); });
+    li.appendChild(box);
+  }
+  function startWatch(run) { if (state !== 'menu') return; watchRun = run; openOverview(); }
   function openLeaderboard() {
     var sheet = $('lb'), list = $('lbList'), sub = $('lbSub'); sheet.classList.remove('hidden'); list.textContent = '';
     if (!online.configured) { sub.textContent = 'The online leaderboard opens soon. Until then your times are saved on this device.'; return; }
-    sub.textContent = 'Loading…';
+    sub.textContent = 'Loading…'; $('lbHint').textContent = online.configured ? 'Tap a row to watch that run or race their ghost.' : '';
     api('/rest/v1/leaderboard?select=run_id,display_name,ms,paint_hex,jumps&race_date=eq.' + encodeURIComponent(raceDate) + '&order=ms.asc&limit=10').then(function (r) {
       var rows = Array.isArray(r.body) ? r.body : [];
       sub.textContent = rows.length ? 'Fastest verified runs today. Log in to qualify.' : 'No verified runs yet today. Be the first.'; if (loggedIn()) sub.textContent = rows.length ? 'Fastest verified runs today.' : 'No verified runs yet today. Be the first.';
@@ -3883,8 +4155,27 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
         nm.textContent = String(row.display_name || '');                                      // textContent: a name can never inject markup
         tm.textContent = C.fmtTime(row.ms) + (row.jumps ? '  \u2605' : '');
         li.appendChild(dot); li.appendChild(nm); li.appendChild(tm); if (lastRunId && row.run_id === lastRunId) li.className = 'mine'; list.appendChild(li);
+        li.setAttribute('tabindex', '0'); li.setAttribute('role', 'button');
+        function toggle(ev) { if (ev && ev.target && ev.target.tagName === 'BUTTON') return; var was = li.classList.contains('open'); [].forEach.call(list.children, function (x) { x.classList.remove('open'); }); if (!was) { if (!li.querySelector('.lbact')) buildRowActions(li, row); li.classList.add('open'); } }
+        li.addEventListener('click', toggle); li.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
       });
     }).catch(function () { sub.textContent = 'Could not reach the leaderboard right now.'; });
+  }
+  function openNameDialog(first) {
+    if (!loggedIn()) return;
+    $('nameInput').value = /^Racer-\d{4}$/.test(auth.name || '') ? '' : (auth.name || ''); $('nameHint').textContent = ''; $('nameSave').disabled = false;
+    $('nameSheet').classList.remove('hidden'); setTimeout(function () { try { $('nameInput').focus(); } catch (e) { } }, 60);
+  }
+  function saveName() {
+    var raw = $('nameInput').value.replace(/[^\p{L}\p{N} _-]/gu, '').replace(/\s+/g, ' ').trim();
+    if (raw.length < 2) { $('nameHint').textContent = 'Use at least 2 letters or numbers.'; return; }
+    $('nameSave').disabled = true; $('nameHint').textContent = 'Saving…';
+    api('/functions/v1/auth-shopify', { method: 'POST', token: auth.token, body: { action: 'rename', name: raw } }).then(function (r) {
+      $('nameSave').disabled = false;
+      if (r.status === 200 && r.body.session) { auth.token = r.body.session; auth.name = r.body.name; saveSession(); renderAccount(); $('nameSheet').classList.add('hidden'); toast('You are now ' + auth.name); }
+      else if (r.status === 401) { $('nameHint').textContent = 'Your login expired. Log in again.'; }
+      else $('nameHint').textContent = (r.body && r.body.error ? r.body.error : 'Could not change the name') + (/[.!]$/.test(r.body && r.body.error || '') ? '' : '.');
+    }).catch(function () { $('nameSave').disabled = false; $('nameHint').textContent = 'Could not reach the server. Try again.'; });
   }
   function renameRacer() {
     if (!loggedIn()) return;
@@ -3899,19 +4190,20 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     if (!online.configured) { t.textContent = 'Practice mode. The online leaderboard opens soon.'; b.style.display = 'none'; }
     else if (loggedIn()) { t.textContent = 'Signed in as ' + auth.name + '. Your runs qualify.'; b.textContent = 'Log out'; b.style.display = ''; b.onclick = logout; }
     else { t.textContent = 'Practice mode. Log in with your TGK account to qualify for the leaderboard.'; b.textContent = 'Log in'; b.style.display = online.canLogin ? '' : 'none'; b.onclick = function () { startLogin(false); }; }
-    var rn = $('acctRename'); rn.style.display = (online.configured && loggedIn()) ? '' : 'none'; rn.onclick = renameRacer;
+    var rn = $('acctRename'); rn.style.display = (online.configured && loggedIn()) ? '' : 'none'; rn.onclick = function () { openNameDialog(false); };
     badge.textContent = loggedIn() ? 'RANKED' : 'PRACTICE'; badge.className = 'mode ' + (loggedIn() ? 'ranked' : 'prac');
   }
   function initOnline() {
     loadSession(); renderAccount();
+    $('nameSave').addEventListener('click', saveName); $('nameCancel').addEventListener('click', function () { $('nameSheet').classList.add('hidden'); });
+    $('nameInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveName(); } else if (e.key === 'Escape') $('nameSheet').classList.add('hidden'); });
     $('lbBtn').addEventListener('click', openLeaderboard); $('lbClose').addEventListener('click', function () { $('lb').classList.add('hidden'); });
     if (online.configured && /[?&]code=/.test(window.location.search)) handleLoginReturn(window.location.search);
   }
 
   /* ---------------- all races today: everyone on the track at once ---------------- */
-  /* Your own runs replay exactly (the deterministic sim re-run from the recorded inputs, drawn as the full S6).
-     The crowd is a simulated field (practice build): each driver is the same deterministic sim driven by a bot with its own
-     pace, racing line and mistakes, recorded once at 10 Hz and played back as thousands-of-cars-ready instanced meshes. */
+  /* Live: every player's best verified run of today, re-run from its recorded inputs and drawn as one instanced mesh (cheap for hundreds of cars).
+     Practice build with no server: only your own runs on this device, drawn as the full S6. There are no computer-generated drivers. */
   var ov = null, SR = 10, swarmGeo = null, markerGeo = null;
   function runsKey() { return 'tgk.runs.' + raceDate + '.' + track.sig; }
   function loadRuns() { try { var a = JSON.parse(store.get(runsKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
@@ -3923,52 +4215,33 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   }
   function presetForHex(h) { for (var i = 0; i < W.PAINTS.length; i++) if (W.PAINTS[i].hex.toLowerCase() === String(h).toLowerCase()) return W.PAINTS[i]; return null; }
 
-  function botProfile(grip, brk) {
-    var v = new Array(track.N);
-    for (var i = 0; i < track.N; i++) v[i] = Math.min(C.CAR.vMax - 3, Math.sqrt(C.CAR.grip * grip / Math.max(Math.abs(track.K[i]), 1e-4)));
-    v[track.N - 1] = 0;
-    for (var j = track.N - 2; j >= 0; j--) v[j] = Math.min(v[j], Math.sqrt(v[j + 1] * v[j + 1] + 2 * C.CAR.brake * brk * C.DS));
-    return v;
-  }
-  /* one simulated driver -> a Float32Array of samples (x, y, z, yaw, roll, progress) every 1/SR s from the green light */
-  function swarmBot(i) {
-    var rng = C.mulberry32(C.hashSeed(raceDate + ':swarm:' + i)), half = track.width / 2;
-    var p = { g: 0.28 + Math.pow(rng(), 0.85) * 0.40, b: 0.30 + rng() * 0.38, la: 0.40 + rng() * 0.22, off: (rng() - 0.5) * 2 * (half - 3.2),
-              noise: rng() * rng() * 0.5, dead: 0.025 + rng() * 0.05, delay: Math.floor(Math.pow(rng(), 1.6) * 1.6 * 120),
-              quit: rng() < 0.2 ? Math.floor((0.06 + rng() * 0.8) * 40 * 120) : -1 };      // ~1 in 5 abandon the run part-way, as most started races do
-    var hue = rng(), sat = 0.55 + rng() * 0.4, lig = 0.38 + rng() * 0.3, jx = (rng() - 0.5) * 3.2;
-    var R = track.ramps.length && rng() < 0.2 ? track.ramps[0] : null, scErr = (rng() - 0.5) * 2 * 2.6, scLand = -1, I = C.internals;
-    var prof = botProfile(p.g, p.b), s = new C.Sim(track), buf = [], stuck = 0, jit = 0, steps = 0;
-    var maxTicks = C.COUNTDOWN_TICKS + 120 * 130, N = track.N, DS = C.DS;
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[c]; }); }
+  /** A real player's verified run, replayed headlessly into the compact samples the instanced cars are drawn from. Returns null if it does not
+   *  replay to exactly its verified time on this build of the game (a different game version): such a run is left out rather than shown wrong. */
+  function swarmFromRun(run) {
+    var s = new C.Sim(track), log = shiftLog(run, C.COUNTDOWN_TICKS), li = 0, bits = 0, buf = [], maxTicks = C.COUNTDOWN_TICKS + 120 * 150;
     function snap() { buf.push(s.x, s.y, s.z, s.yaw, s.rolled ? s.rollAng : 0, s.s); }
     for (var k = 1; k <= maxTicks; k++) {
-      var bits = 0;
-      if (p.quit >= 0 && s.raceTick >= p.quit) bits = 0;
-      else if (s.phase === 'racing' && s.raceTick >= p.delay) {
-        if (s.raceTick % 14 === 0) jit = (rng() - 0.5) * p.noise * 0.4;
-        var la = 8 + p.la * Math.abs(s.u), j = Math.min(N - 1, s.idx + Math.round(la / DS));
-        var tx = track.X[j] + track.TZ[j] * p.off, tz = track.Z[j] - track.TX[j] * p.off;
-        var dx = tx - s.x, dz = tz - s.z, fx = Math.sin(s.yaw), fz = Math.cos(s.yaw);
-        var ang = Math.atan2(dx * fz - dz * fx, dx * fx + dz * fz) + jit, vt = prof[Math.min(N - 1, s.idx + 3)];
-        if (s.u < vt) bits |= B.THR; else if (s.u > vt + 1.5) bits |= B.BRK;
-        if (ang > p.dead) bits |= B.RIGHT; else if (ang < -p.dead) bits |= B.LEFT;
-        if (R && !s.lastLanding && s.idx >= R.i - 26 && s.idx <= R.i + 14 && !s.launchActive && s.grounded) {      // go for the hidden rock: flat out, aimed at the slab
-          var ax = R.x + Math.sin(R.yaw) * 4 + Math.cos(R.yaw) * scErr, az = R.z + Math.cos(R.yaw) * 4 - Math.sin(R.yaw) * scErr;
-          var ad = Math.atan2((ax - s.x) * fz - (az - s.z) * fx, (ax - s.x) * fx + (az - s.z) * fz); bits = B.THR | (ad > 0.02 ? B.RIGHT : (ad < -0.02 ? B.LEFT : 0));
-        }
-        if (R && (s.launchActive || (!s.grounded && s.airTicks > 4 && s.lastLanding === null && s.raceTick > 0 && s.launchActive))) bits = I.jumpPilot(s, track, false);
-        if (R && s.lastLanding) { if (scLand < 0) scLand = s.tick; if (s.tick - scLand < 150) bits = I.jumpPilot(s, track, true); }
-        if (Math.abs(s.u) < 1 && s.raceTick > p.delay + 60) stuck++; else stuck = 0;
-        if (stuck > 240) { bits = B.RECOVER; if (stuck > 242) stuck = 0; }
-      }
-      s.step(bits); steps++;
+      while (li < log.length && log[li][0] <= k) { bits = log[li][1]; li++; }
+      s.step(bits);
       if (s.phase === 'racing' && s.raceTick % 12 === 0) snap();
       if (s.phase === 'finished' && Math.abs(s.u) < 0.05) break;
-      if (p.quit >= 0 && s.raceTick > p.quit + 360 && Math.abs(s.u) < 0.05) break;
     }
+    if (s.phase !== 'finished' || s.finishMs !== run.ms) return null;
     if (!buf.length) snap();
     snap();
-    return { f: new Float32Array(buf), n: buf.length / 6, ms: s.phase === 'finished' ? s.finishMs : -1, jumped: s.jumps > 0, hex: '#' + new THREE.Color().setHSL(hue, sat, lig).getHexString(), jx: jx, name: 'Racer ' + String(i + 1).padStart(4, '0'), curS: 0, fin: false };
+    return { f: new Float32Array(buf), n: buf.length / 6, ms: run.ms, jumped: s.jumps > 0, hex: run.hex, jx: ((C.hashSeed(String(run.id)) % 1000) / 1000 - 0.5) * 2.4, name: run.name, mine: !!run.mine, curS: 0, fin: false };
+  }
+  var dayCache = null;
+  /** every player's best verified run today (the server clamps the count), from the public day_runs function */
+  function fetchDayRuns() {
+    if (dayCache && dayCache.date === raceDate && Date.now() - dayCache.t < 60000) return Promise.resolve(dayCache);
+    var cap = coarse ? 50 : 100;
+    return api('/rest/v1/rpc/day_runs', { method: 'POST', body: { p_date: raceDate, p_limit: cap } }).then(function (r) {
+      if (r.status !== 200 || !Array.isArray(r.body)) throw new Error('bad response');
+      var out = []; r.body.forEach(function (row) { var run = validRun(row, row.run_id); if (run) { run.mine = !!((lastRunId && row.run_id === lastRunId) || (loggedIn() && run.name === auth.name)); out.push(run); } });
+      dayCache = { t: Date.now(), date: raceDate, runs: out, capped: r.body.length >= cap, cap: cap }; return dayCache;
+    });
   }
   function buildSwarmGeo() {
     if (swarmGeo) return swarmGeo;
@@ -4003,6 +4276,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
 
   function openOverview() {
     if (!world || state === 'overview') return;
+    clearNotices();
     state = 'overview';
     ['menu', 'results', 'pause', 'hud'].forEach(function (id) { $(id).classList.add('hidden'); });
     document.body.classList.remove('racing'); $('ov').classList.remove('hidden');
@@ -4012,17 +4286,53 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     var bb = track.bbox, tf = Math.tan(24 * Math.PI / 180), aspect = Math.max(0.5, window.innerWidth / Math.max(1, window.innerHeight));
     var needV = ((bb.z1 - bb.z0) + 160) / 2 / tf, needH = ((bb.x1 - bb.x0) + 160 + 260) / 2 / (tf * aspect);
     var Hfit = Math.max(needV, needH);
-    ov = { real: [], swarm: null, tick: 0, accum: 0, speed: 1, paused: false, ready: false, loading: false, Hfit: Hfit, cx: (bb.x0 + bb.x1) / 2 + 60 * Hfit / 700, cz: (bb.z0 + bb.z1) / 2,
+    ov = { real: [], swarm: null, tick: 0, accum: 0, speed: 1, paused: false, ready: false, loading: false, Hfit: Hfit, cx: (bb.x0 + bb.x1) / 2, cz: (bb.z0 + bb.z1) / 2,
            view: { mode: 'pack', az: 0.55, el: 0.68, D: 300, tx: 0, ty: 0, tz: 0, init: false, panX: 0, panZ: 0 }, goal: { el: 0.68, D: 300 }, listT: 0, vec: new THREE.Vector3(),
-           mesh: null, lead: null, meanS: 0, crowd: parseInt($('ovCrowd').value, 10) || 0, buildId: 0, tmp: {}, ent: [] };
-    setOvMode('pack'); buildOverview();
+           mesh: null, lead: null, meanS: 0, buildId: 0, tmp: {}, ent: [], zoomMul: 1, free: null, freeT: 0 };
+    ov.watch = watchRun;
+    $('ov').classList.remove('showlist'); ov.free = computeFree(); refitTrack(); setOvMode('pack'); buildOverview();
+  }
+  /** the part of the screen the panels do not cover: the camera centres and fits the action inside it */
+  function computeFree() {
+    var W2 = window.innerWidth, H2 = window.innerHeight, l = 0, t = 0, r = W2, b = H2;
+    try {
+      var bn = $('ovBanner').getBoundingClientRect(); if (bn.width >= W2 * 0.5) t = Math.max(t, bn.bottom);
+      var sd = document.querySelector('.ovside'); if (sd && sd.getClientRects().length) { var lr = sd.getBoundingClientRect(); if (lr.left >= W2 * 0.5 && lr.top < H2 * 0.6) r = Math.min(r, lr.left); else if (lr.top >= H2 * 0.4 && lr.width >= W2 * 0.5) b = Math.min(b, lr.top); }
+      var br = document.querySelector('.ovbar').getBoundingClientRect(); if (br.height > 0) b = Math.min(b, br.top);
+    } catch (e) { }
+    if (r - l < W2 * 0.3 || b - t < H2 * 0.3) { l = 0; t = 0; r = W2; b = H2; }
+    return { l: l, t: t, r: r, b: b, w: (r - l) / W2, h: (b - t) / H2 };
+  }
+  function refitTrack() {
+    var bb = track.bbox, tf = Math.tan(24 * Math.PI / 180), f = ov.free, aspect = Math.max(0.5, window.innerWidth / Math.max(1, window.innerHeight));
+    var needV = ((bb.z1 - bb.z0) + 160) / 2 / (tf * f.h), needH = ((bb.x1 - bb.x0) + 160) / 2 / (tf * aspect * f.w);
+    ov.Hfit = Math.max(needV, needH); if (ov.view && ov.view.mode === 'over') ov.goal.D = ov.Hfit / Math.sin(1.53);
+  }
+  /** where the racing is: the middle 88% of the cars still running (stragglers and the odd crash do not stretch the shot) */
+  function packBounds() {
+    var xs = [], zs = [], all = [];
+    function add(c) { all.push(c); if (!c.fin) { xs.push(c.px); zs.push(c.pz); } }
+    if (ov.swarm) ov.swarm.cars.forEach(add);
+    ov.real.forEach(function (c) { add({ px: c.car.group.position.x, pz: c.car.group.position.z, fin: c.sim.phase === 'finished' }); });
+    if (!xs.length) { all.forEach(function (c) { xs.push(c.px); zs.push(c.pz); }); }
+    var n = xs.length; if (!n) return null;
+    xs.sort(function (a, b) { return a - b; }); zs.sort(function (a, b) { return a - b; });
+    var lo = Math.floor(n * 0.06), hi = Math.max(lo, Math.ceil(n * 0.94) - 1);
+    var hx = (xs[hi] - xs[lo]) / 2, hz = (zs[hi] - zs[lo]) / 2;
+    return { x: (xs[lo] + xs[hi]) / 2, z: (zs[lo] + zs[hi]) / 2, R: Math.max(80, Math.hypot(hx, hz) * 1.05) };
+  }
+  function fitDist(R, W2, H2) {
+    var f = ov.free, tv = Math.tan(camera.fov * Math.PI / 360), asp = W2 / Math.max(1, H2), tanV = tv * f.h, tanH = tv * asp * f.w;
+    return Math.max(R * Math.max(Math.sin(ov.goal.el), 0.4) / tanV, R / tanH) * 1.2;
   }
   function setOvMode(m) {
     var v = ov.view; v.mode = m;
     if (m === 'over') { v.az = 0; v.panX = v.panZ = 0; ov.goal = { el: 1.53, D: ov.Hfit / Math.sin(1.53) }; }
     else if (m === 'lead') ov.goal = { el: 0.5, D: 85 };
-    else ov.goal = { el: 0.68, D: 300 };
+    else ov.goal = { el: 0.9, D: 300 };
+    ov.zoomMul = 1;
     ['Pack', 'Over', 'Lead'].forEach(function (n) { $('ovCam' + n).classList.toggle('on', n.toLowerCase() === m); });
+    $('ovCamCycle').textContent = { pack: 'Pack', lead: 'Leader', over: 'Map' }[m];
   }
   function clearOverview() {
     ov.real.forEach(function (c) { world.root.remove(c.car.group, c.marker); disposeObj(c.car.group); c.marker.traverse(function (n) { if (n.material) n.material.dispose(); }); if (c.label.parentNode) c.label.parentNode.removeChild(c.label); });
@@ -4033,36 +4343,52 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   function buildOverview() {
     clearOverview(); ov.ready = false; ov.tick = 0; ov.accum = 0; ov.lead = null;
     var id = ov.buildId = ov.buildId + 1;
-    var mine = loadRuns();
+    var serverMode = online.configured && !ov.watch;                 // live: every verified run of today. Offline/practice build: only your own runs on this device
+    var mine = ov.watch ? [ov.watch] : (serverMode ? [] : loadRuns());
     mine.forEach(function (r, i) {
       var s = new C.Sim(track), c = W.buildCar(THREE, qName); W.setPaint(c, r.hex, presetForHex(r.hex)); world.root.add(c.group);
-      var name = mine.length > 1 ? 'You ' + (i + 1) : 'You', m = makeMarker(r.hex); world.root.add(m);
+      var name = ov.watch ? ov.watch.name : (mine.length > 1 ? 'You ' + (i + 1) : 'You'), m = makeMarker(r.hex); world.root.add(m);
       var lab = document.createElement('div'); lab.className = 'ovlabel mine'; lab.textContent = name; $('ovLabels').appendChild(lab);
       ov.real.push({ run: r, log: shiftLog(r, C.COUNTDOWN_TICKS), name: name, sim: s, car: c, marker: m, label: lab, li: 0, bits: 0, spin: 0, txt: name, stopped: false, prev: { x: s.x, y: s.y, z: s.z, yaw: s.yaw } });
     });
-    var n = ov.crowd;
-    ov.swarm = { n: n, cars: [], built: 0, id: id };
-    if (n > 0) {
+    ov.swarm = { runs: [], cars: [], built: 0, skipped: 0, capped: false, id: id };
+    if (!serverMode) { ov.loading = false; ov.ready = true; ovHeadline(); return; }
+    ov.loading = true; ov.failed = false; $('ovCount').textContent = '\u2026'; $('ovSub').textContent = 'Loading today\'s races\u2026';
+    fetchDayRuns().then(function (d) {
+      if (!ov || ov.buildId !== id) return;
+      var sw = ov.swarm; sw.runs = d.runs; sw.capped = d.capped;
+      if (!d.runs.length) { ov.loading = false; ov.ready = true; ovHeadline(); return; }
       var geo = buildSwarmGeo(), mat = new THREE.MeshLambertMaterial({ vertexColors: true });
-      ov.mesh = new THREE.InstancedMesh(geo, mat, n); ov.mesh.frustumCulled = false;
+      ov.mesh = new THREE.InstancedMesh(geo, mat, d.runs.length); ov.mesh.frustumCulled = false;
       ov.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); ov.mesh.setColorAt(0, new THREE.Color(1, 1, 1)); ov.mesh.count = 0;   // colour buffer is sized from count, so create it first
-      world.root.add(ov.mesh); ov.loading = true; $('ovSub').textContent = 'Loading drivers 0/' + n + '…';
-    } else { ov.loading = false; ov.ready = true; ovHeadline(); }
+      world.root.add(ov.mesh);
+    }).catch(function () { if (!ov || ov.buildId !== id) return; ov.loading = false; ov.ready = true; ov.failed = true; ovHeadline(); });
   }
   function ovHeadline() {
-    var total = ov.real.length + (ov.swarm ? ov.swarm.cars.length : 0);
-    $('ovCount').textContent = total.toLocaleString('en-US') + ' RACES STARTED';
-    var jc = ov.swarm ? ov.swarm.cars.filter(function (c) { return c.jumped; }).length : 0;
-    $('ovSub').textContent = ov.real.length + (ov.real.length === 1 ? ' run of yours' : ' runs of yours') + (ov.swarm && ov.swarm.cars.length ? ' + ' + ov.swarm.cars.length.toLocaleString('en-US') + ' simulated drivers' : '') + (jc ? ' \u00b7 ' + jc + ' found the rock jump' : '');
+    if (ov.watch) { $('ovCount').textContent = String(ov.watch.name).toUpperCase() + '  \u00b7  ' + C.fmtTime(ov.watch.ms); $('ovSub').textContent = 'Verified run from today\'s leaderboard, replayed exactly'; $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date()).toUpperCase().replace(',', ''); return; }
+    var sw = ov.swarm, shown = sw.cars.length, jc = sw.cars.filter(function (c) { return c.jumped; }).length, sub;
+    if (online.configured) {
+      $('ovCount').textContent = shown.toLocaleString('en-US') + (shown === 1 ? ' RACE TODAY' : ' RACES TODAY');
+      sub = ov.failed ? 'Could not load today\'s races. Check your connection, then tap Replay.' : (shown ? 'Verified runs by TGK customers \u00b7 best run per player' + (sw.capped ? ' \u00b7 fastest ' + sw.runs.length + ' shown' : '') : 'No verified runs yet today. Be the first.');
+      if (jc) sub += ' \u00b7 ' + jc + ' found the rock jump';
+      if (sw.skipped) sub += ' \u00b7 ' + sw.skipped + ' not shown (made on another game version)';
+    } else {
+      $('ovCount').textContent = ov.real.length + (ov.real.length === 1 ? ' PRACTICE RUN' : ' PRACTICE RUNS');
+      sub = 'Your runs on this device. Log in to see the real field.';
+    }
+    $('ovSub').textContent = sub;
     $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date()).toUpperCase().replace(',', '');
   }
-  function swarmLoad() {       // a few drivers per frame so the page stays responsive
+  function swarmLoad() {       // a few runs per frame so the page stays responsive
     var sw = ov.swarm, t0 = Date.now(), cap = 8;
-    while (sw.built < sw.n && cap-- > 0 && Date.now() - t0 < 14) {
-      var car = swarmBot(sw.built), k = sw.built++; sw.cars.push(car); ov.mesh.setColorAt(k, new THREE.Color(car.hex));
+    if (!ov.mesh) return;
+    while (sw.built < sw.runs.length && cap-- > 0 && Date.now() - t0 < 14) {
+      var car = swarmFromRun(sw.runs[sw.built++]);
+      if (!car) { sw.skipped++; continue; }
+      var k = sw.cars.length; sw.cars.push(car); ov.mesh.setColorAt(k, new THREE.Color(car.hex));
     }
-    $('ovSub').textContent = 'Loading drivers ' + sw.built + '/' + sw.n + '…';
-    if (sw.built >= sw.n) { ov.mesh.instanceColor.needsUpdate = true; ov.loading = false; ov.ready = true; ov.tick = 0; ov.accum = 0; ovHeadline(); }
+    $('ovSub').textContent = 'Loading races ' + sw.built + '/' + sw.runs.length + '\u2026';
+    if (sw.built >= sw.runs.length) { ov.mesh.instanceColor.needsUpdate = true; ov.loading = false; ov.ready = true; ov.tick = 0; ov.accum = 0; ovHeadline(); }
   }
   function ovStep() {
     for (var i = 0; i < ov.real.length; i++) {
@@ -4087,7 +4413,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
       var o = a * 6, o2 = (a < n - 1 ? a + 1 : a) * 6;
       var x = F[o] + (F[o2] - F[o]) * f, y = F[o + 1] + (F[o2 + 1] - F[o + 1]) * f, z = F[o + 2] + (F[o2 + 2] - F[o + 2]) * f;
       var yaw = F[o + 3] + (F[o2 + 3] - F[o + 3]) * f, roll = F[o + 4] + (F[o2 + 4] - F[o + 4]) * f, sp = F[o + 5] + (F[o2 + 5] - F[o + 5]) * f;
-      c.curS = sp; c.fin = c.ms >= 0 && elapsed >= c.ms;
+      c.curS = sp; c.fin = c.ms >= 0 && elapsed >= c.ms; c.px = F[o] + (F[o2] - F[o]) * f; c.pz = F[o + 2] + (F[o2 + 2] - F[o + 2]) * f;
       if (!c.fin) { sumS += sp; nAlive++; if (sp > leadS) { leadS = sp; leadC = c; } }
       var cy = Math.cos(yaw), sy = Math.sin(yaw), cr = Math.cos(roll), sr = Math.sin(roll);
       x += cy * c.jx; z -= sy * c.jx;                                 // sideways offset so the start-line pile is not one car on top of another
@@ -4144,14 +4470,19 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
       var L = ov.leadC; if (L) { var q = Math.min(L.n - 1, Math.floor(Math.max(0, tRace) * SR)), o = q * 6; tx = L.f[o]; ty = L.f[o + 1]; tz = L.f[o + 2]; v.az = L.f[o + 3]; }
       else { tx = realLead.sim.x; ty = realLead.sim.y; tz = realLead.sim.z; v.az = realLead.sim.yaw; }
     } else {
-      var idx = C.clamp(Math.round((ov.ready ? ov.meanS : 0) / C.DS), 0, track.N - 1); tx = track.X[idx]; tz = track.Z[idx]; ty = track.Y[idx];
+      var pk = ov.ready ? packBounds() : null;
+      if (pk) { tx = pk.x; tz = pk.z; ty = C.groundAt(track, tx, tz, undefined, ov.tmp).gy; ov.goal.D = C.clamp(fitDist(pk.R, W2, H2) * ov.zoomMul, 60, ov.Hfit * 1.6); }
+      else { var idx = C.clamp(Math.round((ov.ready ? ov.meanS : 0) / C.DS), 0, track.N - 1); tx = track.X[idx]; tz = track.Z[idx]; ty = track.Y[idx]; }
     }
     if (!v.init) { v.tx = tx; v.tz = tz; v.ty = ty; v.init = true; }
-    var ks = Math.min(1, dt * (v.mode === 'over' ? 8 : 2.6)); v.tx += (tx - v.tx) * ks; v.tz += (tz - v.tz) * ks; v.ty += (ty - v.ty) * ks;
+    // follow faster when the replay runs faster, or the camera falls behind the cars
+    var ks = Math.min(1, dt * (v.mode === 'over' ? 8 : 2.6 * Math.max(1, ov.paused ? 1 : ov.speed))); v.tx += (tx - v.tx) * ks; v.tz += (tz - v.tz) * ks; v.ty += (ty - v.ty) * ks;
     var ce = Math.cos(v.el), se = Math.sin(v.el);
     var cx = v.tx - Math.sin(v.az) * ce * v.D, cy = v.ty + se * v.D, cz = v.tz - Math.cos(v.az) * ce * v.D;
     var gnd = C.groundAt(track, cx, cz, undefined, ov.tmp).gy + 4; if (cy < gnd) cy = gnd;
     camera.position.set(-cx, cy, cz); camera.lookAt(-v.tx, v.ty, v.tz);
+    ov.freeT -= dt; if (ov.freeT <= 0) { ov.freeT = 0.4; ov.free = computeFree(); refitTrack(); }
+    camera.setViewOffset(W2, H2, Math.round(W2 / 2 - (ov.free.l + ov.free.r) / 2), Math.round(H2 / 2 - (ov.free.t + ov.free.b) / 2), W2, H2);   // centre the action in the part of the screen the panels leave free
     // clock + ranking
     $('ovClock').textContent = ov.ready ? C.fmtTime(Math.max(0, tRace * 1000)) : '--:--.---';
     ov.listT -= dt;
@@ -4159,16 +4490,16 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
   }
   function renderOvList(elapsed) {
     var ent = [];
-    if (ov.swarm) ov.swarm.cars.forEach(function (c) { ent.push({ name: c.name, hex: c.hex, fin: c.fin, ms: c.ms, s: c.curS, mine: false }); });
+    if (ov.swarm) ov.swarm.cars.forEach(function (c) { ent.push({ name: c.name, hex: c.hex, fin: c.fin, ms: c.ms, s: c.curS, mine: !!c.mine }); });
     ov.real.forEach(function (c) { var f = c.sim.phase === 'finished'; ent.push({ name: c.name, hex: c.run.hex, fin: f, ms: c.sim.finishMs, s: c.sim.s, mine: true }); });
     ent.sort(function (a, b) { if (a.fin && b.fin) return a.ms - b.ms; if (a.fin) return -1; if (b.fin) return 1; return b.s - a.s; });
     var TOP = 12, h = '';
     function row(e, i) {
       var right = e.fin ? C.fmtTime(e.ms) : Math.max(0, Math.round(track.length - e.s)) + ' m';
-      return '<div class="ovrow' + (e.mine ? ' mine' : '') + '"><b>' + (i + 1) + '</b><i style="background:' + e.hex + '"></i><span>' + e.name + '</span><em>' + right + '</em></div>';
+      return '<div class="ovrow' + (e.mine ? ' mine' : '') + '"><b>' + (i + 1) + '</b><i style="background:' + esc(e.hex) + '"></i><span>' + esc(e.name) + '</span><em>' + right + '</em></div>';
     }
     ent.forEach(function (e, i) { if (i < TOP || e.mine) { if (i >= TOP && i === TOP) h += '<div class="ovgap">…</div>'; h += row(e, i); } });
-    $('ovList').innerHTML = h || '<div class="ovempty">No runs yet today. Finish a race, or add simulated drivers.</div>';
+    $('ovList').innerHTML = h || '<div class="ovempty">' + (online.configured ? 'No verified runs yet today.' : 'No runs yet. Finish a race to see it here.') + '</div>';
     ov.ent = ent;
   }
   function ovRestart() { if (ov) buildOverview(); }
@@ -4178,9 +4509,10 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     world.sky.visible = true; scene.fog = new THREE.Fog(world.pal.fog, 120, QUALITY[qName].fogFar); scene.background = new THREE.Color(world.pal.horizon);
     camera.far = 2600; camera.near = 0.2; camera.fov = 62; camera.up.set(0, 1, 0); camera.updateProjectionMatrix();
     carObj.group.visible = true; FX.smoke.mesh.visible = true; FX.trails.mesh.visible = true;
+    watchRun = null; try { camera.clearViewOffset(); } catch (e) { } $('ov').classList.remove('showlist');
     ov = null; cam.init = false; toMenu();
   }
-  function ovZoom(f) { if (!ov) return; var D = C.clamp(ov.view.D * f, 30, ov.Hfit * 1.6); ov.view.D = ov.goal.D = D; }
+  function ovZoom(f) { if (!ov) return; if (ov.view.mode === 'pack') { ov.zoomMul = C.clamp(ov.zoomMul * f, 0.35, 3); return; } var D = C.clamp(ov.view.D * f, 30, ov.Hfit * 1.6); ov.view.D = ov.goal.D = D; }
   (function ovInput() {
     var canvas = $('gl'), pts = {};
     canvas.addEventListener('wheel', function (e) { if (state !== 'overview') return; e.preventDefault(); ovZoom(Math.exp(e.deltaY * 0.0015)); }, { passive: false });
@@ -4216,9 +4548,11 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     $('ovBack').addEventListener('click', closeOverview); $('ovRestart').addEventListener('click', ovRestart);
     $('ovZin').addEventListener('click', function () { ovZoom(0.7); }); $('ovZout').addEventListener('click', function () { ovZoom(1 / 0.7); });
     $('ovPause').addEventListener('click', function () { if (ov) { ov.paused = !ov.paused; $('ovPause').textContent = ov.paused ? 'Play' : 'Pause'; } });
-    [1, 2, 4].forEach(function (n) { $('ovS' + n).addEventListener('click', function () { if (ov) { ov.speed = n; [1, 2, 4].forEach(function (m) { $('ovS' + m).classList.toggle('on', m === n); }); } }); });
+    [1, 2, 4].forEach(function (n) { $('ovS' + n).addEventListener('click', function () { if (ov) { ov.speed = n; $('ovSpeedCycle').textContent = n + 'x'; [1, 2, 4].forEach(function (m) { $('ovS' + m).classList.toggle('on', m === n); }); } }); });
+    $('ovCamCycle').addEventListener('click', function () { if (ov) setOvMode({ pack: 'lead', lead: 'over', over: 'pack' }[ov.view.mode]); });
+    $('ovSpeedCycle').addEventListener('click', function () { if (ov) $('ovS' + ({ 1: 2, 2: 4, 4: 1 }[ov.speed] || 1)).click(); });
+    $('ovListBtn').addEventListener('click', function () { $('ov').classList.toggle('showlist'); $('ovListBtn').classList.toggle('on', $('ov').classList.contains('showlist')); if (ov) ov.freeT = 0; });
     $('ovCamPack').addEventListener('click', function () { if (ov) setOvMode('pack'); }); $('ovCamOver').addEventListener('click', function () { if (ov) setOvMode('over'); }); $('ovCamLead').addEventListener('click', function () { if (ov) setOvMode('lead'); });
-    $('ovCrowd').addEventListener('change', function () { if (ov) { ov.crowd = parseInt($('ovCrowd').value, 10) || 0; buildOverview(); } });
     $('garageBtn').addEventListener('click', function () { $('mainView').classList.add('hidden'); $('garageView').classList.remove('hidden'); });
     $('garageBack').addEventListener('click', function () { $('garageView').classList.add('hidden'); $('mainView').classList.remove('hidden'); });
     $('againBtn').addEventListener('click', function () { startRace(true); });
@@ -4231,6 +4565,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     $('ghostSel').value = store.get('tgk.ghost') === '0' ? '0' : '1'; $('quickSel').value = store.get('tgk.quick') === '0' ? '0' : '1';
     $('ghostSel').addEventListener('change', function () { store.set('tgk.ghost', $('ghostSel').value); });
     $('quickSel').addEventListener('change', function () { store.set('tgk.quick', $('quickSel').value); });
+    syncSoundUi(); ['sndSel', 'sndMenu'].forEach(function (id) { $(id).addEventListener('change', function () { setSound($(id).value); }); });
     $('qSel').addEventListener('change', function () { qName = $('qSel').value; store.set('tgk.quality', qName); prPerf = 1; applyQuality(true); });
     $('qMenu').value = qName;
     $('qMenu').addEventListener('change', function () { qName = $('qMenu').value; store.set('tgk.quality', qName); prPerf = 1; applyQuality(true); });
@@ -4247,7 +4582,7 @@ if (typeof module !== 'undefined') module.exports = TGKFX;
     } catch (e) { console.error(e); $('fatal').classList.remove('hidden'); $('fatalMsg').textContent = String(e && e.message || e); }
   }
   boot();
-  window.__tgk = { online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; } };
+  window.__tgk = { dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; } };
 })();
 
 </script>
