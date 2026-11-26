@@ -643,6 +643,25 @@ body.gview #gcFloat{display:flex}
 @media (max-width:430px) and (max-height:700px){ .arow select{min-height:38px} .arow{gap:2px} #garageView .gtabs button{min-height:40px} }
 
 @media (max-width:720px) and (orientation:portrait) and (max-height:700px){ #garageView .paint-head{margin:4px 0 2px;row-gap:3px} .gcam button{min-height:32px;min-width:36px;padding:0 8px} #garageView .gtabs{margin:4px 0} }
+
+/* ---- garage and menu: the car gets real room, and the buttons are uniform ---- */
+.ghead{position:sticky;top:0;z-index:5;background:rgba(8,8,9,.97);padding-bottom:2px}
+#garageBack{position:sticky;bottom:0;z-index:5;background:#0b0d0e}
+@media (orientation:portrait){ #menu.gopen .mcard{max-height:57%} #menu.gopen #topbar{display:none} }
+.gcam button,#gcFloat button{box-sizing:border-box;height:40px;min-width:40px;padding:0 12px;white-space:nowrap;flex:none;display:inline-flex;align-items:center;justify-content:center;font:700 13px/1 var(--font);letter-spacing:.06em;text-transform:uppercase}
+.gcam button:last-child{font-size:13px}
+#gcFloat{flex-wrap:nowrap;max-width:calc(100vw - 16px);gap:6px}
+#gcFloat button{height:46px;min-width:48px;font-size:13px}
+#gcFloat #gcShow{padding:0 16px}
+body.gview #topbar{display:none}
+
+@media (orientation:portrait){ #topbar{display:grid;grid-template-columns:repeat(2,44px);gap:6px;top:calc(env(safe-area-inset-top,0px) + 8px);right:calc(env(safe-area-inset-right,0px) + 8px)} #topbar>*{width:44px;height:44px} }
+
+#menu.gopen .mcard{scroll-padding-top:150px;scroll-padding-bottom:70px}
+#garageView .gpane{scroll-margin-top:150px;scroll-margin-bottom:70px}
+#garageView .gpane *{scroll-margin-top:150px;scroll-margin-bottom:70px}
+
+@media (orientation:portrait) and (max-height:700px){ #topbar{grid-template-columns:repeat(2,42px);gap:5px;top:calc(env(safe-area-inset-top,0px) + 4px)} #topbar>*{width:42px;height:42px} }
 </style>
 </head>
 <body>
@@ -684,12 +703,14 @@ body.gview #gcFloat{display:flex}
         <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#about">About</a><a href="#support">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></nav>
       </div>
       <div id="garageView" class="hidden">
+        <div class="ghead">
         <div class="paint-head"><b>Garage</b><button type="button" class="linkbtn" id="achBtn">Achievements</button><span class="gcam" role="group" aria-label="Camera"><button type="button" id="gcView" aria-label="Hide the panel to see the whole car">View</button><button type="button" id="gcOut" aria-label="Zoom out">&minus;</button><button type="button" id="gcIn" aria-label="Zoom in">+</button><button type="button" id="gcReset" aria-label="Reset the view">Reset</button></span><span id="paintName"></span></div>
         <div class="gtabs" role="tablist" aria-label="Garage sections">
           <button type="button" role="tab" data-tab="paint" class="on" aria-selected="true">Paint</button>
           <button type="button" role="tab" data-tab="decals" aria-selected="false">Decals</button>
           <button type="button" role="tab" data-tab="acc" aria-selected="false">Parts</button>
           <button type="button" role="tab" data-tab="veh" aria-selected="false">Cars</button>
+        </div>
         </div>
         <div class="gpane" id="gPaint"><div id="swatches"></div></div>
         <div class="gpane hidden" id="gDecals">
@@ -789,6 +810,7 @@ body.gview #gcFloat{display:flex}
 <section id="acctSheet" class="sheet hidden" role="dialog" aria-label="Account">
   <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
     <h2>Account</h2><div id="acctName" class="acctname"></div><div id="acctSub" class="meta"></div>
+    <div id="acctSync" class="meta" aria-live="polite" style="margin-top:6px"></div>
     <div class="srow"><span>Races finished</span><b id="stRaces">0</b></div>
     <div class="srow"><span>Best streak</span><b id="stStreak">0</b></div>
     <div class="srow"><span>Achievements</span><b id="stAch">0</b></div>
@@ -4701,12 +4723,12 @@ var TGKPages = (function () {
     W.PAINTS.forEach(function (p) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.style.setProperty('--c', p.hex);
       b.title = p.name; b.setAttribute('aria-label', p.name); b.setAttribute('aria-pressed', String(paintId === p.id));
-      b.addEventListener('click', function () { paintId = p.id; store.set('tgk.paint', p.id); applyPaint(); refreshSwatches(); });
+      b.addEventListener('click', function () { paintId = p.id; store.set('tgk.paint', p.id); markGarageChanged(); applyPaint(); refreshSwatches(); });
       box.appendChild(b); b._id = p.id;
     });
     var lab = document.createElement('label'); lab.className = 'sw custom'; lab.title = 'Custom colour';
     var inp = document.createElement('input'); inp.type = 'color'; inp.value = paintHex || '#e8731c'; inp.setAttribute('aria-label', 'Custom colour');
-    inp.addEventListener('input', function () { paintId = 'custom'; paintHex = inp.value; store.set('tgk.paint', 'custom'); store.set('tgk.paintHex', paintHex); applyPaint(); refreshSwatches(); });
+    inp.addEventListener('input', function () { paintId = 'custom'; paintHex = inp.value; store.set('tgk.paint', 'custom'); store.set('tgk.paintHex', paintHex); markGarageChanged(); applyPaint(); refreshSwatches(); });
     lab.appendChild(inp); box.appendChild(lab); lab._id = 'custom';
     refreshSwatches();
   }
@@ -4840,7 +4862,7 @@ var TGKPages = (function () {
 
   /* ---------------- camera ---------------- */
   var camMode = parseInt(store.get('tgk.cam'), 10) || 0, camNames = ['Chase', 'Far chase', 'Bumper'];
-  var cam = { x: 0, y: 0, z: 0, yaw: 0, fov: 62, shake: 0, init: false, az: 0.6, el: 0.22, drag: false, zoom: 1, zoomT: 1, manual: false };
+  var cam = { x: 0, y: 0, z: 0, yaw: 0, fov: 62, shake: 0, init: false, az: 0.6, el: 0.30, drag: false, zoom: 1, zoomT: 1, manual: false };
   function cycleCamera() { camMode = (camMode + 1) % 3; store.set('tgk.cam', String(camMode)); cam.init = false; toast('Camera: ' + camNames[camMode], false, 'key'); }
   function angDiff(a, b) { var d = a - b; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
   var sfTmp = {};
@@ -4852,38 +4874,55 @@ var TGKPages = (function () {
 
   /** the menu card covers most of a phone screen: slide the 3D scene so the car shows in the strip / beside the card that is left */
   /** while the garage is open: where the car should sit (the space the panel leaves free) and how far back the camera must be for the whole car to fit there */
+  /** View mode: measure the car as it appears on screen and nudge the camera distance and height until it fills a comfortable share of the screen and sits clear of the buttons, whatever the screen shape */
+  var viewFit = { r: 0, oy: 0, on: false };
+  function fitView(dt) {
+    if (!carObj || !carObj.body) return; var W = window.innerWidth, H = window.innerHeight, port = H > W;
+    if (!viewFit.on) { viewFit.on = true; viewFit.r = 0; viewFit.oy = 0; }
+    var box = new THREE.Box3().setFromObject(carObj.body); camera.updateMatrixWorld(true);
+    var xs = [], ys = [], vv = new THREE.Vector3(), i, j, k;
+    for (i = 0; i < 2; i++) for (j = 0; j < 2; j++) for (k = 0; k < 2; k++) { vv.set(i ? box.max.x : box.min.x, j ? box.max.y : box.min.y, k ? box.max.z : box.min.z).project(camera); xs.push((vv.x + 1) / 2 * W); ys.push((1 - vv.y) / 2 * H); }
+    var l = Math.min.apply(null, xs), r = Math.max.apply(null, xs), t = Math.min.apply(null, ys), b = Math.max.apply(null, ys), bw = r - l, bh = b - t;
+    var tw = port ? 0.78 : 0.62, th = port ? 0.46 : 0.56, scale = Math.max(bw / (W * tw), bh / (H * th)), cur = garageR || 8.4;
+    viewFit.r = C.clamp(viewFit.r ? viewFit.r + (cur * scale - viewFit.r) * Math.min(1, dt * 3) : cur * scale, 4.5, 40);
+    var barH = 66, wantC = (H - barH) / 2, errY = (t + b) / 2 - wantC;                                                // keep the car centred in the space above the buttons
+    viewFit.oy += errY * Math.min(1, dt * 3);
+  }
   function garageView() {
     if (!HAS_G || $('garageView').classList.contains('hidden')) return null;
-    if (document.body.classList.contains('gview')) { var tv = Math.tan(camera.fov * Math.PI / 360), kv = Math.min(window.innerWidth, window.innerHeight) / window.innerHeight; return { ox: 0, oy: 0, r: C.clamp(5.8 / (2 * tv * kv), 6, 34) }; }      // panel hidden: the car has the whole screen
+    if (document.body.classList.contains('gview')) { var tv = Math.tan(camera.fov * Math.PI / 360), W0 = window.innerWidth, H0 = window.innerHeight; return { ox: 0, oy: Math.round(viewFit.oy), r: viewFit.r || C.clamp(5.6 / (2 * tv * (W0 / H0) * (H0 > W0 ? 0.78 : 0.62)), 4.5, 34) }; }      // panel hidden: the car is sized to fit the screen (measured live)
     var c = document.querySelector('#menu .mcard'); if (!c) return null;
     var r = c.getBoundingClientRect(), w = window.innerWidth, h = window.innerHeight, fcx = w / 2, fcy = h / 2, fw = w, fh = h;
     if (r.width >= w * 0.85) { fh = Math.max(h * 0.25, r.top); fcy = fh / 2; }                    // a sheet along the bottom: the car goes in the space above it
     else if (r.left < w / 2) { var left = r.right + 10; fw = Math.max(w * 0.25, w - left); fcx = left + fw / 2; }
     var t = Math.tan(camera.fov * Math.PI / 360), k = Math.min(fw, fh) / h;
-    return { ox: Math.round(w / 2 - fcx), oy: Math.round(h / 2 - fcy), r: C.clamp(5.8 / (2 * t * k), 6, 34) };
+    return { ox: Math.round(w / 2 - fcx), oy: Math.round(h / 2 - fcy), r: C.clamp(6.6 / (2 * t * k), 6, 34) };
   }
   function menuViewOffset() {
     var w = window.innerWidth, h = window.innerHeight, portrait = h > w, small = Math.min(w, h) < 560;
     var gv = garageView(); if (gv) { camera.setViewOffset(w, h, gv.ox, gv.oy, w, h); return; }
     if (!small) { clearViewOffset(); return; }
-    if (portrait) camera.setViewOffset(w, h, 0, Math.round(h * 0.40), w, h); else camera.setViewOffset(w, h, -Math.round(w * 0.26), 0, w, h);
+    if (portrait) camera.setViewOffset(w, h, Math.round(w * 0.13), Math.round(h * 0.40), w, h);              // car to the left, clear of the icon grid on the right else camera.setViewOffset(w, h, -Math.round(w * 0.26), 0, w, h);
   }
   function clearViewOffset() { if (camera.view && camera.view.enabled) { camera.clearViewOffset(); camera.updateProjectionMatrix(); } }
   function updateCamera(dt, v) {
     if (!shakeOn) cam.shake = 0;
     var speed = Math.hypot(sim.u, sim.v);
+    if (carObj && carObj.stage && carObj.stage.visible !== undefined) carObj.stage.visible = (state === 'menu');          // the showroom disc is only for the menu and garage
     if (state === 'menu') {
+      if (carObj && !carObj.stage) { try { carObj.stage = makeStage(); carObj.group.add(carObj.stage); } catch (e) { carObj.stage = {}; } } if (carObj && carObj.stage && carObj.stage.visible !== undefined) carObj.stage.visible = true;
       var gf = garageFocus(), inG = !!garageView();
       if (!inG) { cam.manual = false; cam.zoomT = 1; if (document.body.classList.contains('gview')) document.body.classList.remove('gview'); }                                                      // leaving the garage hands the camera back
       cam.zoom += (cam.zoomT - cam.zoom) * Math.min(1, dt * 9);
       if (inG && cam.manual && !cam.drag) { /* the player's own view: no auto-turn, no snap back to a preset angle */ }
       else if (gf && !cam.drag) { cam.az += angDiff(gf.az, cam.az) * Math.min(1, dt * 3); cam.el += (gf.el - cam.el) * Math.min(1, dt * 3); gWas = true; }
-      else if (!cam.drag) { if (gWas) { cam.el += (0.22 - cam.el) * Math.min(1, dt * 3); if (Math.abs(cam.el - 0.22) < 0.01) gWas = false; } cam.az += dt * 0.25; }
+      else if (!cam.drag) { if (gWas) { cam.el += (0.30 - cam.el) * Math.min(1, dt * 3); if (Math.abs(cam.el - 0.30) < 0.01) gWas = false; } cam.az += dt * 0.25; }
       var pSmall = window.innerHeight > window.innerWidth && window.innerWidth < 560, r = pSmall ? 17 : 8.4, cx = v.x, cz = v.z, cy = v.y + 0.75;
       var gv0 = garageView(), baseR = r;                                                              // while the garage is open, pull back (smoothly) until the car fits beside the panel; ease back out afterwards
-      if (gv0) { garageR = garageR ? garageR + (Math.max(baseR, gv0.r) - garageR) * Math.min(1, dt * 4) : baseR; r = garageR; }
+      if (gv0) { var wantR = document.body.classList.contains('gview') ? gv0.r : Math.max(baseR, gv0.r); garageR = garageR ? garageR + (wantR - garageR) * Math.min(1, dt * 4) : baseR; r = garageR; }
       else if (garageR) { garageR += (baseR - garageR) * Math.min(1, dt * 4); r = garageR; if (Math.abs(garageR - baseR) < 0.05) garageR = 0; }
       r *= cam.zoom;
+      if (document.body.classList.contains('gview')) { try { fitView(dt); } catch (e) { } } else viewFit.on = false;
       var px = cx + Math.sin(cam.az) * Math.cos(cam.el) * r, pz = cz + Math.cos(cam.az) * Math.cos(cam.el) * r, py = cy + Math.sin(cam.el) * r + 0.6;
       py = Math.max(py, groundAt(px, pz) + 0.6);
       cam.fov += ((pSmall ? 58 : 40) - cam.fov) * Math.min(1, dt * 4); camera.fov = cam.fov;
@@ -5213,7 +5252,7 @@ var TGKPages = (function () {
   function has(id) { return UNLOCK_ALL || !!ach[id]; }
   var garage = HAS_G ? (function () { try { return TGKGarage.sanitize(JSON.parse(store.get('tgk.garage') || 'null'), has); } catch (e) { return TGKGarage.sanitize(null); } })() : null;
   function angDiff(a, b) { var d = (a - b) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; }
-  function saveGarage() { try { store.set('tgk.garage', JSON.stringify(garage)); } catch (e) { } }
+  function saveGarage() { try { store.set('tgk.garage', JSON.stringify(garage)); } catch (e) { } markGarageChanged(); }
   function bodyHexNow() { var p = paintPreset(); return (paintId === 'custom' && paintHex) ? paintHex : (p ? p.hex : '#2cbcb4'); }
   function enforceLocks() { var before = JSON.stringify(garage.acc); garage = TGKGarage.sanitize(garage, has); if (JSON.stringify(garage.acc) !== before) saveGarage(); }
   function applyGarage() {
@@ -5225,6 +5264,13 @@ var TGKPages = (function () {
     } catch (e) { /* a cosmetic problem must never stop the game */ }
   }
   /** switch the player's car live: new body, same paint, decals and parts re-fitted to the new body */
+  /** a soft light disc under the car while you are in the menu or the garage, so any paint (black especially) stands out against the road */
+  function makeStage() {
+    var cv = document.createElement('canvas'); cv.width = cv.height = 128; var cx2 = cv.getContext('2d'), gr = cx2.createRadialGradient(64, 64, 6, 64, 64, 62);
+    gr.addColorStop(0, 'rgba(214,222,230,0.99)'); gr.addColorStop(0.72, 'rgba(184,195,206,0.97)'); gr.addColorStop(0.93, 'rgba(140,152,166,0.7)'); gr.addColorStop(1, 'rgba(120,132,146,0)'); cx2.fillStyle = gr; cx2.fillRect(0, 0, 128, 128);
+    var tex = new THREE.CanvasTexture(cv), m = new THREE.Mesh(new THREE.CircleGeometry(4.9, 64), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }));
+    m.rotation.x = -Math.PI / 2; m.position.y = 0.03; m.name = 'stage'; m.renderOrder = 1; return m;
+  }
   function swapCar() {
     if (!carObj || !world) return; var id = curCar(); if (carObj.carId === id) return;
     var old = carObj; try { TGKGarage.remove(old); } catch (e) { } world.root.remove(old.group);
@@ -5368,7 +5414,50 @@ var TGKPages = (function () {
 
   /* ---------------- achievements (they unlock garage parts) and the account sheet ---------------- */
   var raceFlags = { jump: false, trail: 0 };
-  function saveAch() { try { store.set('tgk.ach', JSON.stringify(ach)); store.set('tgk.stats', JSON.stringify(stats)); } catch (e) { } }
+
+  /* ---- your profile follows your account ----
+     Logged in, the garage, paint, achievements and stats are saved to your account and merged on every device: achievements are unioned (nothing earned anywhere is lost), each counter keeps its larger value,
+     and the garage + paint changed most recently wins. Logged out, everything stays on this device exactly as before. Cosmetic only. */
+  var gstamp = parseInt(store.get('tgk.gstamp'), 10) || 0, syncBusy = false, syncTimer = 0, syncState = 'off', adopting = false, lastSyncAt = parseInt(store.get('tgk.lastSync'), 10) || 0;
+  function markGarageChanged() { if (adopting) return; gstamp = Date.now(); try { store.set('tgk.gstamp', String(gstamp)); } catch (e) { } schedulePush(); }
+  function schedulePush() { if (!loggedIn() || !online.configured) return; clearTimeout(syncTimer); syncTimer = setTimeout(function () { syncProfile(); }, 2500); }
+  function profileLocal() { return { v: 1, t: gstamp, paint: { id: paintId, hex: paintHex || null }, garage: HAS_G ? JSON.parse(JSON.stringify(garage)) : null, ach: ach, stats: stats }; }
+  function syncText() {
+    if (!online.configured) return ''; if (!loggedIn()) return 'Log in to keep your garage, paint and achievements on every device you use.';
+    if (syncState === 'syncing') return 'Saving to your account\u2026';
+    if (syncState === 'offline') return 'Could not reach your account just now. Your changes are safe on this device and will save when you are back online.';
+    return 'Saved to your account. Your garage, paint and achievements follow you to any device you log in on.';
+  }
+  function setSyncState(s) { syncState = s; var e = $('acctSync'); if (e) e.textContent = syncText(); }
+  function applyProfile(P) {
+    var changed = false;
+    Object.keys(P.ach || {}).forEach(function (id) { if (!ach[id]) { ach[id] = P.ach[id]; changed = true; } });
+    Object.keys(P.stats || {}).forEach(function (k) { if ((P.stats[k] || 0) > (stats[k] || 0)) { stats[k] = P.stats[k]; changed = true; } });
+    if (changed) { try { store.set('tgk.ach', JSON.stringify(ach)); store.set('tgk.stats', JSON.stringify(stats)); } catch (e) { } }
+    var adopted = false;
+    if (HAS_G && P.garage && P.t > gstamp) {                                                                       // another device changed the garage or paint more recently: take it
+      adopting = true;
+      try {
+        garage = TGKGarage.sanitize(P.garage, has); store.set('tgk.garage', JSON.stringify(garage));
+        if (P.paint) { var okId = P.paint.id === 'custom' || W.PAINTS.some(function (p) { return p.id === P.paint.id; }); paintId = okId ? P.paint.id : 'tgk-teal'; paintHex = P.paint.hex || null; store.set('tgk.paint', paintId); if (paintHex) store.set('tgk.paintHex', paintHex); }
+        gstamp = P.t; store.set('tgk.gstamp', String(gstamp)); adopted = true;
+        if (carObj && world) { swapCar(); } if (carObj) { applyPaint(); applyGarage(); }
+        refreshSwatches(); buildCarsPane(); refreshGarage();
+      } catch (e) { /* a cosmetic problem never breaks the game */ } finally { adopting = false; }
+    }
+    if (changed || adopted) { try { checkAch(); } catch (e) { } }
+    return { achievements: changed, garage: adopted };
+  }
+  /** send this device's profile, receive the merged one, apply it. Safe to call any time: it does nothing when logged out or offline. */
+  function syncProfile() {
+    if (!loggedIn() || !online.configured || syncBusy) return Promise.resolve(null); syncBusy = true; setSyncState('syncing');
+    return api('/functions/v1/auth-shopify', { method: 'POST', token: auth.token, body: { action: 'profile', data: profileLocal() } }).then(function (r) {
+      syncBusy = false; if (!r || r.status !== 200 || !r.body || !r.body.profile) { setSyncState('offline'); return null; }
+      var res = applyProfile(r.body.profile); lastSyncAt = Date.now(); try { store.set('tgk.lastSync', String(lastSyncAt)); } catch (e) { } setSyncState('ok'); return res;
+    }).catch(function () { syncBusy = false; setSyncState('offline'); return null; });
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && loggedIn() && Date.now() - lastSyncAt > 120000) syncProfile(); });
+  function saveAch() { try { store.set('tgk.ach', JSON.stringify(ach)); store.set('tgk.stats', JSON.stringify(stats)); } catch (e) { } schedulePush(); }
   function unlocksOf(id) { var out = []; Object.keys(TGKGarage.UNLOCK).forEach(function (kv) { if (TGKGarage.UNLOCK[kv] === id) { var p = kv.split(':'); out.push(TGKGarage.ACC[p[0]].label + ': ' + TGKGarage.ACC[p[0]].opts[p[1]]); } }); return out; }
   function checkAch() {
     if (!HAS_G) return; var fresh = [];
@@ -5397,7 +5486,7 @@ var TGKPages = (function () {
     $('acctSheet').classList.add('hidden'); $('achSheet').classList.remove('hidden'); $('achSheet').querySelector('.body').scrollTop = 0;
   }
   function openAccount() {
-    var li = loggedIn(); $('acctName').textContent = li ? auth.name : 'Not logged in';
+    var li = loggedIn(); $('acctName').textContent = li ? auth.name : 'Not logged in'; setSyncState(syncState);
     $('acctSub').textContent = li ? 'Your ranked runs count toward the daily prize.' : (online.configured ? 'Practice mode. Log in with your TGK account to be ranked and win the daily prize.' : 'Practice mode.');
     $('stRaces').textContent = stats.races || 0; $('stStreak').textContent = (stats.streak || 0) + ((stats.streak || 0) === 1 ? ' day' : ' days'); $('stAch').textContent = TGKGarage.ACH.filter(function (a) { return has(a.id); }).length + ' / ' + TGKGarage.ACH.length;
     var lb = $('acctLogin2'); lb.textContent = li ? 'Log out' : 'Log in'; lb.classList.toggle('login', !li); lb.style.display = (li || online.canLogin) ? '' : 'none'; $('acctRename2').style.display = li ? '' : 'none';
@@ -5813,7 +5902,10 @@ var TGKPages = (function () {
   function loggedIn() { return !!auth.token && auth.exp > Date.now() / 1000; }
   function loadSession() { try { var s = JSON.parse(ssGet('tgk.session') || 'null'); if (s && s.token && s.exp > Date.now() / 1000) auth = { token: s.token, name: s.name, exp: s.exp }; } catch (e) { } }
   function saveSession() { ssSet('tgk.session', JSON.stringify(auth)); }
-  function logout() { auth = { token: null, name: null, exp: 0 }; ssDel('tgk.session'); renderAccount(); toast('Logged out. Practice mode'); }
+  function logout() {
+    clearTimeout(syncTimer); if (loggedIn() && online.configured) { try { api('/functions/v1/auth-shopify', { method: 'POST', token: auth.token, body: { action: 'profile', data: profileLocal() } }); } catch (e) { } }       // one last save, with the token captured now
+    auth = { token: null, name: null, exp: 0 }; ssDel('tgk.session'); syncState = 'off'; renderAccount(); toast('Logged out. Practice mode');
+  }
   function b64url(bytes) { var s = ''; for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
   function randomB64(n) { var a = new Uint8Array(n); window.crypto.getRandomValues(a); return b64url(a); }
   function api(path, opts) {
@@ -5844,6 +5936,7 @@ var TGKPages = (function () {
       if (r.status !== 200 || !r.body.session) { toast(r.body && r.body.missing ? 'Login is not set up yet (missing: ' + r.body.missing.join(', ') + ')' : (r.body && r.body.error ? r.body.error : 'Login failed'), true); return false; }
       auth = { token: r.body.session, name: r.body.name, exp: Date.now() / 1000 + (r.body.expiresInSeconds || 43200) - 60 }; saveSession(); renderAccount();
       if (/^Racer-\d{4}$/.test(auth.name)) { toast('Signed in. Choose your racer name'); openNameDialog(true); } else toast('Signed in as ' + auth.name + '. Your runs now count');
+      syncProfile();                                                                                         // your garage, paint and achievements from any other device
       return postBest();
     }).catch(function () { toast('Could not reach the login server'); return false; });
   }
@@ -5962,7 +6055,7 @@ var TGKPages = (function () {
     badge.textContent = loggedIn() ? 'RANKED' : 'PRACTICE'; badge.className = 'mode ' + (loggedIn() ? 'ranked' : 'prac');
   }
   function initOnline() {
-    loadSession(); renderAccount();
+    loadSession(); renderAccount(); if (loggedIn()) syncProfile();
     $('nameSave').addEventListener('click', saveName); $('nameCancel').addEventListener('click', function () { $('nameSheet').classList.add('hidden'); });
     $('nameInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveName(); } else if (e.key === 'Escape') $('nameSheet').classList.add('hidden'); });
     $('lbBtn').addEventListener('click', openLeaderboard); $('lbClose').addEventListener('click', function () { $('lb').classList.add('hidden'); });
@@ -6449,7 +6542,7 @@ var TGKPages = (function () {
   window.addEventListener('keydown', function (e) { if (e.code === 'Escape' && document.body.classList.contains('gview')) { setGView(false); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
   function ensureCar() { if (carObj && world && carObj.carId !== curCar()) swapCar(); }
   ensureCar();
-  window.__tgk = { setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
+  window.__tgk = { gv: garageView, snap: function () { renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); }, syncProfile: syncProfile, profileLocal: profileLocal, gstamp: function () { return gstamp; }, syncState: function () { return syncState; }, setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
     aerial: function (cx, cy, cz, tx, ty, tz) { camera.near = 0.6; camera.position.set(-cx, cy, cz); camera.lookAt(-tx, ty, tz); camera.updateProjectionMatrix(); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); } };
 })();
 
