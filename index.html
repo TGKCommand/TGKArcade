@@ -600,6 +600,11 @@ body.touch.racing #toast,body.touch.racing #toast.big,#toast.compact{font-size:1
 body.touch.racing #toast.big{color:var(--org-hi)}
 body.touch.racing #split{font-size:18px}body.touch.racing #split small{font-size:10px}
 body.touch.racing #banner{font-size:13px}
+
+/* ---- account sheet: the log in / log out button reads clearly ---- */
+#acctLogin2{color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.06)}
+#acctLogin2.login{color:var(--teal-hi);border-color:var(--teal);background:rgba(44,188,180,.14)}
+#acctLogin2:hover{background:rgba(255,255,255,.12)}
 </style>
 </head>
 <body>
@@ -618,7 +623,7 @@ body.touch.racing #banner{font-size:13px}
       <div id="mainView">
         <div class="mcols">
 <div class="mcol">
-        <div class="brandrow"><img class="logo" alt="TGK Motorsport" width="64" height="64"><a class="shop" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
+        <div class="brandrow"><img class="logo" alt="TGK Motorsport" width="64" height="64" src="data:image/png;base64,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"><a class="shop" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
         <h1>TGK Daily <br>Race</h1>
         <p class="tag">ONE TRACK. ONE DAY. ONE WINNER.</p>
         <div class="facts"><div><small>DATE</small><b id="todayDate">&nbsp;</b></div><div><small>NEW MAP IN</small><b id="nextTrack">--:--:--</b></div></div>
@@ -747,7 +752,7 @@ body.touch.racing #banner{font-size:13px}
     <div class="srow"><span>Races finished</span><b id="stRaces">0</b></div>
     <div class="srow"><span>Best streak</span><b id="stStreak">0</b></div>
     <div class="srow"><span>Achievements</span><b id="stAch">0</b></div>
-    <div class="btnrow"><button type="button" id="acctLogin2"></button><button type="button" class="btn2" id="acctRename2" style="display:none">Change name</button></div>
+    <div class="btnrow"><button type="button" class="btn2" id="acctLogin2"></button><button type="button" class="btn2" id="acctRename2" style="display:none">Change name</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="acctAchBtn">Achievements</button><button type="button" class="btn2" id="acctClose">Close</button></div>
   </div></div>
 </section>
@@ -825,7 +830,8 @@ body.touch.racing #banner{font-size:13px}
   </div></div>
 </section>
 
-<div id="loading"><img class="logo" alt="TGK Motorsport" width="120" height="120"><b>TGK DAILY RACE</b><div class="check"></div><span>Generating today’s track…</span></div>
+<div id="loading"><img class="logo" alt="TGK Motorsport" width="120" height="120" src="data:image/png;base64,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"><b>TGK DAILY RACE</b><div class="check"></div><span>Generating today’s track…</span></div>
+<script>(function(){var u="data:image/png;base64,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",a=document.querySelectorAll("img.logo");for(var i=0;i<a.length;i++)a[i].src=u;})();</script>
 <div id="fatal" class="hidden"><b>This browser can’t run the 3D game.</b><span>Try a current version of Chrome, Firefox, Safari or Edge.</span><span id="fatalMsg" style="color:#a3a6ad;font-size:13px"></span></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -2028,6 +2034,12 @@ if (typeof module !== 'undefined') module.exports = TGKCore;
 
 </script>
 <script>
+/* TGK DAILY RACE - course versions: none active. GENERATED by build_cores.py (run with --legacy to bundle the old Nov 25 maps). */
+var TGKCores = { current: TGKCore, resolve: function () { return { core: TGKCore, attempt: undefined, legacy: false }; }, pinned: function () { return false; } };
+if (typeof module !== 'undefined') module.exports = TGKCores;
+
+</script>
+<script>
 /* TGK Audi S6 body - ported from the original TGK Time Attack game (measured dimension sheet, lofted flanks,
    tornado-line crease, hex single-frame grille, true-arc arches, 10-spoke wheels). Produces plain quad meshes;
    world.js turns them into Three.js geometry. */
@@ -2973,9 +2985,9 @@ var TGKCars = (function () {
       plate: { w: 0.26, y0: 0.48, y1: 0.58 }, diff: { w: 0.62, y0: 0.29, y1: 0.45 },
       tips: [{ cx: -0.45, hw: 0.075, y0: 0.35, y1: 0.445 }, { cx: 0.45, hw: 0.075, y0: 0.35, y1: 0.445 }],
       mirror: { z0: 0.84, z1: 1.00, y0: 0.912, y1: 0.985 }, seams: [0.90, 0.02], seamY: [0.36, 0.88], handle: null, skirtZ: 0.86,
-      blade: { z: [-1.00, -0.10], y: [0.34, 0.80] },
+      blade: { z: [-0.74, -0.04], y: [0.34, 0.80] },     // ends 13 cm before the rear arch (arch front edge at z = -0.875)
       wing: { cx: 0.52, zc: -1.98, blade: 0.96, h: 0.21 },
-      halfw: 0.978, anchor: { sideY: 0.62, sideZ: 0.42, hoodZ: 1.65, roofZ: -0.25, trunkZ: -1.85 },
+      halfw: 0.978, anchor: { sideY: 0.62, sideZ: 0.42, hoodZ: 1.65, roofZ: -0.25, trunkZ: -1.5 },
       gar: { skirtLen: 1.72, skirtZc: 0.05, quad: [-0.56, -0.32, 0.32, 0.56], dual: [-0.45, 0.45], tipY: 0.40 }
     }
   };
@@ -3051,10 +3063,10 @@ var TGKCars = (function () {
       if (c.handle) { var hw = halfW(0), h0 = sd > 0 ? hw - 0.008 : -hw - 0.0, h1 = sd > 0 ? hw + 0.0 : -hw + 0.008; m.box(Math.min(h0, h1) + (sd > 0 ? 0.003 : -0.003), Math.max(h0, h1) + (sd > 0 ? 0.003 : -0.003), c.handle[2], c.handle[2] + 0.02, c.handle[0], c.handle[1], CHROME, 'trim'); }
       c.seams.forEach(function (zd) { var xs = (halfW(zd) + 0.003) * sd; m.quad(m.vx(xs, c.seamY[0], zd - 0.006), m.vx(xs, c.seamY[0], zd + 0.006), m.vx(xs, c.seamY[1], zd + 0.006), m.vx(xs, c.seamY[1], zd - 0.006), [86, 84, 82], 'seam'); });
       var hwS = halfW(0); m.box(sd > 0 ? hwS - 0.01 : -hwS - 0.012, sd > 0 ? hwS + 0.012 : -hwS + 0.01, 0.20, 0.30, -c.skirtZ, c.skirtZ, DARK, 'trim');
-      if (c.blade) {   // Phantom: the dark side blade behind the door, with intake slats
-        var Bd = c.blade, hb = halfW((Bd.z[0] + Bd.z[1]) / 2) + 0.003;
-        m.quad(m.vx(sd * hb, Bd.y[0], Bd.z[0]), m.vx(sd * hb, Bd.y[0], Bd.z[1]), m.vx(sd * hb, Bd.y[1], Bd.z[1] - 0.12), m.vx(sd * hb, Bd.y[1], Bd.z[0]), [12, 12, 14], 'trim');
-        for (var bs = 0; bs < 5; bs++) { var by2 = Bd.y[0] + 0.07 + bs * 0.075; m.quad(m.vx(sd * (hb + 0.004), by2, Bd.z[0] + 0.05), m.vx(sd * (hb + 0.004), by2, Bd.z[1] - 0.2 + bs * 0.02), m.vx(sd * (hb + 0.004), by2 + 0.012, Bd.z[1] - 0.2 + bs * 0.02), m.vx(sd * (hb + 0.004), by2 + 0.012, Bd.z[0] + 0.05), [48, 50, 54], 'trim'); }
+      if (c.blade) {   // Phantom: the dark side blade behind the door, with intake slats; each corner follows the body's width at its own z
+        var Bd = c.blade, hx = function (zz) { return halfW(zz) * 0.999 + 0.004; };
+        m.quad(m.vx(sd * hx(Bd.z[0]), Bd.y[0], Bd.z[0]), m.vx(sd * hx(Bd.z[1]), Bd.y[0], Bd.z[1]), m.vx(sd * hx(Bd.z[1] - 0.12), Bd.y[1], Bd.z[1] - 0.12), m.vx(sd * hx(Bd.z[0]), Bd.y[1], Bd.z[0]), [12, 12, 14], 'trim');
+        for (var bs = 0; bs < 5; bs++) { var by2 = Bd.y[0] + 0.07 + bs * 0.075, za = Bd.z[0] + 0.05, zb = Bd.z[1] - 0.2 + bs * 0.02; m.quad(m.vx(sd * (hx(za) + 0.004), by2, za), m.vx(sd * (hx(zb) + 0.004), by2, zb), m.vx(sd * (hx(zb) + 0.004), by2 + 0.012, zb), m.vx(sd * (hx(za) + 0.004), by2 + 0.012, za), [48, 50, 54], 'trim'); }
       }
     }
     // single-frame grille: octagon with a frame and a black bar mesh
@@ -3098,6 +3110,7 @@ var TGKCars = (function () {
 var TGKWorld = (function () {
   'use strict';
   var C = TGKCore;
+  function setCore(c) { C = c || TGKCore; }          // a day that is still on an older course version is drawn with that version's own helpers
 
   var PALETTE = {
     forest:      { skyTop: 0x4f86c6, horizon: 0xd2e4f2, fog: 0xc4d9e8, ground: 0x2c8a2a, ground2: 0x55b042, rock: 0x6f767c, dirt: 0x8a6a45, road: 0xe2e2e2, sun: 0xfff1d6, hemiSky: 0xd4e6f6, hemiGround: 0x3b5a2d },
@@ -3679,7 +3692,7 @@ var TGKWorld = (function () {
     return [parseInt(h.substr(0, 2), 16) / 255, parseInt(h.substr(2, 2), 16) / 255, parseInt(h.substr(4, 2), 16) / 255];
   }
 
-  return { PALETTE: PALETTE, PAINTS: PAINTS, skyDome: skyDome, buildWorld: buildWorld, buildCar: buildCar, setPaint: setPaint, applyDents: applyDents, updateWater: updateWater, updateGates: updateGates, clampGround: clampGround, meshHeightAt: meshHeightAt };
+  return { PALETTE: PALETTE, PAINTS: PAINTS, skyDome: skyDome, buildWorld: buildWorld, buildCar: buildCar, setPaint: setPaint, applyDents: applyDents, updateWater: updateWater, updateGates: updateGates, clampGround: clampGround, meshHeightAt: meshHeightAt, setCore: setCore };
 })();
 if (typeof module !== 'undefined') module.exports = TGKWorld;
 
@@ -3856,16 +3869,56 @@ var TGKAudio = (function () {
        pf = firing pulses per revolution (V8 4, five-cylinder 2.5, V10 5); rs = rev range vs the Sentinel; g = oscillator mix (saw, square, 2nd-harmonic saw, sub);
        k = how hard the exhaust is driven (more = rawer); lope = uneven-firing burble; bright = filter opening; roar = intake / exhaust noise; turbo = whistle level; pop = overrun crackle */
     var PROFILES = {
-      sentinel: { pf: 4, rs: 1.0, g: [0.5, 0.34, 0.2, 0.34], k: 2.6, lope: 1.0, lopeRatio: 0.5, bright: 1.0, roar: 1.0, turbo: 1.0, turboPitch: 1.0, pop: 1.0 },
-      kestrel: { pf: 2.5, rs: 1.14, g: [0.52, 0.16, 0.36, 0.2], k: 3.6, lope: 0.85, lopeRatio: 0.4, bright: 1.3, roar: 1.3, turbo: 1.7, turboPitch: 1.18, pop: 1.8 },
-      phantom: { pf: 5, rs: 1.34, g: [0.4, 0.08, 0.5, 0.1], k: 1.9, lope: 0.25, lopeRatio: 0.5, bright: 1.3, roar: 1.15, turbo: 0, turboPitch: 1.0, pop: 0.6 }
+      sentinel: { oscMix: 0.5, pf: 4, rs: 1.0, g: [0.5, 0.34, 0.2, 0.34], k: 2.6, lope: 1.0, lopeRatio: 0.5, bright: 1.0, roar: 1.0, turbo: 1.0, turboPitch: 1.0, pop: 1.0 },
+      kestrel: { oscMix: 0.42, pf: 2.5, rs: 1.14, g: [0.52, 0.16, 0.36, 0.2], k: 3.6, lope: 0.85, lopeRatio: 0.4, bright: 1.3, roar: 1.3, turbo: 1.7, turboPitch: 1.18, pop: 1.8 },
+      phantom: { oscMix: 0.36, pf: 5, rs: 1.34, g: [0.4, 0.08, 0.5, 0.1], k: 1.9, lope: 0.25, lopeRatio: 0.5, bright: 1.3, roar: 1.15, turbo: 0, turboPitch: 1.0, pop: 0.6 }
     };
+    /* ---------- the engine itself: its real firing pattern, shaped by the exhaust ----------
+       Each cylinder's firing is a short burst (a low thump plus a crack of noise). The bursts are laid out the way that engine fires them (a cross-plane V8 is uneven and burbles, a five-cylinder
+       has its rasping five-beat, a V10 is even and smooth), then the whole train is run through the exhaust's resonances. That is rendered once into looped recordings at three rev ranges,
+       which are blended and pitch-shifted with the revs, the way game engines do it. The oscillator voice above stays underneath for body. */
+    var ENG = {
+      sentinel: { amps: [1, 0.78, 0.95, 0.7, 1, 0.82, 0.9, 0.72], off: [0, 0.012, 0, -0.012, 0, 0.012, 0, -0.012], jit: 0.5, ampJit: 0.06, thump: 68, tau1: 0.024, tau2: 0.0022, snapHz: 3400, noise: 3.2, res: [[170, 6, 1.0], [340, 7, 0.65], [880, 5, 0.4]], dry: 0.5, loopLP: 1.0 },
+      kestrel: { amps: [1, 0.9, 1, 0.84, 0.95], off: [0, 0.006, -0.004, 0.008, -0.006], jit: 0.7, ampJit: 0.09, thump: 92, tau1: 0.018, tau2: 0.0016, snapHz: 4800, noise: 3.2, res: [[240, 6, 0.9], [520, 7, 0.75], [1300, 6, 0.5]], dry: 0.45, loopLP: 1.25 },
+      phantom: { amps: [1, 0.97, 1, 0.96, 1, 0.97, 1, 0.96, 1, 0.97], off: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], jit: 0.25, ampJit: 0.03, thump: 125, tau1: 0.013, tau2: 0.0012, snapHz: 6800, noise: 2.6, res: [[420, 7, 0.75], [900, 8, 0.9], [2200, 6, 0.6]], dry: 0.4, loopLP: 1.5 }
+    };
+    var LOOP_RPM = [1800, 3700, 6200], LOOP_C = [LOOP_RPM[0] / 6500, LOOP_RPM[1] / 6500, LOOP_RPM[2] / 6500], loopCache = {}, loopSrc = [], loopG = [], loopBase = [];
+    var loopSum = g(1), loopLP = lpf(4000, 0.6), loopOut = g(0); loopSum.connect(loopLP); loopLP.connect(loopOut); loopOut.connect(eDuck);
+    function rng(seed) { var s = seed >>> 0; return function () { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+    /** one seamless loop: k whole engine cycles (720 degrees each) at baseRpm. Returns { data, base } where base is the exact rpm the loop plays at rate 1. */
+    function synthLoop(sr, baseRpm, E, seed) {
+      var cyc = 120 / baseRpm, k = Math.max(3, Math.ceil(0.22 / cyc)), L = Math.round(k * cyc * sr), cycS = L / k, R = rng(seed), n = E.amps.length, buf = new Float32Array(L), snapK = 1 - Math.exp(-6.2832 * E.snapHz / sr), W = Math.min(Math.floor(0.03 * sr), Math.floor(cycS * 0.95)), c, f, j;
+      var tmpl = [];                                                                  // each cylinder has its own fixed crack, so every engine cycle repeats the one before it (a real engine is very regular), with only slight variation
+      for (f = 0; f < n; f++) { var arr = new Float32Array(W), lp0 = 0; for (j = 0; j < W; j++) { var tt = j / sr, nz0 = (R() * 2 - 1) * Math.exp(-tt / E.tau2); lp0 += (nz0 - lp0) * snapK; arr[j] = lp0; } tmpl.push(arr); }
+      for (c = 0; c < k; c++) for (f = 0; f < n; f++) {
+        var t0 = c * cycS + (f / n + E.off[f] * E.jit * 2 + (R() - 0.5) * 0.002 * E.jit) * cycS, a = E.amps[f] * (1 + (R() - 0.5) * 2 * E.ampJit), i0 = Math.floor(t0), fr = t0 - i0;
+        for (j = 0; j < W; j++) { var tau = (j - fr) / sr; if (tau < 0) continue; var th = Math.sin(6.2832 * E.thump * tau) * Math.exp(-tau / E.tau1); buf[(i0 + j) % L] += a * (0.9 * th + 2.2 * E.noise * tmpl[f][j]); }
+      }
+      var out = new Float32Array(L), q, i;
+      for (i = 0; i < L; i++) out[i] = buf[i] * E.dry;
+      E.res.forEach(function (rs) {                                                   // exhaust resonances, run round the loop twice so the ends join up
+        var w = 6.2832 * rs[0] / sr, r = Math.exp(-w / (2 * rs[1])), a1 = 2 * r * Math.cos(w), a2 = -r * r, y1 = 0, y2 = 0, gain = (1 - r) * rs[2] * 3;
+        for (q = 0; q < 2 * L; q++) { var y = buf[q % L] + a1 * y1 + a2 * y2; y2 = y1; y1 = y; if (q >= L) out[q - L] += y * gain; }
+      });
+      var mean = 0, peak = 0; for (i = 0; i < L; i++) mean += out[i]; mean /= L; for (i = 0; i < L; i++) { out[i] -= mean; if (Math.abs(out[i]) > peak) peak = Math.abs(out[i]); }
+      var norm = peak > 0 ? 0.85 / peak : 1; for (i = 0; i < L; i++) { var v = out[i] * norm; out[i] = Math.tanh(v * 1.15) / Math.tanh(1.15); }       // a little soft clip, like a hot exhaust
+      return { data: out, base: 120 * k * sr / L };
+    }
+    function useLoops(id, rs) {
+      var E = ENG[id] || ENG.sentinel; loopSrc.forEach(function (s) { try { s.stop(); s.disconnect(); } catch (e) { } }); loopG.forEach(function (x) { try { x.disconnect(); } catch (e) { } }); loopSrc = []; loopG = []; loopBase = [];
+      LOOP_RPM.forEach(function (rpm, i) {
+        var key = id + ':' + i + ':' + ctx.sampleRate, hit = loopCache[key]; if (!hit) { var sl = synthLoop(ctx.sampleRate, rpm * rs, E, 9001 + i * 77 + id.length), ab = ctx.createBuffer(1, sl.data.length, ctx.sampleRate); ab.getChannelData(0).set(sl.data); hit = loopCache[key] = { ab: ab, base: sl.base }; }
+        var src = ctx.createBufferSource(); src.buffer = hit.ab; src.loop = true; var gn = g(0); src.connect(gn); gn.connect(loopSum); src.start(0); loopSrc.push(src); loopG.push(gn); loopBase.push(hit.base);
+      });
+    }
     var P = PROFILES.sentinel, curId = 'sentinel', curves = {};
     function setCar(id) {
       P = PROFILES[id] || PROFILES.sentinel; curId = PROFILES[id] ? id : 'sentinel';
       gA.gain.value = P.g[0]; gB.gain.value = P.g[1]; gC.gain.value = P.g[2]; gD.gain.value = P.g[3];
       shaper.curve = curves[P.k] || (curves[P.k] = tanhCurve(P.k));
+      useLoops(curId, P.rs);
     }
+    useLoops('sentinel', 1);
 
     /* ---------- tyres, surface, wind, water ---------- */
     var sq = noiseSrc(0.9), sq1 = bp(2100, 7), sq2 = bp(2500, 5), sqG = g(0); sq.connect(sq1); sq.connect(sq2); sq1.connect(sqG); sq2.connect(sqG); sqG.connect(surfL);
@@ -3902,7 +3955,13 @@ var TGKAudio = (function () {
       set(eLP.frequency, (300 + rpm * 0.28 + load * (800 + rpm * 0.25)) * P.bright * (1 - 0.3 * damage), now, 0.04);
       var shift = now - S.shiftAt < 0.09 ? 0.6 : 1; set(eDuck.gain, shift, now, 0.012);
       var limiter = (rpm > 6420 * P.rs && thr > 0.5) ? (0.62 + 0.38 * (Math.floor(now * 22) % 2)) : 1;            // rev limiter bounce
-      set(eGain.gain, lvl * limiter * on, now, 0.03);
+      set(eGain.gain, lvl * limiter * on * P.oscMix, now, 0.03);
+      // the firing-pattern layer: blend the three recordings by revs, pitch each to the exact rpm, open the tone with throttle
+      var un = rpm / (6500 * P.rs), ws = [0, 0, 0], wsum = 0, li;
+      for (li = 0; li < 3; li++) { var wd = Math.max(0, 1 - Math.abs(un - LOOP_C[li]) / (li === 1 ? 0.34 : 0.45)); ws[li] = wd * wd; wsum += ws[li]; }
+      for (li = 0; li < loopSrc.length; li++) { set(loopG[li].gain, wsum > 0 ? Math.sqrt(ws[li] / wsum) : (li === 1 ? 1 : 0), now, 0.04); loopSrc[li].playbackRate.setTargetAtTime(Math.max(0.2, Math.min(3, rpm / loopBase[li])), now, 0.03); }
+      var Ef = ENG[curId] || ENG.sentinel; set(loopLP.frequency, (900 + rpm * 0.55 + load * (2600 + rpm * 0.55)) * Ef.loopLP * (1 - 0.3 * damage), now, 0.04);
+      set(loopOut.gain, lvl * limiter * on * 1.9 * (0.7 + 0.3 * load), now, 0.03);
       set(lopeG.gain, lvl * P.lope * (0.28 - 0.14 * clamp(rpm / (6500 * P.rs), 0, 1)) * on, now, 0.05);
       set(roughG.gain, lvl * 0.5 * damage * on, now, 0.1); set(rough.frequency, 7 + damage * 5, now, 0.1);
       set(roarBP.frequency, 450 + rpm * 0.22, now, 0.05); set(roarG.gain, load * 0.16 * P.roar * (0.5 + rpm / (13000 * P.rs)) * on, now, 0.05);
@@ -3979,6 +4038,7 @@ var TGKAudio = (function () {
       setLayer: function (n, v) { ({ engine: engL, surface: surfL, wind: windL }[n] || { gain: { value: 0 } }).gain.value = v; },
       setActive: function (on) { active = !!on; if (!on) set(bus.gain, 0, T(), 0.08); },
       unlock: function () { try { if (ctx.state === 'suspended' && ctx.resume) ctx.resume(); var b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); } catch (e) { } setM(); },
+      _loops: function () { return loopSrc.map(function (s, i) { var d = s.buffer.getChannelData(0), n = d.length, rms = 0, k; for (k = 0; k < n; k++) rms += d[k] * d[k]; rms = Math.sqrt(rms / n); var step = 0, m = 0; for (k = 1; k < n; k++) { step += Math.abs(d[k] - d[k - 1]); m++; } return { len: n, base: loopBase[i], rms: rms, seam: Math.abs(d[0] - d[n - 1]), meanStep: step / m }; }); },
       debug: function () { return { car: curId, pf: P.pf, rpm: Math.round(S.rpm), load: +S.load.toFixed(2), gear: S.gear, boost: +S.boost.toFixed(2), active: active, muted: muted, vol: vol }; },
       nodes: { master: master, bus: bus, eGain: eGain, sqG: sqG, gvG: gvG, rdG: rdG, wdG: wdG, wtG: wtG, oA: oA }
     };
@@ -4121,6 +4181,27 @@ var TGKGarage = (function () {
   }
   var SLIDE = { 'side-r': 0.6, 'side-l': 0.6, hood: 0.4, roof: 0.5, trunk: 0.3 };      // how far (m) forward / back a sticker may be moved from its anchor
 
+  /* ---- conforming decal shape ---- */
+  var GEO_CACHE = {}, GEO_KEYS = [], CROP = 0.09;
+  /** a w x h picture as a grid of points sitting on the body: sample(lx, ly) gives the height above the anchor plane (null = no paint there). Cells that straddle an edge are clipped along it. */
+  function conformShape(w, h, SEG, sample) {
+    var N = SEG + 1, V = [], i, j, pos = [], uv = [];
+    var Z = []; for (j = 0; j < N; j++) for (i = 0; i < N; i++) Z.push(sample((i / SEG - 0.5) * w, (0.5 - j / SEG) * h));
+    var fill = Z.slice();                      // a corner with no paint under it takes its height from its neighbours, so a clipped edge stays on the body instead of drifting to the flat plane
+    for (var pass = 0; pass < SEG; pass++) { var nxt = fill.slice(), any = false;
+      for (j = 0; j < N; j++) for (i = 0; i < N; i++) { if (fill[j * N + i] !== null) continue; var sum = 0, cnt = 0;
+        for (var dj = -1; dj <= 1; dj++) for (var di = -1; di <= 1; di++) { var jj = j + dj, ii = i + di; if (jj < 0 || ii < 0 || jj >= N || ii >= N) continue; var fv = fill[jj * N + ii]; if (fv !== null) { sum += fv; cnt++; } }
+        if (cnt) { nxt[j * N + i] = sum / cnt; any = true; } }
+      fill = nxt; if (!any) break; }
+    for (j = 0; j < N; j++) for (i = 0; i < N; i++) { var lx = (i / SEG - 0.5) * w, ly = (0.5 - j / SEG) * h, z = Z[j * N + i], zf = fill[j * N + i]; V.push({ x: lx, y: ly, z: zf === null ? 0.005 : zf, u: i / SEG, v: 1 - j / SEG, f: z === null ? -CROP * 4 : CROP - Math.abs(z) }); }
+    for (j = 0; j < SEG; j++) for (i = 0; i < SEG; i++) {
+      var q = [V[j * N + i], V[(j + 1) * N + i], V[(j + 1) * N + i + 1], V[j * N + i + 1]], poly = [];
+      for (var k = 0; k < 4; k++) { var a = q[k], b = q[(k + 1) % 4]; if (a.f >= 0) poly.push(a); if ((a.f >= 0) !== (b.f >= 0)) { var t = a.f / (a.f - b.f); poly.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t, u: a.u + (b.u - a.u) * t, v: a.v + (b.v - a.v) * t, f: 0 }); } }
+      for (var m = 1; m + 1 < poly.length; m++) [poly[0], poly[m], poly[m + 1]].forEach(function (p) { pos.push(p.x, p.y, p.z); uv.push(p.u, p.v); });
+    }
+    return { pos: new Float32Array(pos), uv: new Float32Array(uv) };
+  }
+
   function buildDecals(THREE, car, cfg, assets, probe) {
     var group = new THREE.Group(), AN = anchorsFor(car); group.name = 'decals';
     cfg.decals.forEach(function (d) {
@@ -4130,9 +4211,22 @@ var TGKGarage = (function () {
         var h = 0.4 * d.scale, w = h * aspect, maxW = zone.indexOf('side') === 0 ? 1.5 : 1.3; if (w > maxW) { h *= maxW / w; w = maxW; }
         var up = zone.indexOf('side') === 0 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, 0, 1), n = hit.n, ex = new THREE.Vector3().crossVectors(up, n).normalize(), ey = new THREE.Vector3().crossVectors(n, ex).normalize();
         var q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(ex, ey, n));
-        var mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3, toneMapped: false }));
+        var mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3, toneMapped: false }), mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat);
         mesh.quaternion.copy(q); mesh.rotateZ(d.rot * Math.PI / 180); if (d.flip) mesh.scale.x = -1;
-        mesh.position.copy(hit.p).addScaledVector(n, 0.012 + 0.02 * d.scale); mesh.renderOrder = 3; mesh.userData.decal = d.id; group.add(mesh);
+        mesh.position.copy(hit.p); mesh.renderOrder = 3; mesh.userData.decal = d.id;
+        /* conform to the body: a grid of points is cast onto the real surface along the decal's normal and sat 5 mm off it, so the sticker hugs a flank, hood or trunk instead of standing off it
+           as a flat card; where there is no paint within reach (window line, wheel arch, panel edge) it is cut off cleanly. The shape is remembered, so only a decal you change is recomputed. */
+        var key = (car.carId || 's') + '|' + zone + '|' + d.scale + '|' + d.rot + '|' + (d.flip ? 1 : 0) + '|' + (d.pos || 0) + '|' + w.toFixed(3) + '|' + h.toFixed(3), shape = GEO_CACHE[key];
+        if (!shape) {
+          mesh.updateMatrix(); var ax = new THREE.Vector3(1, 0, 0).applyQuaternion(mesh.quaternion), ay = new THREE.Vector3(0, 1, 0).applyQuaternion(mesh.quaternion), sx = d.flip ? -1 : 1, o = new THREE.Vector3(), nn = n.clone().negate();
+          shape = conformShape(w, h, Math.max(10, Math.min(18, Math.ceil(Math.max(w, h) / 0.085))), function (lx, ly) {
+            o.copy(hit.p).addScaledVector(ax, lx * sx).addScaledVector(ay, ly).addScaledVector(n, 0.25);
+            var hk = probe(o.x, o.y, o.z, nn.x, nn.y, nn.z); return hk ? hk.p.clone().sub(hit.p).dot(n) + 0.004 : null;
+          });
+          if (GEO_KEYS.length > 48) delete GEO_CACHE[GEO_KEYS.shift()]; GEO_KEYS.push(key); GEO_CACHE[key] = shape;
+        }
+        if (!shape.pos.length) { mat.dispose(); mesh.geometry.dispose(); return; }
+        mesh.geometry.setAttribute('position', new THREE.BufferAttribute(shape.pos, 3)); mesh.geometry.setAttribute('uv', new THREE.BufferAttribute(shape.uv, 2)); mesh.geometry.computeBoundingSphere(); group.add(mesh);
       });
     });
     return group;
@@ -4410,10 +4504,24 @@ var TGKPages = (function () {
 
   /* ---------------- daily track ---------------- */
   var pastDate = null;      // set while practising an old course: practice only, never ranked, never counts toward the streak or the prize
+  /* A day that was first raced on an older version of the course code keeps that version (see cores.js). Which one is decided by the attempt the SERVER pinned for the day when its first run was posted. */
+  var CORES = (typeof TGKCores !== 'undefined') ? TGKCores : null, pins = {};
+  function ensurePin(date) {
+    if (!CORES || !CORES.pinned(date) || pins[date] !== undefined) return Promise.resolve();
+    var cached = parseInt(store.get('tgk.pin.' + date), 10); if (cached > 0) pins[date] = cached;           // the last answer, in case the server cannot be reached now
+    if (!online.configured) { if (pins[date] === undefined) pins[date] = null; return Promise.resolve(); }
+    var timeout = new Promise(function (res) { setTimeout(function () { res(null); }, 2500); });
+    return Promise.race([api('/rest/v1/rpc/day_course', { method: 'POST', body: { p_date: date } }), timeout]).then(function (r) {
+      if (r && r.status === 200 && typeof r.body === 'number' && r.body > 0) { pins[date] = r.body; store.set('tgk.pin.' + date, String(r.body)); }
+      else if (pins[date] === undefined) pins[date] = null;
+    }).catch(function () { if (pins[date] === undefined) pins[date] = null; });
+  }
   function loadDaily(forDate) {
     var todayD = C.chicagoDate(Date.now()); pastDate = (forDate && /^\d{4}-\d{2}-\d{2}$/.test(forDate) && forDate < todayD) ? forDate : null; raceDate = pastDate || todayD;
+    var rs = CORES ? CORES.resolve(raceDate, pins[raceDate]) : null;
+    C = rs ? rs.core : TGKCore; W.setCore(C);                                  // every other date uses the current code, exactly as before
     var hint = parseInt(store.get('tgk.attempt.' + raceDate), 10);
-    track = C.generateTrack(raceDate, hint > 0 ? { attempt: hint } : undefined);
+    track = C.generateTrack(raceDate, rs && rs.attempt ? { attempt: rs.attempt } : (hint > 0 ? { attempt: hint } : undefined));
     store.set('tgk.attempt.' + raceDate, String(track.attempt || 0));
     track.sig = trackSig(); loadPick(); sim = new C.Sim(track); dentSig = '';
     recorder.reset();
@@ -4886,14 +4994,14 @@ var TGKPages = (function () {
   function playDay(d, ghostId) {
     $('pastSheet').classList.add('hidden');
     var L = $('loading'), sp = L.querySelector('span'), old = sp.textContent; sp.textContent = 'Generating the course\u2026'; L.classList.remove('hidden');
-    setTimeout(function () {                                  // let the overlay paint first: building a course takes a moment
+    ensurePin(d).then(function () { setTimeout(function () {      // let the overlay paint first: building a course takes a moment
       try { loadDaily(d); loadWorld(); sim.reset(); snapshot(); } finally { L.classList.add('hidden'); sp.textContent = old; }
       if (ghostId) fetchRun(ghostId).then(function (run) {
         if (buildGhostTrace(run).ms !== run.ms) throw new Error('does not replay');
         ghostPick = run; store.set(pickKey(), JSON.stringify(run)); renderGhostLine(); toast('You will race ' + run.name + '\'s ghost ' + C.fmtTime(run.ms), true);
       }).catch(function () { toast('Could not load that ghost'); });
       else toast(pastDate ? 'Past race \u00b7 practice only' : 'Back to today');
-    }, 60);
+    }, 60); });
   }
   function openPast() {
     var days = pastDays(), list = $('pastList'); list.innerHTML = '';
@@ -5135,7 +5243,7 @@ var TGKPages = (function () {
     var li = loggedIn(); $('acctName').textContent = li ? auth.name : 'Not logged in';
     $('acctSub').textContent = li ? 'Your ranked runs count toward the daily prize.' : (online.configured ? 'Practice mode. Log in with your TGK account to be ranked and win the daily prize.' : 'Practice mode.');
     $('stRaces').textContent = stats.races || 0; $('stStreak').textContent = (stats.streak || 0) + ((stats.streak || 0) === 1 ? ' day' : ' days'); $('stAch').textContent = TGKGarage.ACH.filter(function (a) { return has(a.id); }).length + ' / ' + TGKGarage.ACH.length;
-    var lb = $('acctLogin2'); lb.textContent = li ? 'Log out' : 'Log in'; lb.style.display = (li || online.canLogin) ? '' : 'none'; $('acctRename2').style.display = li ? '' : 'none';
+    var lb = $('acctLogin2'); lb.textContent = li ? 'Log out' : 'Log in'; lb.classList.toggle('login', !li); lb.style.display = (li || online.canLogin) ? '' : 'none'; $('acctRename2').style.display = li ? '' : 'none';
     $('settingsSheet').classList.add('hidden'); $('infoSheet').classList.add('hidden'); $('achSheet').classList.add('hidden'); $('acctSheet').classList.remove('hidden');
   }
 
@@ -6088,6 +6196,11 @@ var TGKPages = (function () {
 
   function boot() {
     if (!window.WebGLRenderingContext) { $('fatal').classList.remove('hidden'); return; }
+    var today0 = C.chicagoDate(Date.now());
+    if (CORES && CORES.pinned(today0)) ensurePin(today0).then(bootGo, bootGo);       // only a day on an older course version waits (up to 2.5 s) for the server's answer
+    else bootGo();
+  }
+  function bootGo() {
     try {
       recorder.reset(); initRenderer(); loadDaily(); loadWorld(); buildSwatches(); wireUi(); wirePages(); bindTouch(); initOnline();
       sim.reset(); snapshot(); updateCar(0.016, 1); tickCountdown(); setInterval(tickCountdown, 1000);
@@ -6113,7 +6226,7 @@ var TGKPages = (function () {
   if ($('noticeSel')) { $('noticeSel').value = noticeLevel; $('noticeSel').addEventListener('change', function () { noticeLevel = $('noticeSel').value; store.set('tgk.notices', noticeLevel); toast(noticeLevel === 'full' ? 'Race pop-ups: all' : (noticeLevel === 'min' ? 'Race pop-ups: only important' : 'Race pop-ups: none')); }); }
   function ensureCar() { if (carObj && world && carObj.carId !== curCar()) swapCar(); }
   ensureCar();
-  window.__tgk = { notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
+  window.__tgk = { pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
     aerial: function (cx, cy, cz, tx, ty, tz) { camera.near = 0.6; camera.position.set(-cx, cy, cz); camera.lookAt(-tx, ty, tz); camera.updateProjectionMatrix(); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); } };
 })();
 
