@@ -586,7 +586,7 @@ body.touch.portrait #tWheel{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
 body.steer-wheel.touch.portrait #tRec{bottom:calc(env(safe-area-inset-bottom,0px) + 14px + var(--wh) + 8px)}
 @media (orientation:landscape) and (max-height:360px){ #tTilt .tsub{display:none} #tTilt .ttl{font-size:11px;top:6px} }
 /* ---- garage: car picker ---- */
-.carlist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.carlist{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
 .carcard{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:68px;padding:6px 4px;background:var(--char2);border:1px solid var(--line);border-radius:10px;color:#cfd2d6;font-family:var(--font);cursor:pointer}
 .carcard svg{width:min(76px,100%);height:28px;color:#9aa3aa}
 .carcard b{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#fff}.carcard small{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.75;text-align:center}
@@ -679,6 +679,64 @@ body.gview #topbar{display:none}
 .chips:empty{display:none}
 .dcbtns{flex-wrap:wrap}
 body.gdrag #gl{cursor:grabbing}
+
+.tally{margin:4px 0 0;font-size:12.5px;color:#cfd2d6;letter-spacing:.02em}.tally:empty{display:none}.tally b{color:#fff}
+#ovAllBtn.on{background:var(--teal);color:#06201f}
+
+/* ---- decal editor: undo/redo, an Add tab and an Edit tab, grouped library with labels, one-tap placement ---- */
+#gDecals:not(.hidden){display:block!important;grid-template-columns:none!important}
+.dcctl{display:block!important;margin-top:0!important}
+.dcctl.off{opacity:.45;pointer-events:none}
+.dctop{margin-bottom:4px}
+.dcrow{flex-wrap:nowrap!important;justify-content:flex-start!important}
+.dcrow #dcCount{flex:1;min-width:0;text-align:center;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#cfd2d6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dcic{min-height:40px!important;padding:0 12px!important;font-size:13px!important;flex:none;white-space:nowrap}
+.dcic:disabled{opacity:.38}
+.dcsub{display:flex;gap:6px;margin:8px 0 8px}
+.dcsub button{flex:1;min-height:44px;background:var(--char2);border:1px solid var(--line);color:#cfd2d6;font:700 13px var(--font);letter-spacing:.07em;text-transform:uppercase;cursor:pointer}
+.dcsub button.on{background:var(--org);border-color:var(--org);color:var(--bar)}
+.dcpanel.off{display:none}
+.dcsearch{width:100%;box-sizing:border-box;min-height:42px;background:#0b0d0e;border:1px solid var(--line);color:#fff;padding:0 12px;font:inherit;font-size:14px;margin-bottom:8px}
+.cats{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;padding-bottom:2px}
+.cats button{flex:none;min-height:38px;padding:0 14px;background:var(--char2);border:1px solid var(--line);color:#cfd2d6;cursor:pointer;font:600 12px var(--font);letter-spacing:.06em;text-transform:uppercase}
+.cats button.on{border-color:var(--teal);color:#fff;box-shadow:inset 0 0 0 1px var(--teal)}
+#gDecals .lib{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))!important;gap:8px!important;margin-top:0}
+#gDecals .lib .tile{aspect-ratio:auto!important;flex-direction:column;gap:5px;min-height:78px!important;padding:6px 4px}
+#gDecals .lib .tile canvas,#gDecals .lib .tile img{max-width:100%;max-height:42px;object-fit:contain}
+#gDecals .lib .tile#dcNew{font-size:26px;color:var(--teal)}
+.tl{font-size:10.5px;line-height:1.1;color:#cfd2d6;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.libempty{grid-column:1/-1;padding:14px 4px;color:var(--dim);font-size:13px}
+.dcsel{font-weight:700;font-size:14px;margin:2px 0 10px;color:#fff;letter-spacing:.02em;text-transform:none}
+.dcacts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}
+.dcacts .btn2{min-height:46px!important;padding:0 4px!important;font-size:13px!important;flex:none}
+.dcacts .danger{color:#ff9a8a}
+.dcacts .btn2:disabled{opacity:.38}
+.dcplace{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.dcplace>span{width:100%;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.dcplace button{min-height:40px;padding:0 12px;background:var(--char2);border:1px solid var(--line);color:#cfd2d6;cursor:pointer;font:600 13px var(--font);letter-spacing:.03em;text-transform:none}
+.dcplace button.on{border-color:var(--teal);color:#fff;box-shadow:inset 0 0 0 1px var(--teal)}
+label.dcrange{display:grid!important;grid-template-columns:62px 1fr 52px;gap:10px;align-items:center;margin:4px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#cfd2d6;flex-direction:row}
+label.dcrange input[type=range]{width:100%;min-height:44px}
+label.dcrange input[type=number]{min-height:42px;max-width:100px}
+label.dcrange output{text-align:right;color:#fff;font-weight:700;letter-spacing:.02em}
+.vh{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none}
+#gDecals.dcwide .dcsub{display:none}
+#gDecals.dcwide .dcbody{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+#gDecals.dcwide .dcpanel.off{display:block}
+#gDecals.dcwide #dcEditP{order:-1}
+@media (max-height:520px){ .dcic{min-height:36px!important} .dcsub button{min-height:38px} #gDecals .lib .tile{min-height:66px!important} .dcacts .btn2{min-height:40px!important} label.dcrange input[type=range]{min-height:36px} }
+
+.carcard{min-width:0}.carcard small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:620px){ .carlist{grid-template-columns:repeat(2,1fr)!important} }
+
+.dcoff,label.dcrange.dcoff{display:none!important}
+
+@media (orientation:landscape) and (max-height:400px){ .tally{display:none!important} }
+
+.ovall{position:absolute;left:50%;transform:translateX(-50%);bottom:84px;pointer-events:auto;white-space:nowrap;min-height:40px;padding:0 20px;background:rgba(0,0,0,.78);z-index:3}
+.ovall.on{background:var(--teal);color:#06201f;border-color:var(--teal)}
+
+@media (max-width:380px){ .ovbar button{font-size:12px!important;padding:6px 1px!important} }
 </style>
 </head>
 <body>
@@ -709,6 +767,7 @@ body.gdrag #gl{cursor:grabbing}
         <div class="duo"><button type="button" class="btn2" id="garageBtn">Garage</button><button type="button" class="btn2" id="pastBtn">Past races</button></div>
         <div class="duo"><button type="button" class="btn2" id="allBtn">All races today</button><button type="button" class="btn2" id="lbBtn">Leaderboard</button></div>
         <div class="best" id="menuBest"></div>
+        <div id="menuTally" class="tally" aria-live="polite"></div>
         <div id="menuGhostRow"><span id="menuGhost"></span> <button type="button" class="linkbtn" id="ghostClear" style="display:none">Use my own</button></div>
         <div id="menuStreak"></div>
         <div id="acct"><span id="acctText"></span><span class="acctbtns"><button type="button" class="btn2" id="acctRename" style="display:none">Change name</button><button type="button" class="btn2" id="acctBtn"></button></span></div>
@@ -731,20 +790,44 @@ body.gdrag #gl{cursor:grabbing}
         </div>
         <div class="gpane" id="gPaint"><div id="swatches"></div></div>
         <div class="gpane hidden" id="gDecals">
-          <div class="gleft">
-            <p id="dcHint" class="dchint">Tap a decal on the right to add it. Drag it on the car to move it. Add as many as you like.</p>
-            <div class="dcrow"><span id="dcCount">No decals yet</span><button type="button" class="btn2" id="dcClearAll">Remove all</button></div>
-            <div id="dcSlots" class="slots chips" role="listbox" aria-label="Placed decals"></div>
-            <div id="dcCtl" class="dcctl off">
-              <label>Place <select id="dcZone" aria-label="Where on the car"></select></label>
-              <label>Size <input type="range" id="dcSize" min="20" max="300" step="5" aria-label="Decal size"></label>
-              <label>Turn <input type="range" id="dcRot" min="-180" max="180" step="5" aria-label="Decal rotation"></label>
-              <label>Position <input type="range" id="dcPos" min="-100" max="100" step="5" aria-label="Move the decal back or forward"></label>
-              <label id="dcNumRow">Number <input type="number" id="dcNum" min="0" max="99" aria-label="Race number"></label>
-              <div class="dcbtns"><button type="button" class="btn2" id="dcFlip" aria-pressed="false">Flip</button><button type="button" class="btn2" id="dcEdit" style="display:none">Edit</button><button type="button" class="btn2" id="dcClear">Remove</button><button type="button" class="btn2" id="dcDup">Duplicate</button><button type="button" class="btn2" id="dcMirror">Mirror</button></div>
+          <div class="dctop">
+            <div class="dcrow">
+              <button type="button" class="btn2 dcic" id="dcUndo" disabled aria-label="Undo the last change">&#8630; Undo</button>
+              <button type="button" class="btn2 dcic" id="dcRedo" disabled aria-label="Redo">Redo &#8631;</button>
+              <span id="dcCount">No decals yet</span>
+              <button type="button" class="btn2 dcic" id="dcClearAll">Remove all</button>
+            </div>
+            <div id="dcSlots" class="slots chips" role="listbox" aria-label="Decals on the car"></div>
+            <p id="dcHint" class="dchint">Tap a decal to add it. Drag it on the car to move it. Add as many as you like.</p>
+          </div>
+          <div class="dcsub" role="tablist" aria-label="Decal tools"><button type="button" role="tab" id="dcTabAdd" data-sub="add" class="on" aria-selected="true">Add decal</button><button type="button" role="tab" id="dcTabEdit" data-sub="edit" aria-selected="false">Edit selected</button></div>
+          <div class="dcbody">
+            <div id="dcAddP" class="dcpanel">
+              <input type="search" id="dcSearch" class="dcsearch" placeholder="Search decals" aria-label="Search decals" autocomplete="off" autocapitalize="off" spellcheck="false">
+              <div id="dcCats" class="cats" role="group" aria-label="Decal groups"><button type="button" data-cat="all" class="on" aria-pressed="true">All</button><button type="button" data-cat="brand" aria-pressed="false">TGK</button><button type="button" data-cat="racing" aria-pressed="false">Racing</button><button type="button" data-cat="fun" aria-pressed="false">Fun</button><button type="button" data-cat="mine" aria-pressed="false">Mine</button></div>
+              <div id="dcLib" class="tiles lib" role="listbox" aria-label="Decals"></div>
+            </div>
+            <div id="dcEditP" class="dcpanel off">
+              <div id="dcCtl" class="dcctl off">
+                <div class="dcsel" id="dcSel">Nothing selected. Tap a decal in the list above, or on the car.</div>
+                <div class="dcacts">
+                  <button type="button" class="btn2" id="dcFlip" aria-pressed="false">Flip</button>
+                  <button type="button" class="btn2" id="dcDup">Duplicate</button>
+                  <button type="button" class="btn2" id="dcMirror">Mirror</button>
+                  <button type="button" class="btn2" id="dcFwd" aria-label="Bring forward">Forward</button>
+                  <button type="button" class="btn2" id="dcBack" aria-label="Send back">Back</button>
+                  <button type="button" class="btn2" id="dcEdit" style="display:none">Edit art</button>
+                  <button type="button" class="btn2 danger" id="dcClear">Remove</button>
+                </div>
+                <div class="dcplace" id="dcPlace" role="group" aria-label="Place on"><span>Place on</span></div>
+                <label class="dcrange">Size <input type="range" id="dcSize" min="20" max="300" step="5" aria-label="Decal size"><output id="dcSizeV"></output></label>
+                <label class="dcrange">Turn <input type="range" id="dcRot" min="-180" max="180" step="5" aria-label="Decal rotation"><output id="dcRotV"></output></label>
+                <label class="dcrange" id="dcPosRow">Slide <input type="range" id="dcPos" min="-100" max="100" step="5" aria-label="Move the decal back or forward"><output></output></label>
+                <label class="dcrange" id="dcNumRow">Number <input type="number" id="dcNum" min="0" max="99" aria-label="Race number"><output></output></label>
+                <select id="dcZone" class="vh" aria-label="Where on the car" tabindex="-1"></select>
+              </div>
             </div>
           </div>
-          <div class="gright"><div id="dcLib" class="tiles" role="listbox" aria-label="Decals"></div></div>
         </div>
         <div class="gpane hidden" id="gAcc"><div id="accGrid" class="accgrid"></div></div>
         <div class="gpane hidden" id="gCars"><div id="carList" class="carlist" role="listbox" aria-label="Cars"></div><p id="carBlurb" class="carblurb"></p>
@@ -799,6 +882,7 @@ body.gdrag #gl{cursor:grabbing}
   <div id="ovMark"><b id="ovDate"></b><span>TGKMOTORSPORT.COM</span></div>
   <div class="ovside"><div id="ovList"></div>
 </div>
+  <button type="button" class="pill ovall" id="ovAllBtn" aria-pressed="false" title="Replay every verified attempt of the day, not just each player's best">Every attempt</button>
   <div class="ovbar"><button type="button" id="ovCamPack" class="on">Pack cam</button><button type="button" id="ovCamLead">Leader</button><button type="button" id="ovCamOver">Overhead</button><button type="button" id="ovZout" aria-label="Zoom out">&minus;</button><button type="button" id="ovZin" aria-label="Zoom in">+</button><button type="button" id="ovS1" class="on">1x</button><button type="button" id="ovS2">2x</button><button type="button" id="ovS4">4x</button><button type="button" id="ovPause">Pause</button><button type="button" id="ovListBtn" class="cmp">Top</button><button type="button" id="ovCamCycle" class="cmp" aria-label="Camera">Pack</button><button type="button" id="ovSpeedCycle" class="cmp">1x</button><button type="button" id="ovRestart">Replay</button></div>
 </section>
 <div id="lane" aria-live="polite"><div id="split"></div><div id="toast" role="status"></div><div id="banner"><span></span></div></div>
@@ -3061,7 +3145,7 @@ var TGKCars = (function () {
       TZ: [-2.50, -2.46, -2.38, -2.27, -2.10, -1.80, -1.30, -0.60, 0.20, 0.90, 1.35, 1.75, 2.05, 2.30, 2.43, 2.49, 2.50],
       TW: [0.78, 0.90, 0.96, 0.985, 0.995, 1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 0.995, 0.985, 0.955, 0.900, 0.830, 0.760],
       TY: [1.10, 1.15, 1.22, 1.25, 1.27, 1.275, 1.27, 1.26, 1.24, 1.17, 1.13, 1.10, 1.08, 1.05, 1.00, 0.97, 0.95],
-      floorRise: { fz: 2.1, fl: 0.25, fh: 0.12, rz: -2.15, rl: 0.3, rh: 0.14 }, floor0: 0.22,
+      floorRise: { fz: 2.1, fl: 0.25, fh: 0.12, rz: -2.15, rl: 0.3, rh: 0.14 }, floor0: 0.19,
       RZ: [-2.28, -2.20, -2.05, -1.85, -1.60, -1.30, -0.95, -0.55, -0.15, 0.20, 0.55, 0.85, 1.05, 1.18],
       RY: [1.285, 1.340, 1.420, 1.500, 1.575, 1.630, 1.665, 1.690, 1.680, 1.640, 1.560, 1.440, 1.330, 1.275],
       zones: { A: 0.25, B: 0.05, C: -1.78, D: -1.92 }, bpillar: null,
@@ -3072,7 +3156,7 @@ var TGKCars = (function () {
       tail: { x: [0.0, 0.94], y: [1.000, 1.090], bar: [1.040, 1.054], lines: [1.012, 1.030, 1.072] },
       plate: { w: 0.28, y0: 0.62, y1: 0.73 }, diff: { w: 0.70, y0: 0.36, y1: 0.55 },
       tips: [{ cx: -0.55, hw: 0.105, y0: 0.405, y1: 0.500 }, { cx: 0.55, hw: 0.105, y0: 0.405, y1: 0.500 }],
-      mirror: { z0: 1.00, z1: 1.18, y0: 1.170, y1: 1.250 }, seams: [1.08, 0.12, -1.28], seamY: [0.42, 1.20], handle: [0.52, 0.78, 1.15], skirtZ: 1.15,
+      mirror: { z0: 1.00, z1: 1.18, y0: 1.170, y1: 1.250 }, seams: [0.95, -0.10, -0.98], seamY: [0.42, 1.20], handle: [0.52, 0.78, 1.15], skirtZ: 0.98,
       wing: { cx: 0.60, zc: -2.35, blade: 0.88, h: 0.06 },
       halfw: 1.0, anchor: { sideY: 0.80, sideZ: -0.10, hoodZ: 1.75, roofZ: -0.55, trunkZ: -2.02 },
       gar: { skirtLen: 2.3, skirtZc: 0, quad: [-0.72, -0.45, 0.45, 0.72], dual: [-0.55, 0.55], tipY: 0.45 }
@@ -3244,10 +3328,11 @@ var TGKCars = (function () {
   var LIST = [
     { id: 'sentinel', name: 'Sentinel', kind: 'Sport sedan', blurb: 'Twin-turbo V8 sport sedan. The original.' },
     { id: 'kestrel', name: 'Kestrel', kind: 'Compact coupe', blurb: 'Short, wide and eager. A five-cylinder snarl.' },
-    { id: 'phantom', name: 'Phantom', kind: 'Mid-engine supercar', blurb: 'Low, wide and screaming. A naturally aspirated V10.' }
+    { id: 'phantom', name: 'Phantom', kind: 'Mid-engine supercar', blurb: 'Low, wide and screaming. A naturally aspirated V10.' },
+    { id: 'rsq8', name: 'RSQ8', kind: 'Performance SUV', blurb: 'Tall, wide and brutally quick. A twin-turbo V8 with a loud burble.' }
   ];
   function build(id) { var base = TGKS6V2.build(); if (id === 'kestrel' || id === 'phantom' || id === 'rsq8') return buildBody(id, base.wheel, base.spec); base.spec.len = 4.95; base.spec.carName = 'Sentinel'; return base; }
-  return { build: build, wheelMB: wheelMB, WHEEL_STYLES: WHEEL_STYLES, WHEEL_FINISH: WHEEL_FINISH, LIST: LIST, IDS: ['sentinel', 'kestrel', 'phantom'], CARS: CARS };
+  return { build: build, wheelMB: wheelMB, WHEEL_STYLES: WHEEL_STYLES, WHEEL_FINISH: WHEEL_FINISH, LIST: LIST, IDS: ['sentinel', 'kestrel', 'phantom', 'rsq8'], CARS: CARS };
 })();
 
 </script>
@@ -4026,6 +4111,7 @@ var TGKAudio = (function () {
     var PROFILES = {
       sentinel: { oscMix: 0.5, pf: 4, rs: 1.0, g: [0.5, 0.34, 0.2, 0.34], k: 2.6, lope: 1.0, lopeRatio: 0.5, bright: 1.0, roar: 1.0, turbo: 1.0, turboPitch: 1.0, pop: 1.0 },
       kestrel: { oscMix: 0.42, pf: 2.5, rs: 1.14, g: [0.52, 0.16, 0.36, 0.2], k: 3.6, lope: 0.85, lopeRatio: 0.4, bright: 1.3, roar: 1.3, turbo: 1.7, turboPitch: 1.18, pop: 1.8 },
+      rsq8: { oscMix: 0.52, pf: 4, rs: 0.9, g: [0.5, 0.34, 0.2, 0.44], k: 2.9, lope: 1.25, lopeRatio: 0.5, bright: 0.85, roar: 1.2, turbo: 1.3, turboPitch: 0.9, pop: 1.5 },
       phantom: { oscMix: 0.36, pf: 5, rs: 1.34, g: [0.4, 0.08, 0.5, 0.1], k: 1.9, lope: 0.25, lopeRatio: 0.5, bright: 1.3, roar: 1.15, turbo: 0, turboPitch: 1.0, pop: 0.6 }
     };
     /* ---------- the engine itself: its real firing pattern, shaped by the exhaust ----------
@@ -4035,6 +4121,7 @@ var TGKAudio = (function () {
     var ENG = {
       sentinel: { amps: [1, 0.78, 0.95, 0.7, 1, 0.82, 0.9, 0.72], off: [0, 0.012, 0, -0.012, 0, 0.012, 0, -0.012], jit: 0.5, ampJit: 0.06, thump: 68, tau1: 0.024, tau2: 0.0022, snapHz: 3400, noise: 3.2, res: [[170, 6, 1.0], [340, 7, 0.65], [880, 5, 0.4]], dry: 0.5, loopLP: 1.0 },
       kestrel: { amps: [1, 0.9, 1, 0.84, 0.95], off: [0, 0.006, -0.004, 0.008, -0.006], jit: 0.7, ampJit: 0.09, thump: 92, tau1: 0.018, tau2: 0.0016, snapHz: 4800, noise: 3.2, res: [[240, 6, 0.9], [520, 7, 0.75], [1300, 6, 0.5]], dry: 0.45, loopLP: 1.25 },
+      rsq8: { amps: [1, 0.78, 0.95, 0.7, 1, 0.82, 0.9, 0.72], off: [0, 0.012, 0, -0.012, 0, 0.012, 0, -0.012], jit: 0.5, ampJit: 0.06, thump: 56, tau1: 0.029, tau2: 0.0022, snapHz: 2900, noise: 3.2, res: [[170, 6, 1.0], [340, 7, 0.65], [880, 5, 0.4]], dry: 0.5, loopLP: 1.0 },
       phantom: { amps: [1, 0.97, 1, 0.96, 1, 0.97, 1, 0.96, 1, 0.97], off: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], jit: 0.25, ampJit: 0.03, thump: 125, tau1: 0.013, tau2: 0.0012, snapHz: 6800, noise: 2.6, res: [[420, 7, 0.75], [900, 8, 0.9], [2200, 6, 0.6]], dry: 0.4, loopLP: 1.5 }
     };
     var LOOP_RPM = [1800, 3700, 6200], LOOP_C = [LOOP_RPM[0] / 6500, LOOP_RPM[1] / 6500, LOOP_RPM[2] / 6500], loopCache = {}, loopSrc = [], loopG = [], loopBase = [];
@@ -4278,6 +4365,9 @@ var TGKGarage = (function () {
   ];
   var LIBBY = {}; LIB.forEach(function (d) { LIBBY[d.id] = d; });
   if (typeof TGKDecalImages !== 'undefined') TGKDecalImages.forEach(function (d) { var o = { id: d.id, name: d.name, aspect: d.w / d.h, src: d.src || null }; LIB.push(o); LIBBY[o.id] = o; });
+  var FACES = { 'img-driver': 'right' };                              // pictures that look sideways: they should face the way the car travels
+  var CATS = { brand: ['badge', 'wordmark', 'motorsport', 'img-husky', 'img-drip', 'img-circle', 'img-tgkwide', 'img-driver', 'tgkflag'], racing: ['roundel', 'racenum', 'checker', 'stripes', 'chevrons', 'speedlines', 'arrows', 'barcode', 'flame', 'bolt', 'lightning', 'sunburst', 'carbon'] };
+  function tagLib() { LIB.forEach(function (l) { l.cat = 'fun'; Object.keys(CATS).forEach(function (c) { if (CATS[c].indexOf(l.id) >= 0) l.cat = c; }); if (FACES[l.id]) l.faces = FACES[l.id]; }); }
   var LIB2 = [
     { id: 'sunburst', name: 'Sunburst', aspect: 1 }, { id: 'hex', name: 'Honeycomb', aspect: 1 }, { id: 'shark', name: 'Shark teeth', aspect: 3.2 }, { id: 'speedlines', name: 'Speed lines', aspect: 2.6 },
     { id: 'wings', name: 'Wings', aspect: 2 }, { id: 'racenum', name: 'Number plate', aspect: 1.4, num: true }, { id: 'lightning', name: 'Twin bolts', aspect: 1 }, { id: 'tribal', name: 'Tribal swoosh', aspect: 2.4 },
@@ -4325,9 +4415,10 @@ var TGKGarage = (function () {
     stag: { name: 'Thunder stag', parts: [{ id: 'lv-sun', zone: 'hood', w: 0.74, h: 0.74, dz: -0.18 }, { id: 'lv-wedge', zone: 'sides', w: 3.0, h: 0.46, dy: -0.18, asym: true }, { id: 'lv-stag', zone: 'sides', w: 0.84, h: 0.67, dy: 0.12, dz: 0.10 }, { id: 'lv-ryline', zone: 'roof', w: 0.20, h: 1.45 }, { id: 'lv-ryline', zone: 'trunk', w: 0.20, h: 0.80 }] }
   };
   if (DECALS2) LIB2.concat(LIVERY_ART).forEach(function (d) { LIB.push(d); LIBBY[d.id] = d; });
+  tagLib();
   var MAX_CUSTOM = 8, MAX_PNG = 9000;
 
-  var CARIDS = ['sentinel', 'kestrel', 'phantom'];
+  var CARIDS = ['sentinel', 'kestrel', 'phantom', 'rsq8'];
   function defaults() { return { v: 1, car: 'sentinel', decals: [], customs: [], acc: { wing: 'none', scoop: 'none', splitter: 'none', skirts: 'none', exhaust: 'none', roof: 'none', diffuser: 'none', wheels: 'stock', wheelcol: 'stock', glow: 'none', tone: 'carbon' } }; }
   /** Whatever came from storage (or anywhere else) becomes a valid, bounded config. Anything unknown is dropped, never trusted. */
   function sanitize(raw, has) {
@@ -4525,7 +4616,7 @@ var TGKGarage = (function () {
   }
 
   function buildDecals(THREE, car, cfg, assets, probe) {
-    var group = new THREE.Group(), AN = anchorsFor(car); group.name = 'decals';
+    var group = new THREE.Group(), AN = anchorsFor(car), isLv = !!cfg.livery; group.name = 'decals';
     cfg.decals.forEach(function (d, di) {
       if (!d) return; var lib = LIBBY[d.id], aspect = lib ? lib.aspect : 1, tex = textureFor(THREE, d, assets);
       (d.zone === 'sides' ? ['side-r', 'side-l'] : [d.zone]).forEach(function (zone) {
@@ -4539,9 +4630,9 @@ var TGKGarage = (function () {
         if (d.w && d.h) { w = d.w; h = d.h; }                                        // a livery piece has its own size in metres
         var up = sideLike ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, 0, 1), n = hit.n, ex = new THREE.Vector3().crossVectors(up, n).normalize(), ey = new THREE.Vector3().crossVectors(n, ex).normalize();
         var q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(ex, ey, n));
-        var mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3, toneMapped: false }), mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat);
+        var mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: isLv ? -2 : -4, polygonOffsetUnits: isLv ? -2 : -4, toneMapped: false }), mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat);
         mesh.quaternion.copy(q); mesh.rotateZ((d.rot || 0) * Math.PI / 180); if (fl) mesh.scale.x = -1;
-        mesh.position.copy(hit.p); mesh.renderOrder = 3; mesh.userData.decal = d.id; mesh.userData.di = di;
+        mesh.position.copy(hit.p); mesh.renderOrder = isLv ? 2 : 3 + di * 0.001; mesh.userData.decal = d.id; mesh.userData.di = isLv ? -1 : di; mesh.userData.livery = isLv;                  // a livery is the bottom layer and is not one of the player's decals
         /* conform to the body: a grid of points is cast onto the real surface along the decal's normal and sat 5 mm off it, so the sticker hugs a flank, hood or trunk instead of standing off it
            as a flat card; where there is no paint within reach (window line, wheel arch, panel edge) it is cut off cleanly. The shape is remembered, so only a decal you change is recomputed. */
         var key = (car.carId || 's') + '|' + zone + (zone === 'free' ? hit.p.x.toFixed(2) + ',' + hit.p.y.toFixed(2) + ',' + hit.p.z.toFixed(2) : '') + '|' + d.scale + '|' + (d.rot || 0) + '|' + (fl ? 1 : 0) + '|' + (d.pos || 0) + '|' + (d.dz || 0) + '|' + (d.dy || 0) + '|' + w.toFixed(3) + '|' + h.toFixed(3) + (assets.fast ? '|F' : ''), shape = GEO_CACHE[key];
@@ -4665,7 +4756,7 @@ var TGKGarage = (function () {
   /** (re)build everything on a car. assets: { logo: Image, png: {customId: dataURL}, bodyHex } */
   function build(THREE, car, cfg, assets) {
     remove(car); assets = assets || {}; var probe = makeProbe(THREE, car, assets.memo ? (car.carId || 's') : null), dec = buildDecals(THREE, car, cfg, assets, probe), parts = buildParts(THREE, car, cfg, assets, probe);
-    var lv = DECALS2 && cfg.acc && LIVERIES[cfg.acc.livery]; if (lv) { var lg = buildDecals(THREE, car, { decals: lv.parts.map(function (q) { return Object.assign({ scale: 1, rot: 0, flip: false, pos: 0, num: 0 }, q); }) }, assets, probe); lg.children.slice().forEach(function (mm) { dec.add(mm); }); }
+    var lv = DECALS2 && cfg.acc && LIVERIES[cfg.acc.livery]; if (lv) { var lg = buildDecals(THREE, car, { livery: true, decals: lv.parts.map(function (q) { return Object.assign({ scale: 1, rot: 0, flip: false, pos: 0, num: 0 }, q); }) }, assets, probe); lg.children.slice().forEach(function (mm) { dec.add(mm); }); }
     car.body.add(dec); car.body.add(parts.group); if (parts.glow) car.group.add(parts.glow);
     car.body.traverse(function (o) { if (o.name === 'stockExhaust') o.visible = cfg.acc.exhaust === 'none'; if (o.name === 'stockWing') o.visible = cfg.acc.wing === 'none'; });       // fitted tips replace the stock ones, they do not add to them
     applyWheels(THREE, car, cfg);
@@ -4806,7 +4897,7 @@ var TGKPages = (function () {
   var qName = store.get('tgk.quality'); if (!QUALITY[qName]) qName = coarse ? 'low' : 'medium';
 
   /* ---------------- renderer / scene ---------------- */
-  var CAR_IDS = ['sentinel', 'kestrel', 'phantom'];
+  var CAR_IDS = ['sentinel', 'kestrel', 'phantom', 'rsq8'];
   function normCar(v) { return CAR_IDS.indexOf(v) >= 0 ? v : 'sentinel'; }
   function curCar() { return (typeof garage !== 'undefined' && garage && garage.car) ? normCar(garage.car) : 'sentinel'; }
   var renderer, scene, camera, world = null, carObj = null, envTex = null, track, sim, raceDate, FX = null;
@@ -4902,7 +4993,7 @@ var TGKPages = (function () {
     $('todayDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase();
     renderPastUi();
     drawMiniMap();
-    var pb = getPB(); $('menuBest').textContent = pb ? 'Your best today ' + C.fmtTime(pb) : 'No time set yet today'; renderStreak(); renderGhostLine();
+    var pb = getPB(); $('menuBest').textContent = pb ? 'Your best today ' + C.fmtTime(pb) : 'No time set yet today'; renderStreak(); renderGhostLine(); fetchTally(false);
   }
   function biomeLabel(b) { return { forest: 'forest road', desert: 'desert road', mountain: 'mountain pass', canyon: 'canyon road', countryside: 'countryside', industrial: 'industrial course' }[b] || b; }
 
@@ -5213,13 +5304,13 @@ var TGKPages = (function () {
     function ndcOf(e) { var r = $('gl').getBoundingClientRect(); return new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); }
     function decalGrab(e) {
       if (!HAS_G || gTab !== 'decals' || !garageView() || !carObj || !carObj.garage || !carObj.garage.decals) return false;
-      var meshes = carObj.garage.decals.children; if (!meshes.length) return false; carObj.group.updateMatrixWorld(true);
+      var meshes = carObj.garage.decals.children.filter(function (m) { return !m.userData.livery && m.userData.di >= 0; }); if (!meshes.length) return false; carObj.group.updateMatrixWorld(true);        // a livery is never grabbed or moved
       var rc = new THREE.Raycaster(); rc.setFromCamera(ndcOf(e), camera); var hit = rc.intersectObjects(meshes, false)[0], di = hit ? hit.object.userData.di : -1;
       if (di < 0) { var best = 46, r = $('gl').getBoundingClientRect(), v = new THREE.Vector3(); meshes.forEach(function (m) { m.getWorldPosition(v); v.project(camera); var sx = (v.x + 1) / 2 * r.width + r.left, sy = (1 - v.y) / 2 * r.height + r.top, ds = Math.hypot(sx - e.clientX, sy - e.clientY); if (v.z < 1 && ds < best) { best = ds; di = m.userData.di; } }); }      // or the nearest one within a fingertip
       if (di < 0 || !garage.decals[di]) return false;
-      gSlot = di; refreshGarage(); cam.manual = true; document.body.classList.add('gdrag');
+      gSlot = di; refreshGarage(); if (!$('gDecals').classList.contains('dcwide')) setSub('edit'); cam.manual = true; document.body.classList.add('gdrag'); pushHist();
       var targets = []; carObj.body.traverse(function (o) { if (!o.isMesh) return; for (var p = o; p; p = p.parent) { if (p === carObj.garage.decals || p === carObj.garage.parts || (carObj.wheels && carObj.wheels.indexOf(p) >= 0)) return; if (p === carObj.body) break; } targets.push(o); });
-      dd = { id: e.pointerId, i: di, targets: targets, moved: false }; return true;
+      var gd = garage.decals[di]; dd = { id: e.pointerId, i: di, targets: targets, moved: false, side: gd.n && Math.abs(gd.n[0]) > 0.7 ? Math.sign(gd.n[0]) : 0 }; return true;
     }
     function decalDrag(e) {
       var rc = new THREE.Raycaster(); rc.setFromCamera(ndcOf(e), camera); var hit = rc.intersectObjects(dd.targets, false)[0], d = garage.decals[dd.i]; if (!hit || !d) return;
@@ -5229,7 +5320,10 @@ var TGKPages = (function () {
       var up = Math.abs(n.y) <= 0.7 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, 0, 1), ex = new THREE.Vector3().crossVectors(up, n).normalize(), ey = new THREE.Vector3().crossVectors(n, ex).normalize(), q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(ex, ey, n));
       carObj.garage.decals.children.forEach(function (m) { if (m.userData.di !== dd.i) return; m.quaternion.copy(q); m.rotateZ((d.rot || 0) * Math.PI / 180); m.scale.x = d.flip ? -1 : 1; m.position.copy(p).addScaledVector(n, 0.012); });      // live: the sticker follows the finger; the exact fit is worked out on release
     }
-    function decalDrop() { if (!dd) return; var moved = dd.moved; dd = null; document.body.classList.remove('gdrag'); if (moved) { saveGarage(); applyGarage(); refreshGarage(); } }
+    function decalDrop() { if (!dd) return; var moved = dd.moved, gd = garage.decals[dd.i], side = dd.side; dd = null; document.body.classList.remove('gdrag');
+      if (!moved) { hist.undo.pop(); syncHist(); return; }
+      if (gd) { var f = faceFor(TGKGarage.LIBBY[gd.id], gd.n); if (f !== null && Math.sign(gd.n[0]) !== side) gd.flip = f; }       // dragged to the other side: a decal that looks sideways turns to face forward again
+      saveGarage(); applyGarage(); refreshGarage(); }
     window.addEventListener('pointerdown', function (e) {
       if (state !== 'menu' || !e.target || e.target.id !== 'gl') return; pts[e.pointerId] = { x: e.clientX, y: e.clientY }; var n = count();
       if (dd) return; if (n === 1 && decalGrab(e)) return;
@@ -5326,7 +5420,7 @@ var TGKPages = (function () {
     W.updateGates(world, 0); repairCar();
     $('menu').classList.remove('hidden'); $('results').classList.add('hidden'); $('pause').classList.add('hidden'); $('hud').classList.add('hidden');
     document.body.classList.remove('racing');
-    var pb = getPB(); $('menuBest').textContent = pb ? 'Your best today ' + C.fmtTime(pb) : 'No time set yet today'; renderStreak(); renderGhostLine();
+    var pb = getPB(); $('menuBest').textContent = pb ? 'Your best today ' + C.fmtTime(pb) : 'No time set yet today'; renderStreak(); renderGhostLine(); fetchTally(false);
     if (ghostCar) ghostCar.group.visible = false;
   }
   function repairCar() { if (carObj && dentSig !== '') { W.applyDents(THREE, carObj, []); } dentSig = ''; }
@@ -5531,6 +5625,7 @@ var TGKPages = (function () {
   }
 
   /* ---------------- garage: decals and accessories (cosmetic only; see garage.js) ---------------- */
+  var libCat = 'all', libQ = '', gSub = 'add', hist = { undo: [], redo: [] }, gGesture = 0;
   var HAS_G = !!window.TGKGarage, gTab = 'paint', gSlot = 0, gWas = false, garageR = 0;
   var UNLOCK_ALL = /[?&]unlockall\b/.test(location.search);       // owner preview: every part unlocked for this visit only (never saved)
   function loadJson(k, d) { try { var v = JSON.parse(store.get(k) || 'null'); return (v && typeof v === 'object') ? v : d; } catch (e) { return d; } }
@@ -5589,7 +5684,7 @@ var TGKPages = (function () {
   }
   /** put a garage (and paint) on the player's car right now: new body if the car differs, paint, parts, wheels and decals */
   function installGarage(gar, paint) {
-    adopting = true;
+    adopting = true; hist = { undo: [], redo: [] };
     try {
       garage = gar; store.set('tgk.garage', JSON.stringify(garage));
       if (paint) { var okId = paint.id === 'custom' || W.PAINTS.some(function (p) { return p.id === paint.id; }); paintId = okId ? paint.id : 'tgk-teal'; paintHex = (paintId === 'custom' && paint.hex) ? paint.hex : null; store.set('tgk.paint', paintId); if (paintHex) store.set('tgk.paintHex', paintHex); }
@@ -5629,6 +5724,7 @@ var TGKPages = (function () {
   }
   var CAR_SVG = {
     sentinel: '<svg viewBox="0 0 72 28" aria-hidden="true"><path fill="currentColor" d="M4 20 L7 14 Q9 12 16 11 L26 6 Q28 5 32 5 L47 5 Q53 5 57 9 L64 12 Q69 13 69 18 L69 20 Z"/><circle cx="18" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/><circle cx="55" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/></svg>',
+    rsq8: '<svg viewBox="0 0 72 28" aria-hidden="true"><path fill="currentColor" d="M4 20 L6 11 Q8 8 16 7 L26 3 Q30 2 37 2 L51 2 Q58 2 62 7 L67 11 Q70 13 70 20 Z"/><circle cx="19" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/><circle cx="55" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/></svg>',
     kestrel: '<svg viewBox="0 0 72 28" aria-hidden="true"><path fill="currentColor" d="M7 20 L9 14 Q12 11 20 10 L29 5 Q32 4 37 4 L46 5 Q51 6 55 11 L62 13 Q66 14 66 20 Z"/><path fill="currentColor" d="M6 8 h9 v2 h-9 z M8 10 h1.5 v4 h-1.5 z"/><circle cx="19" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/><circle cx="53" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/></svg>',
     phantom: '<svg viewBox="0 0 72 28" aria-hidden="true"><path fill="currentColor" d="M3 20 L6 15 Q10 13 18 12 L33 6 Q38 5 43 6 L56 10 L66 13 Q70 14 70 20 Z"/><path fill="currentColor" d="M3 9 h12 v2 h-12 z M6 11 h1.5 v4 h-1.5 z"/><circle cx="19" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/><circle cx="54" cy="21" r="4.6" fill="#0d0f11" stroke="currentColor" stroke-width="1.4"/></svg>'
   };
@@ -5674,14 +5770,26 @@ var TGKPages = (function () {
     var hit = TGKGarage.makeProbe(THREE, carObj)(a[0], a[1], a[2] + ((k % 7) - 3) * 0.22, a[3], a[4], a[5]); if (!hit) return null;
     return { p: [r3(hit.p.x), r3(hit.p.y), r3(hit.p.z)], n: [r3(hit.n.x), r3(hit.n.y), r3(hit.n.z)] };
   }
+  /* ---- undo / redo for everything done to the decals ---- */
+  function histSnap(withCustoms) { var s = { d: JSON.stringify(garage.decals), sel: gSlot }; if (withCustoms) s.c = JSON.stringify(garage.customs); return s; }
+  function syncHist() { var u = $('dcUndo'), r = $('dcRedo'); if (u) u.disabled = !hist.undo.length; if (r) r.disabled = !hist.redo.length; }
+  function pushHist(withCustoms) { clearTimeout(gGesture); gGesture = 0; var s = histSnap(withCustoms), top = hist.undo[hist.undo.length - 1]; if (top && top.d === s.d && top.c === s.c) return; hist.undo.push(s); if (hist.undo.length > 80) hist.undo.shift(); hist.redo.length = 0; syncHist(); }
+  function gestureStart() { if (!gGesture) pushHist(); clearTimeout(gGesture); gGesture = setTimeout(function () { gGesture = 0; }, 800); }       // a slider drag is ONE undo step
+  function applySnap(s) { garage.decals = JSON.parse(s.d); if (s.c) garage.customs = JSON.parse(s.c); gSlot = Math.min(s.sel, garage.decals.length - 1); }
+  function undoDecals() { if (!hist.undo.length) return; var s = hist.undo.pop(); hist.redo.push(histSnap(!!s.c)); applySnap(s); commitGarage(); }
+  function redoDecals() { if (!hist.redo.length) return; var s = hist.redo.pop(); hist.undo.push(histSnap(!!s.c)); applySnap(s); commitGarage(); }
+  /** pictures that look sideways (a driver looking right) should face the way the car travels, on either side: on the right door the front is to the viewer's left */
+  function faceFor(lib, n) { if (!lib || !lib.faces || !n || Math.abs(n[0]) < 0.7) return null; var frontLeft = n[0] > 0; return lib.faces === 'right' ? frontLeft : !frontLeft; }
+  function moveLayer(dir) { var i = gSlot, j = i + dir; if (i < 0 || j < 0 || j >= garage.decals.length) return; pushHist(); var t = garage.decals[i]; garage.decals[i] = garage.decals[j]; garage.decals[j] = t; gSlot = j; commitGarage(); }
+  function setSub(s) { gSub = s; $('dcAddP').classList.toggle('off', s !== 'add'); $('dcEditP').classList.toggle('off', s !== 'edit'); [].forEach.call(document.querySelectorAll('.dcsub [data-sub]'), function (b) { var on = b.getAttribute('data-sub') === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); }); }
   function makeDecal(id) {
     var zone = DEFAULT_ZONE[id] || 'side-r', d = { id: id, zone: 'free', scale: 1, rot: 0, flip: false, pos: 0, num: (id === 'roundel' || id === 'racenum') ? 7 : 0 };
-    var spot = decalSpot(zone, garage.decals.filter(function (x) { return x.zone === 'free'; }).length); if (spot) { d.p = spot.p; d.n = spot.n; } else d.zone = zone === 'side-r' ? 'sides' : zone;
+    var spot = decalSpot(zone, garage.decals.filter(function (x) { return x.zone === 'free'; }).length); if (spot) { d.p = spot.p; d.n = spot.n; var f0 = faceFor(TGKGarage.LIBBY[id], d.n); if (f0 !== null) d.flip = f0; } else d.zone = zone === 'side-r' ? 'sides' : zone;
     return d;
   }
   function addDecal(id) {
     if (garage.decals.length >= TGKGarage.MAXD) { toast('That is the most one car can carry (' + TGKGarage.MAXD + ' decals)'); return; }
-    garage.decals.push(makeDecal(id)); gSlot = garage.decals.length - 1; commitGarage();
+    pushHist(); garage.decals.push(makeDecal(id)); gSlot = garage.decals.length - 1; commitGarage();
     if (!store.get('tgk.dragHint')) { toast('Drag the decal on the car to move it'); store.set('tgk.dragHint', '1'); }
   }
   function refreshGarage() {
@@ -5690,22 +5798,34 @@ var TGKPages = (function () {
     garage.decals.forEach(function (dd, i) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'slot' + (gSlot === i ? ' on' : ''); b.setAttribute('aria-pressed', String(gSlot === i)); b.setAttribute('aria-label', 'Decal ' + (i + 1) + (dd ? ': ' + decalName(dd) : ': empty'));
       var th = document.createElement('span'); th.className = 'th'; if (dd) th.appendChild(decalThumb(dd, 38)); else th.textContent = '+'; var tx = document.createElement('span'); tx.className = 'tx'; var sm = document.createElement('small'); sm.textContent = 'Decal ' + (i + 1); var nm = document.createElement('b'); nm.textContent = dd ? decalName(dd) : 'Empty'; tx.appendChild(sm); tx.appendChild(nm); b.appendChild(th); b.appendChild(tx);
-      b.addEventListener('click', function () { gSlot = i; refreshGarage(); }); sl.appendChild(b);
+      b.addEventListener('click', function () { gSlot = i; refreshGarage(); setSub('edit'); }); sl.appendChild(b);
     });
     var lib = $('dcLib'); lib.innerHTML = '';
-    function tile(id, el, onTap, onDel) { var w = document.createElement('div'); w.className = 'tw'; var b = document.createElement('button'); b.type = 'button'; b.className = 'tile' + (d && d.id === id ? ' on' : ''); b.setAttribute('role', 'option'); b.setAttribute('aria-selected', String(!!(d && d.id === id))); b.setAttribute('aria-label', el.getAttribute && el.getAttribute('data-name') || id); b.appendChild(el.nodeType ? el : document.createTextNode(el)); b.addEventListener('click', onTap); w.appendChild(b); if (onDel) { var x = document.createElement('button'); x.type = 'button'; x.className = 'tdel'; x.textContent = '\u00d7'; x.setAttribute('aria-label', 'Delete this decal'); x.addEventListener('click', function (e) { e.stopPropagation(); onDel(); }); w.appendChild(x); } lib.appendChild(w); }
-    TGKGarage.LIB.forEach(function (l) { if (l.hidden) return; var th = decalThumb({ id: l.id, num: 7 }, 40); th.setAttribute('data-name', l.name); th.title = l.name; tile(l.id, th, function () { addDecal(l.id); }); });
-    garage.customs.forEach(function (c) { var th = decalThumb({ id: c.id }, 40); th.setAttribute('data-name', c.name); th.title = c.name; tile(c.id, th, function () { addDecal(c.id); }, function () { deleteCustom(c.id); }); });
-    if (garage.customs.length < TGKGarage.MAX_CUSTOM) { var plus = document.createTextNode('+'); var pw = document.createElement('div'); pw.className = 'tw'; var pb = document.createElement('button'); pb.type = 'button'; pb.className = 'tile'; pb.id = 'dcNew'; pb.setAttribute('aria-label', 'Draw your own decal'); pb.title = 'Draw your own'; pb.appendChild(plus); pb.addEventListener('click', function () { openPixel(null); }); pw.appendChild(pb); lib.appendChild(pw); }
-    var ctl = $('dcCtl'); ctl.classList.toggle('off', !d);
-    if (d) { $('dcZone').value = d.zone; $('dcSize').value = Math.round(d.scale * 100); $('dcRot').value = d.rot; $('dcPos').value = Math.round((d.pos || 0) * 100); $('dcNum').value = d.num; $('dcFlip').setAttribute('aria-pressed', String(d.flip)); $('dcFlip').classList.toggle('on', d.flip); }
-    var nd = garage.decals.length; $('dcCount').textContent = nd ? nd + (nd === 1 ? ' decal' : ' decals') + ' (up to ' + TGKGarage.MAXD + ')' : 'No decals yet'; $('dcClearAll').style.display = nd ? '' : 'none'; $('dcPos').parentNode.style.display = (d && d.zone === 'free') ? 'none' : ''; $('dcDup').disabled = !d || nd >= TGKGarage.MAXD; $('dcMirror').disabled = !d;
-    $('dcNumRow').style.display = (d && (d.id === 'roundel' || d.id === 'racenum')) ? '' : 'none'; $('dcEdit').style.display = (d && !TGKGarage.LIBBY[d.id]) ? '' : 'none';
+    function tile(id, el, name, onTap, onDel) {
+      var w = document.createElement('div'); w.className = 'tw'; var b = document.createElement('button'); b.type = 'button'; b.className = 'tile'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', 'false'); b.setAttribute('aria-label', 'Add ' + name); b.title = name;
+      b.appendChild(el); var lb = document.createElement('span'); lb.className = 'tl'; lb.textContent = name; b.appendChild(lb); b.addEventListener('click', onTap); w.appendChild(b);
+      if (onDel) { var x = document.createElement('button'); x.type = 'button'; x.className = 'tdel'; x.textContent = '\u00d7'; x.setAttribute('aria-label', 'Delete ' + name); x.addEventListener('click', function (e) { e.stopPropagation(); onDel(); }); w.appendChild(x); }
+      lib.appendChild(w);
+    }
+    var q = (libQ || '').toLowerCase().trim();
+    function want(cat, name) { return (libCat === 'all' || libCat === cat) && (!q || name.toLowerCase().indexOf(q) >= 0); }
+    TGKGarage.LIB.forEach(function (l) { if (l.hidden || !want(l.cat || 'fun', l.name)) return; var th = decalThumb({ id: l.id, num: 7 }, 40); th.setAttribute('data-name', l.name); th.title = l.name; tile(l.id, th, l.name, function () { addDecal(l.id); }); });
+    garage.customs.forEach(function (c) { if (!want('mine', c.name)) return; var th = decalThumb({ id: c.id }, 40); th.setAttribute('data-name', c.name); th.title = c.name; tile(c.id, th, c.name, function () { addDecal(c.id); }, function () { deleteCustom(c.id); }); });
+    if (garage.customs.length < TGKGarage.MAX_CUSTOM && (libCat === 'all' || libCat === 'mine') && !q) { var pw = document.createElement('div'); pw.className = 'tw'; var pb = document.createElement('button'); pb.type = 'button'; pb.className = 'tile'; pb.id = 'dcNew'; pb.setAttribute('aria-label', 'Draw your own decal'); pb.title = 'Draw your own'; pb.appendChild(document.createTextNode('+')); var pl2 = document.createElement('span'); pl2.className = 'tl'; pl2.textContent = 'Draw your own'; pb.appendChild(pl2); pb.addEventListener('click', function () { openPixel(null); }); pw.appendChild(pb); lib.appendChild(pw); }
+    if (!lib.children.length) { var em = document.createElement('div'); em.className = 'libempty'; em.textContent = q ? 'No decals match "' + libQ.trim() + '".' : 'Nothing here yet.'; lib.appendChild(em); }
+    var nd = garage.decals.length, ctl = $('dcCtl'); ctl.classList.toggle('off', !d);
+    $('dcSel').textContent = d ? 'Decal ' + (gSlot + 1) + ' of ' + nd + ': ' + decalName(d) : 'Nothing selected. Tap a decal in the list above, or on the car.';
+    if (d) { $('dcZone').value = d.zone; $('dcSize').value = Math.round(d.scale * 100); $('dcRot').value = d.rot; $('dcPos').value = Math.round((d.pos || 0) * 100); $('dcNum').value = d.num; $('dcFlip').setAttribute('aria-pressed', String(d.flip)); $('dcFlip').classList.toggle('on', d.flip); $('dcSizeV').textContent = Math.round(d.scale * 100) + '%'; $('dcRotV').textContent = d.rot + '\u00b0'; }
+    [].forEach.call($('dcPlace').querySelectorAll('[data-zone]'), function (p) { var on = !!d && p.getAttribute('data-zone') === d.zone; p.classList.toggle('on', on); p.setAttribute('aria-pressed', String(on)); });
+    $('dcCount').textContent = nd ? nd + (nd === 1 ? ' decal' : ' decals') : 'No decals yet'; $('dcCount').title = nd ? nd + ' of ' + TGKGarage.MAXD + ' decals used' : ''; $('dcClearAll').style.display = nd ? '' : 'none'; var hidePos = !!(d && d.zone === 'free'); $('dcPosRow').style.display = hidePos ? 'none' : ''; $('dcPosRow').classList.toggle('dcoff', hidePos);
+    $('dcDup').disabled = !d || nd >= TGKGarage.MAXD; $('dcMirror').disabled = !d; $('dcFwd').disabled = !d || gSlot >= nd - 1; $('dcBack').disabled = !d || gSlot <= 0;
+    var showNum = !!(d && (d.id === 'roundel' || d.id === 'racenum')); $('dcNumRow').style.display = showNum ? '' : 'none'; $('dcNumRow').classList.toggle('dcoff', !showNum); $('dcEdit').style.display = (d && !TGKGarage.LIBBY[d.id]) ? '' : 'none'; syncHist();
     var ag = $('accGrid'); [].forEach.call(ag.querySelectorAll('select'), function (s) { var k = s.getAttribute('data-k'); [].forEach.call(s.options, function (o) { var need = TGKGarage.needs(k, o.value), locked = !!need && !has(need), base = TGKGarage.ACC[k].opts[o.value]; o.disabled = locked; o.textContent = base + (locked ? '  \u2013 locked: ' + TGKGarage.ACHBY[need].name : ''); }); s.value = garage.acc[k]; });
     var nAch = TGKGarage.ACH.filter(function (a) { return has(a.id); }).length; $('achBtn').textContent = 'Achievements ' + nAch + '/' + TGKGarage.ACH.length;
     $('paintName').textContent = paintId === 'custom' ? 'Custom' : (paintPreset() ? paintPreset().name : '');
   }
   function deleteCustom(id) {
+    pushHist(true);
     garage.customs = garage.customs.filter(function (c) { return c.id !== id; }); garage.decals = garage.decals.filter(function (d) { return d && d.id !== id; }); commitGarage();
   }
   /* ---- pixel editor ---- */
@@ -5734,7 +5854,7 @@ var TGKPages = (function () {
   function savePixel() {
     var png; try { png = $('pxCv').toDataURL('image/png'); } catch (e) { toast('Could not save that decal'); return; }
     if (png.length > 9000) { toast('Too detailed to save. Simplify it a little'); return; }
-    var name = ($('pxName').value || 'My decal').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 12) || 'My decal', id = px.editing;
+    pushHist(true); var name = ($('pxName').value || 'My decal').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 12) || 'My decal', id = px.editing;
     if (id) { garage.customs.forEach(function (c) { if (c.id === id) { c.png = png; c.name = name; } }); }
     else { if (garage.customs.length >= TGKGarage.MAX_CUSTOM) { toast('Delete a decal first. You can keep 8'); return; } for (var n = 1; n < 1000 && !id; n++) { var tryId = 'c' + n; if (!garage.customs.some(function (c) { return c.id === tryId; })) id = tryId; } garage.customs.push({ id: id, name: name, png: png }); garage.decals.push(makeDecal(id)); gSlot = garage.decals.length - 1; }
     garage = TGKGarage.sanitize(garage); $('pixSheet').classList.add('hidden'); commitGarage(); toast('Decal saved');
@@ -5743,22 +5863,36 @@ var TGKPages = (function () {
     if (!HAS_G) { [].forEach.call(document.querySelectorAll('.gtabs button'), function (b) { if (b.getAttribute('data-tab') !== 'paint') b.style.display = 'none'; }); return; }
     [].forEach.call(document.querySelectorAll('.gtabs button'), function (b) { b.addEventListener('click', function () { setGTab(b.getAttribute('data-tab')); }); });
     var zs = $('dcZone'); Object.keys(TGKGarage.ZONES).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = TGKGarage.ZONES[k]; zs.appendChild(o); });
+    var PILL = { free: 'Free', sides: 'Both doors', 'side-r': 'Right door', 'side-l': 'Left door', hood: 'Hood', roof: 'Roof', trunk: 'Trunk' }, plc = $('dcPlace');
+    Object.keys(TGKGarage.ZONES).forEach(function (k) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-zone', k); b.setAttribute('aria-pressed', 'false'); b.textContent = PILL[k] || TGKGarage.ZONES[k]; b.addEventListener('click', function () { zs.value = k; zs.dispatchEvent(new Event('change', { bubbles: true })); }); plc.appendChild(b); });
     function cur() { return garage.decals[gSlot]; }
-    zs.addEventListener('change', function () { var d = cur(); if (!d) return;
-      if (zs.value === 'free') { if (d.zone !== 'free') { var sp = decalSpot(d.zone, 0); if (sp) { d.zone = 'free'; d.p = sp.p; d.n = sp.n; } } commitGarage(); return; }
-      d.zone = zs.value; delete d.p; delete d.n; d.pos = 0; commitGarage(); });
-    $('dcSize').addEventListener('input', function () { var d = cur(); if (d) { d.scale = +$('dcSize').value / 100; saveGarage(); applyGarage(); } });
-    $('dcRot').addEventListener('input', function () { var d = cur(); if (d) { d.rot = +$('dcRot').value; saveGarage(); applyGarage(); } });
-    $('dcPos').addEventListener('input', function () { var d = cur(); if (d) { d.pos = +$('dcPos').value / 100; saveGarage(); applyGarage(); } });
-    $('dcNum').addEventListener('input', function () { var d = cur(); if (d) { d.num = C.clamp(Math.round(+$('dcNum').value || 0), 0, 99); saveGarage(); applyGarage(); } });
-    $('dcFlip').addEventListener('click', function () { var d = cur(); if (d) { d.flip = !d.flip; commitGarage(); } });
-    $('dcClear').addEventListener('click', function () { if (cur()) { garage.decals.splice(gSlot, 1); gSlot = Math.min(gSlot, garage.decals.length - 1); commitGarage(); } });
-    $('dcDup').addEventListener('click', function () { var d = cur(); if (!d || garage.decals.length >= TGKGarage.MAXD) return; var c = JSON.parse(JSON.stringify(d)); if (c.zone === 'free') c.p[2] = r3(c.p[2] + 0.28); else c.pos = Math.min(1, (c.pos || 0) + 0.3); garage.decals.push(c); gSlot = garage.decals.length - 1; commitGarage(); });
+    zs.addEventListener('change', function () {
+      var d = cur(); if (!d || zs.value === d.zone) return; pushHist();
+      if (zs.value === 'free') { var sp = decalSpot(d.zone, 0); if (sp) { d.zone = 'free'; d.p = sp.p; d.n = sp.n; var f0 = faceFor(TGKGarage.LIBBY[d.id], d.n); if (f0 !== null) d.flip = f0; } commitGarage(); return; }
+      d.zone = zs.value; delete d.p; delete d.n; d.pos = 0; var f1 = (d.zone === 'side-r' || d.zone === 'side-l') ? faceFor(TGKGarage.LIBBY[d.id], [d.zone === 'side-r' ? 1 : -1, 0, 0]) : null; if (f1 !== null) d.flip = f1; commitGarage();
+    });
+    $('dcSize').addEventListener('input', function () { var d = cur(); if (d) { gestureStart(); d.scale = +$('dcSize').value / 100; $('dcSizeV').textContent = Math.round(d.scale * 100) + '%'; saveGarage(); applyGarage(); } });
+    $('dcRot').addEventListener('input', function () { var d = cur(); if (d) { gestureStart(); d.rot = +$('dcRot').value; $('dcRotV').textContent = d.rot + '\u00b0'; saveGarage(); applyGarage(); } });
+    $('dcPos').addEventListener('input', function () { var d = cur(); if (d) { gestureStart(); d.pos = +$('dcPos').value / 100; saveGarage(); applyGarage(); } });
+    $('dcNum').addEventListener('input', function () { var d = cur(); if (d) { gestureStart(); d.num = C.clamp(Math.round(+$('dcNum').value || 0), 0, 99); saveGarage(); applyGarage(); } });
+    $('dcFlip').addEventListener('click', function () { var d = cur(); if (d) { pushHist(); d.flip = !d.flip; commitGarage(); } });
+    $('dcClear').addEventListener('click', function () { if (cur()) { pushHist(); garage.decals.splice(gSlot, 1); gSlot = Math.min(gSlot, garage.decals.length - 1); commitGarage(); } });
+    $('dcEdit').addEventListener('click', function () { var d = cur(); if (d && !TGKGarage.LIBBY[d.id]) openPixel(d.id); });
+    $('dcDup').addEventListener('click', function () { var d = cur(); if (!d || garage.decals.length >= TGKGarage.MAXD) return; pushHist(); var c = JSON.parse(JSON.stringify(d)); if (c.zone === 'free') c.p[2] = r3(c.p[2] + 0.28); else c.pos = Math.min(1, (c.pos || 0) + 0.3); garage.decals.push(c); gSlot = garage.decals.length - 1; commitGarage(); });
     $('dcMirror').addEventListener('click', function () { var d = cur(); if (!d || garage.decals.length >= TGKGarage.MAXD) return; var c = JSON.parse(JSON.stringify(d));
       if (c.zone === 'free') { c.p[0] = r3(-c.p[0]); c.n[0] = r3(-c.n[0]); c.flip = !c.flip; } else if (c.zone === 'side-r' || c.zone === 'side-l') { c.zone = c.zone === 'side-r' ? 'side-l' : 'side-r'; } else { toast('Mirror works on door decals and dragged decals'); return; }
-      garage.decals.push(c); gSlot = garage.decals.length - 1; commitGarage(); });
-    var armedAll = null; $('dcClearAll').addEventListener('click', function () { if (armedAll) { clearTimeout(armedAll); armedAll = null; garage.decals = []; gSlot = -1; $('dcClearAll').textContent = 'Remove all'; commitGarage(); return; } $('dcClearAll').textContent = 'Tap again'; armedAll = setTimeout(function () { armedAll = null; $('dcClearAll').textContent = 'Remove all'; }, 3000); });
-    $('dcEdit').addEventListener('click', function () { var d = cur(); if (d && !TGKGarage.LIBBY[d.id]) openPixel(d.id); });
+      pushHist(); garage.decals.push(c); gSlot = garage.decals.length - 1; commitGarage(); });
+    $('dcFwd').addEventListener('click', function () { moveLayer(1); }); $('dcBack').addEventListener('click', function () { moveLayer(-1); });
+    var armedAll = null; $('dcClearAll').addEventListener('click', function () { if (armedAll) { clearTimeout(armedAll); armedAll = null; pushHist(); garage.decals = []; gSlot = -1; $('dcClearAll').textContent = 'Remove all'; commitGarage(); return; } $('dcClearAll').textContent = 'Tap again'; armedAll = setTimeout(function () { armedAll = null; $('dcClearAll').textContent = 'Remove all'; }, 3000); });
+    $('dcUndo').addEventListener('click', undoDecals); $('dcRedo').addEventListener('click', redoDecals);
+    [].forEach.call(document.querySelectorAll('.dcsub [data-sub]'), function (b) { b.addEventListener('click', function () { setSub(b.getAttribute('data-sub')); }); });
+    $('dcSearch').addEventListener('input', function () { libQ = $('dcSearch').value; refreshGarage(); });
+    [].forEach.call(document.querySelectorAll('#dcCats [data-cat]'), function (b) { b.addEventListener('click', function () { libCat = b.getAttribute('data-cat'); [].forEach.call(document.querySelectorAll('#dcCats [data-cat]'), function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); refreshGarage(); }); });
+    var dpane = $('gDecals'); function fitDecalPane() { dpane.classList.toggle('dcwide', dpane.getBoundingClientRect().width >= 600); } if (window.ResizeObserver) new ResizeObserver(fitDecalPane).observe(dpane); window.addEventListener('resize', fitDecalPane);
+    window.addEventListener('keydown', function (e) {
+      if (gTab !== 'decals' || $('garageView').classList.contains('hidden') || !(e.ctrlKey || e.metaKey)) return; var tn = (e.target && e.target.tagName) || ''; if (/^(INPUT|TEXTAREA|SELECT)$/.test(tn) && e.target.type !== 'range') return;
+      var k = (e.key || '').toLowerCase(); if (k === 'z') { e.preventDefault(); if (e.shiftKey) redoDecals(); else undoDecals(); } else if (k === 'y') { e.preventDefault(); redoDecals(); }
+    });
     var ag = $('accGrid'); ag.innerHTML = '';
     Object.keys(TGKGarage.ACC).forEach(function (k) { var a = TGKGarage.ACC[k], row = document.createElement('label'); row.className = 'arow'; row.appendChild(document.createTextNode(a.label)); var s = document.createElement('select'); s.setAttribute('data-k', k); s.id = 'acc_' + k; s.setAttribute('aria-label', a.label); Object.keys(a.opts).forEach(function (v) { var o = document.createElement('option'); o.value = v; o.textContent = a.opts[v]; s.appendChild(o); }); s.addEventListener('change', function () { garage.acc[k] = s.value; commitGarage(); }); row.appendChild(s); ag.appendChild(row); });
     /* pixel editor */
@@ -5861,7 +5995,7 @@ var TGKPages = (function () {
   }
 
   function handleEvents(ev) {
-    if (ev.go) { raceFlags.jump = false; raceFlags.trail = 0; goFlash = 0.9; $('countdown').textContent = 'GO'; sfx('go'); if (pendingGhostToast) { toast(pendingGhostToast); pendingGhostToast = null; } }
+    if (ev.go) { raceFlags.jump = false; raceFlags.trail = 0; goFlash = 0.9; $('countdown').textContent = 'GO'; sfx('go'); logAttempt(); if (pendingGhostToast) { toast(pendingGhostToast); pendingGhostToast = null; } }
     if (ev.ckpt) {
       W.updateGates(world, sim.nextCk);
       $('hudCk').textContent = sim.nextCk; paintCkBar(); if (!ev.finished) flashCk();
@@ -6460,6 +6594,47 @@ var TGKPages = (function () {
     snap();
     return { f: new Float32Array(buf), n: buf.length / 6, ms: run.ms, jumped: s.jumps > 0, hex: run.hex, car: normCar(run.car), garage: run.garage || null, jx: ((C.hashSeed(String(run.id)) % 1000) / 1000 - 0.5) * 2.4, name: run.name, mine: !!run.mine, curS: 0, fin: false };
   }
+
+  /* ---------------- the daily tally, and "every attempt" ---------------- */
+  var tally = { date: '', attempts: 0, racers: 0, finished: 0, t: 0 }, ovAll = false, attCache = null;
+  function nfmt(n) { return (+n || 0).toLocaleString('en-US'); }
+  function renderTally() {
+    var e = $('menuTally'); if (!e) return; if (!online.configured || tally.date !== raceDate || !(tally.attempts || tally.finished)) { e.textContent = ''; return; }
+    e.textContent = ''; var b = document.createElement('b'); b.textContent = nfmt(tally.attempts); e.appendChild(b);
+    e.appendChild(document.createTextNode(' ' + (tally.attempts === 1 ? 'attempt ' : 'attempts ') + (pastDate ? 'that day' : 'today') + ' \u00b7 ' + nfmt(tally.racers) + (tally.racers === 1 ? ' racer' : ' racers') + ' \u00b7 ' + nfmt(tally.finished) + ' finished'));
+  }
+  function fetchTally(force) {
+    if (!online.configured) return; if (!force && tally.date === raceDate && Date.now() - tally.t < 30000) { renderTally(); return; } var d = raceDate; tally.t = Date.now();
+    api('/rest/v1/rpc/day_stats', { method: 'POST', body: { p_date: d } }).then(function (r) { if (!r || r.status !== 200 || !Array.isArray(r.body) || !r.body[0]) return; var row = r.body[0]; tally = { date: d, attempts: +row.attempts || 0, racers: +row.racers || 0, finished: +row.finished || 0, t: Date.now() }; renderTally(); }).catch(function () { });
+  }
+  /** a race has started: count it (logged-in players, today's race only). The server keeps it light: one per 5 s per player. */
+  function logAttempt() {
+    if (!online.configured || !loggedIn() || pastDate) return;
+    try { api('/functions/v1/submit-run', { method: 'POST', token: auth.token, body: { action: 'attempt', raceDate: raceDate } }).then(function (r) { if (r && r.status === 200 && r.body && r.body.counted && tally.date === raceDate) { tally.attempts++; renderTally(); } }).catch(function () { }); } catch (e) { }
+  }
+  /** EVERY verified attempt of the day (not just each player's best), fastest first, fetched a page at a time */
+  function fetchDayAttempts() {
+    if (attCache && attCache.date === raceDate && Date.now() - attCache.t < 60000) return Promise.resolve(attCache);
+    var cap = coarse ? 150 : 300, PAGE = 100, all = [], date = raceDate;
+    function next(off) {
+      return api('/rest/v1/rpc/day_attempts', { method: 'POST', body: { p_date: date, p_limit: Math.min(PAGE, cap - off), p_offset: off } }).then(function (r) {
+        if (!r || r.status !== 200 || !Array.isArray(r.body)) throw new Error('bad response'); all = all.concat(r.body);
+        if (ov && ov.loading) $('ovSub').textContent = 'Loading attempts ' + all.length + '\u2026';
+        return (r.body.length >= PAGE && all.length < cap) ? next(off + PAGE) : all;
+      });
+    }
+    return next(0).then(function (rows) {
+      var out = []; rows.forEach(function (row) { var run = validRun(row, row.run_id); if (!run) return; run.mine = !!((lastRunId && row.run_id === lastRunId) || (loggedIn() && run.name === auth.name)); run.attemptNo = +row.attempt_no || 1; if (run.attemptNo > 1) run.name = run.name + ' #' + run.attemptNo; out.push(run); });
+      attCache = { t: Date.now(), date: date, runs: out, capped: rows.length >= cap, cap: cap, total: rows.length }; return attCache;
+    });
+  }
+  /** the "Every attempt" pill sits just above the replay toolbar, wherever the toolbar is on this screen */
+  function placeOvAll() { var b = $('ovAllBtn'), bar = document.querySelector('.ovbar'); if (!b || !bar || b.style.display === 'none') return; var r = bar.getBoundingClientRect(); if (r.height) b.style.bottom = Math.round(window.innerHeight - r.top + 8) + 'px'; }
+  window.addEventListener('resize', function () { if (state === 'overview') placeOvAll(); });
+  function setOvAll(on) {
+    ovAll = !!on; var b = $('ovAllBtn'); if (b) { b.classList.toggle('on', ovAll); b.setAttribute('aria-pressed', String(ovAll)); b.textContent = ovAll ? 'Best per racer' : 'Every attempt'; }
+    placeOvAll(); if (ov && state === 'overview') { $('ovBanner').querySelector('b').innerHTML = (ovAll ? 'EVERY ATTEMPT' : 'EVERY TGK DAILY RACE') + '<br>FROM ' + (pastDate ? dayShort(raceDate) : 'TODAY'); buildOverview(); }
+  }
   var dayCache = null;
   /** every player's best verified run today (the server clamps the count), from the public day_runs function */
   function fetchDayRuns() {
@@ -6475,7 +6650,8 @@ var TGKPages = (function () {
   var SWARM_SPEC = {
     sentinel: { body: [0.93, 0.28, 0.95, -2.35, 2.25], cab: [0.80, 0.95, 1.42, -1.25, 0.90], roof: [0.78, 1.42, 1.47, -1.1, 0.7], wz: 1.55, wz2: -1.6, wing: null, blade: null },
     kestrel: { body: [0.95, 0.28, 0.92, -2.08, 2.1], cab: [0.78, 0.92, 1.30, -1.45, 0.62], roof: [0.74, 1.30, 1.35, -1.05, 0.25], wz: 1.27, wz2: -1.27, wing: [0.92, 1.28, 1.34, -2.12, -1.84], blade: null },
-    phantom: { body: [0.98, 0.26, 0.84, -2.2, 2.2], cab: [0.80, 0.84, 1.17, -1.15, 0.98], roof: [0.76, 1.17, 1.21, -0.8, 0.3], wz: 1.33, wz2: -1.33, wing: [0.96, 1.02, 1.07, -2.3, -1.95], blade: [0.99, 0.36, 0.78, -1.0, -0.1] }
+    phantom: { body: [0.98, 0.26, 0.84, -2.2, 2.2], cab: [0.80, 0.84, 1.17, -1.15, 0.98], roof: [0.76, 1.17, 1.21, -0.8, 0.3], wz: 1.33, wz2: -1.33, wing: [0.96, 1.02, 1.07, -2.3, -1.95], blade: [0.99, 0.36, 0.78, -1.0, -0.1] },
+    rsq8: { body: [1.0, 0.30, 1.15, -2.5, 2.5], cab: [0.86, 1.15, 1.62, -2.2, 1.0], roof: [0.80, 1.62, 1.69, -1.6, 0.2], wz: 1.5, wz2: -1.5, wing: null, blade: null }
   };
   function buildSwarmGeo(id) {
     id = normCar(id); if (swarmGeos[id]) return swarmGeos[id];
@@ -6525,7 +6701,7 @@ var TGKPages = (function () {
     ov = { real: [], swarm: null, tick: 0, accum: 0, speed: 1, paused: false, ready: false, loading: false, Hfit: Hfit, cx: (bb.x0 + bb.x1) / 2, cz: (bb.z0 + bb.z1) / 2,
            view: { mode: 'pack', az: 0.55, el: 0.68, D: 300, tx: 0, ty: 0, tz: 0, init: false, panX: 0, panZ: 0 }, goal: { el: 0.68, D: 300 }, listT: 0, vec: new THREE.Vector3(),
            mesh: null, lead: null, meanS: 0, buildId: 0, tmp: {}, ent: [], zoomMul: 1, free: null, freeT: 0 };
-    ov.watch = watchRun; $('ovBanner').querySelector('b').innerHTML = 'EVERY TGK DAILY RACE<br>FROM ' + (pastDate ? dayShort(raceDate) : 'TODAY');
+    ov.watch = watchRun; $('ovBanner').querySelector('b').innerHTML = (ovAll ? 'EVERY ATTEMPT' : 'EVERY TGK DAILY RACE') + '<br>FROM ' + (pastDate ? dayShort(raceDate) : 'TODAY'); $('ovAllBtn').style.display = (online.configured && !watchRun) ? '' : 'none'; placeOvAll(); fetchTally(false);
     $('ov').classList.remove('showlist'); ov.free = computeFree(); refitTrack(); setOvMode('pack'); buildOverview();
   }
   /** the part of the screen the panels do not cover: the camera centres and fits the action inside it */
@@ -6592,7 +6768,7 @@ var TGKPages = (function () {
     ov.swarm = { runs: [], cars: [], built: 0, skipped: 0, capped: false, id: id };
     if (!serverMode) { ov.loading = false; ov.ready = true; ovHeadline(); return; }
     ov.loading = true; ov.failed = false; $('ovCount').textContent = '\u2026'; $('ovSub').textContent = 'Loading today\'s races\u2026';
-    fetchDayRuns().then(function (d) {
+    (ovAll ? fetchDayAttempts() : fetchDayRuns()).then(function (d) {
       if (!ov || ov.buildId !== id) return;
       var sw = ov.swarm; sw.runs = d.runs; sw.capped = d.capped;
       if (!d.runs.length) { ov.loading = false; ov.ready = true; ovHeadline(); return; }
@@ -6603,8 +6779,8 @@ var TGKPages = (function () {
     if (ov.watch) { $('ovCount').textContent = String(ov.watch.name).toUpperCase() + '  \u00b7  ' + C.fmtTime(ov.watch.ms); $('ovSub').textContent = 'Verified run from today\'s leaderboard, replayed exactly'; $('ovDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase().replace(',', ''); return; }
     var sw = ov.swarm, shown = sw.cars.length, jc = sw.cars.filter(function (c) { return c.jumped; }).length, sub;
     if (online.configured) {
-      $('ovCount').textContent = shown.toLocaleString('en-US') + (shown === 1 ? ' RACE TODAY' : ' RACES TODAY');
-      sub = ov.failed ? 'Could not load today\'s races. Check your connection, then tap Replay.' : (shown ? 'Verified runs by TGK customers \u00b7 best run per player' + (sw.capped ? ' \u00b7 fastest ' + sw.runs.length + ' shown' : '') : 'No verified runs yet today. Be the first.');
+      $('ovCount').textContent = shown.toLocaleString('en-US') + (ovAll ? (shown === 1 ? ' ATTEMPT' : ' ATTEMPTS') : (shown === 1 ? ' RACE' : ' RACES')) + (pastDate ? '' : ' TODAY');
+      sub = ov.failed ? 'Could not load today\'s races. Check your connection, then tap Replay.' : (shown ? (ovAll ? 'Every verified attempt by TGK customers \u00b7 fastest first' : 'Verified runs by TGK customers \u00b7 best run per player') + (sw.capped ? ' \u00b7 fastest ' + sw.runs.length + ' shown' : '') + (ovAll && tally.date === raceDate && tally.attempts > shown ? ' \u00b7 ' + nfmt(tally.attempts) + ' started in all' : '') : 'No verified runs yet today. Be the first.');
       if (jc) sub += ' \u00b7 ' + jc + ' found the rock jump';
       if (sw.skipped) sub += ' \u00b7 ' + sw.skipped + ' not shown (made on another game version)';
     } else {
@@ -6827,7 +7003,7 @@ var TGKPages = (function () {
   }
   function wireUi() {
     $('startBtn').addEventListener('click', startRace);
-    $('allBtn').addEventListener('click', openOverview); $('resAllBtn').addEventListener('click', openOverview);
+    $('ovAllBtn').addEventListener('click', function () { setOvAll(!ovAll); }); $('allBtn').addEventListener('click', openOverview); $('resAllBtn').addEventListener('click', openOverview);
     $('ovBack').addEventListener('click', closeOverview); $('ovRestart').addEventListener('click', ovRestart);
     $('ovZin').addEventListener('click', function () { ovZoom(0.7); }); $('ovZout').addEventListener('click', function () { ovZoom(1 / 0.7); });
     $('ovPause').addEventListener('click', function () { if (ov) { ov.paused = !ov.paused; $('ovPause').textContent = ov.paused ? 'Play' : 'Pause'; } });
@@ -6911,7 +7087,7 @@ var TGKPages = (function () {
   window.addEventListener('keydown', function (e) { if (e.code === 'Escape' && document.body.classList.contains('gview')) { setGView(false); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
   function ensureCar() { if (carObj && world && carObj.carId !== curCar()) swapCar(); }
   ensureCar();
-  window.__tgk = { makeCarCode: makeCarCode, loadCarCode: loadCarCode, loadDay: function (d) { loadDaily(d); loadWorld(); sim.reset(); snapshot(); }, gv: garageView, snap: function () { renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); }, syncProfile: syncProfile, profileLocal: profileLocal, gstamp: function () { return gstamp; }, syncState: function () { return syncState; }, setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
+  window.__tgk = { tally: function () { return tally; }, ovAll: function () { return ovAll; }, setOvAll: setOvAll, ov: function () { return ov; }, fetchTally: fetchTally, makeCarCode: makeCarCode, loadCarCode: loadCarCode, loadDay: function (d) { loadDaily(d); loadWorld(); sim.reset(); snapshot(); }, gv: garageView, snap: function () { renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); }, syncProfile: syncProfile, profileLocal: profileLocal, gstamp: function () { return gstamp; }, syncState: function () { return syncState; }, setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
     aerial: function (cx, cy, cz, tx, ty, tz) { camera.near = 0.6; camera.position.set(-cx, cy, cz); camera.lookAt(-tx, ty, tz); camera.updateProjectionMatrix(); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); } };
 })();
 
