@@ -605,6 +605,12 @@ body.touch.racing #banner{font-size:13px}
 #acctLogin2{color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.06)}
 #acctLogin2.login{color:var(--teal-hi);border-color:var(--teal);background:rgba(44,188,180,.14)}
 #acctLogin2:hover{background:rgba(255,255,255,.12)}
+
+/* ---- menus: an always-visible close button (stays put while the card scrolls) ---- */
+.sheet .card{position:relative}
+.sx{position:sticky;top:0;float:right;z-index:6;width:44px;height:44px;margin:0 0 -44px auto;display:flex;align-items:center;justify-content:center;font:400 30px/1 var(--font);color:#fff;background:rgba(20,23,26,.94);border:1px solid rgba(255,255,255,.35);border-radius:10px;cursor:pointer;touch-action:manipulation}
+.sx:hover{border-color:var(--teal);color:var(--teal-hi)}
+.sheet .card h2,.sheet .card h3{padding-right:52px}
 </style>
 </head>
 <body>
@@ -6337,9 +6343,28 @@ var TGKPages = (function () {
   })();
   bindSteerPads(); setSteerMode(steerMode, true);
   if ($('noticeSel')) { $('noticeSel').value = noticeLevel; $('noticeSel').addEventListener('change', function () { noticeLevel = $('noticeSel').value; store.set('tgk.notices', noticeLevel); toast(noticeLevel === 'full' ? 'Race pop-ups: all' : (noticeLevel === 'min' ? 'Race pop-ups: only important' : 'Race pop-ups: none')); }); }
+  /* ---- menus close the way you expect: tap outside, tap the always-visible x, or press Escape ----
+     Each menu keeps its own close button's behaviour (we just press it for you). Not included: the name entry and the decal editor (unsaved work) and the Paused screen (a stray tap must not resume a race). */
+  var DISMISS = { acctSheet: 'acctClose', achSheet: 'achClose', infoSheet: 'infoClose', settingsSheet: 'setClose', pastSheet: 'pastClose', lb: 'lbClose' };
+  function openDismissable() { var ids = Object.keys(DISMISS); for (var i = 0; i < ids.length; i++) { var s = $(ids[i]); if (s && !s.classList.contains('hidden')) return ids[i]; } return null; }
+  function wireDismiss() {
+    var downOn = null;
+    Object.keys(DISMISS).forEach(function (id) {
+      var sh = $(id), card = sh && sh.querySelector('.card'); if (!sh || !card || card.querySelector('.sx')) return;
+      var x = document.createElement('button'); x.type = 'button'; x.className = 'sx'; x.setAttribute('aria-label', 'Close'); x.textContent = '\u00d7';
+      x.addEventListener('click', function () { var b = $(DISMISS[id]); if (b) b.click(); }); card.insertBefore(x, card.firstChild);
+    });
+    document.addEventListener('pointerdown', function (e) { downOn = e.target; }, true);
+    document.addEventListener('click', function (e) {          // only a tap that BEGAN and ENDED on the dimmed backdrop counts, so a drag out of the card (text selection, scrollbar) never closes it
+      var t = e.target; if (!t || !t.classList || !t.classList.contains('sheet') || !DISMISS[t.id] || downOn !== t || t.classList.contains('hidden')) return;
+      var b = $(DISMISS[t.id]); if (b) b.click();
+    }, false);
+    window.addEventListener('keydown', function (e) { if (e.code !== 'Escape') return; var id = openDismissable(); if (!id) return; var b = $(DISMISS[id]); if (b) { b.click(); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+  }
+  wireDismiss();
   function ensureCar() { if (carObj && world && carObj.carId !== curCar()) swapCar(); }
   ensureCar();
-  window.__tgk = { pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
+  window.__tgk = { dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
     aerial: function (cx, cy, cz, tx, ty, tz) { camera.near = 0.6; camera.position.set(-cx, cy, cz); camera.lookAt(-tx, ty, tz); camera.updateProjectionMatrix(); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); } };
 })();
 
