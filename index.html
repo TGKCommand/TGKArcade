@@ -68,7 +68,7 @@ kbd{display:inline-block;min-width:22px;text-align:center;font:inherit;font-size
 .practice{margin-top:12px;font-size:12px;color:var(--dim);line-height:1.4}
 .foot{margin-top:12px;display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:13px}
 .foot select,.pause select{background:var(--char2);color:var(--text);border:1px solid var(--line);padding:5px 8px;font:inherit;font-size:14px;border-radius:2px}
-.paint-head{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 12px}
+.paint-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;row-gap:6px;margin:16px 0 12px}
 .paint-head b{font-size:26px;font-style:italic;text-transform:uppercase}
 .paint-head span{font-size:15px;color:var(--dim)}
 #swatches{display:flex;flex-wrap:wrap;gap:10px}
@@ -611,6 +611,38 @@ body.touch.racing #banner{font-size:13px}
 .sx{position:sticky;top:0;float:right;z-index:6;width:44px;height:44px;margin:0 0 -44px auto;display:flex;align-items:center;justify-content:center;font:400 30px/1 var(--font);color:#fff;background:rgba(20,23,26,.94);border:1px solid rgba(255,255,255,.35);border-radius:10px;cursor:pointer;touch-action:manipulation}
 .sx:hover{border-color:var(--teal);color:var(--teal-hi)}
 .sheet .card h2,.sheet .card h3{padding-right:52px}
+
+/* ---- garage camera buttons ---- */
+.gcam{display:inline-flex;gap:4px;margin-left:auto;order:3}
+#paintName{order:2}
+.gcam button{min-width:40px;min-height:36px;padding:0 10px;background:var(--char2);color:#fff;border:1px solid var(--line);border-radius:8px;font:700 16px var(--font);cursor:pointer;touch-action:manipulation}
+.gcam button:last-child{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.gcam button:hover{border-color:var(--teal);color:var(--teal-hi)}
+
+/* ---- settings: controls that match the rest of the game (the dropdowns were plain white browser boxes) ---- */
+.srow select{appearance:none;-webkit-appearance:none;-moz-appearance:none;min-height:44px;min-width:104px;padding:8px 36px 8px 14px;background:var(--char2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' fill='none' stroke='%23cfd2d6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 12px center;color:var(--text);border:1px solid rgba(255,255,255,.35);border-radius:8px;font:600 15px var(--font);cursor:pointer;touch-action:manipulation}
+.srow select:hover{border-color:var(--teal)}
+.srow select:focus-visible,.srow .btn2:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.srow select option{background:#1b2529;color:#fff}
+.srow .btn2{min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.06);color:#fff;font:700 13px var(--font);letter-spacing:.08em;text-transform:uppercase}
+.srow .btn2:hover{border-color:var(--teal);color:var(--teal-hi)}
+#setLogin.login{color:var(--teal-hi);border-color:var(--teal);background:rgba(44,188,180,.14)}
+#setReset{border-color:rgba(232,115,28,.7);color:#f5934a}
+#setClose{min-height:48px;border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);color:#fff;font-weight:700}
+
+/* ---- garage "View": hide the panel so the whole screen is the car ---- */
+.gcam #gcView,#gcFloat button{text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+body.gview #menu .mcard{visibility:hidden;pointer-events:none}
+#gcFloat{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:none;gap:6px;z-index:9;pointer-events:auto}
+body.gview #gcFloat{display:flex}
+#gcFloat button{min-width:46px;min-height:44px;padding:0 14px;background:rgba(20,23,26,.9);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:10px;font:700 14px var(--font);cursor:pointer;touch-action:manipulation}
+#gcFloat #gcShow{background:var(--org);border-color:var(--org);color:var(--bar)}
+
+/* ---- garage on narrow / short portrait phones: keep the header on one line and the rows tight so Done stays on screen ---- */
+@media (max-width:430px){ #garageView #paintName{display:none} #garageView .gcam{gap:3px} #garageView .gcam button{min-width:36px;min-height:34px;padding:0 7px} #garageView .paint-head{margin:10px 0 8px} }
+@media (max-width:430px) and (max-height:700px){ .arow select{min-height:38px} .arow{gap:2px} #garageView .gtabs button{min-height:40px} }
+
+@media (max-width:720px) and (orientation:portrait) and (max-height:700px){ #garageView .paint-head{margin:4px 0 2px;row-gap:3px} .gcam button{min-height:32px;min-width:36px;padding:0 8px} #garageView .gtabs{margin:4px 0} }
 </style>
 </head>
 <body>
@@ -652,7 +684,7 @@ body.touch.racing #banner{font-size:13px}
         <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#about">About</a><a href="#support">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></nav>
       </div>
       <div id="garageView" class="hidden">
-        <div class="paint-head"><b>Garage</b><button type="button" class="linkbtn" id="achBtn">Achievements</button><span id="paintName"></span></div>
+        <div class="paint-head"><b>Garage</b><button type="button" class="linkbtn" id="achBtn">Achievements</button><span class="gcam" role="group" aria-label="Camera"><button type="button" id="gcView" aria-label="Hide the panel to see the whole car">View</button><button type="button" id="gcOut" aria-label="Zoom out">&minus;</button><button type="button" id="gcIn" aria-label="Zoom in">+</button><button type="button" id="gcReset" aria-label="Reset the view">Reset</button></span><span id="paintName"></span></div>
         <div class="gtabs" role="tablist" aria-label="Garage sections">
           <button type="button" role="tab" data-tab="paint" class="on" aria-selected="true">Paint</button>
           <button type="button" role="tab" data-tab="decals" aria-selected="false">Decals</button>
@@ -683,6 +715,8 @@ body.touch.racing #banner{font-size:13px}
     <div class="check" aria-hidden="true"></div>
   </div>
 </section>
+
+<div id="gcFloat" role="group" aria-label="Car view controls"><button type="button" id="gcfOut" aria-label="Zoom out">&minus;</button><button type="button" id="gcfIn" aria-label="Zoom in">+</button><button type="button" id="gcfReset" aria-label="Reset the view">Reset</button><button type="button" id="gcShow">Show panel</button></div>
 
 <section id="hud" class="hidden" aria-live="off">
   <div class="keypill">
@@ -4125,7 +4159,7 @@ var TGKGarage = (function () {
     tone: { label: 'Parts colour', opts: { carbon: 'Carbon', body: 'Body colour', teal: 'TGK teal', orange: 'TGK orange', white: 'White', silver: 'Silver' } }
   };
   /** the Parts tab only lists these once the designs are approved (preview them with ?parts2=1); the garage accepts and draws them either way */
-  var PARTS2 = (typeof window !== 'undefined' && (window.TGK_PARTS2 === true || /[?&]parts2\b/.test((window.location && window.location.search) || '')));
+  var PARTS2 = !(typeof window !== 'undefined' && (window.TGK_PARTS2 === false || /[?&]parts2=0\b/.test((window.location && window.location.search) || '')));      // on for everyone (add ?parts2=0 to see the old list)
   var NEW_KEYS = { diffuser: 1, wheels: 1, wheelcol: 1 }, NEW_OPTS = { wing: { swan: 1, twin: 1, drag: 1 }, scoop: { louvres: 1 }, splitter: { canards: 1 }, roof: { scoop: 1, snorkel: 1, fin: 1 } };
   var ACC = {}; Object.keys(ACC_ALL).forEach(function (k) { if (!PARTS2 && NEW_KEYS[k]) return; var o = {}; Object.keys(ACC_ALL[k].opts).forEach(function (v) { if (PARTS2 || !(NEW_OPTS[k] && NEW_OPTS[k][v])) o[v] = ACC_ALL[k].opts[v]; }); ACC[k] = { label: ACC_ALL[k].label, opts: o }; });
   /* achievements: every part (except the stock look) is unlocked by playing. The data lives here; the game keeps the score. */
@@ -4147,7 +4181,12 @@ var TGKGarage = (function () {
     'splitter:lip': 'first-lap', 'splitter:race': 'top10', 'skirts:skirt': 'three-days', 'skirts:race': 'ranked',
     'exhaust:dual': 'clean', 'exhaust:quad': 'trailblazer', 'exhaust:oval': 'ten-races', 'roof:bar': 'jumper', 'roof:rack': 'ranked', 'roof:box': 'top10',
     'glow:teal': 'first-lap', 'glow:orange': 'three-days', 'glow:white': 'ten-races', 'glow:purple': 'jumper', 'glow:green': 'trailblazer',
-    'tone:teal': 'clean', 'tone:orange': 'three-days', 'tone:white': 'ten-races', 'tone:silver': 'ranked'
+    'tone:teal': 'clean', 'tone:orange': 'three-days', 'tone:white': 'ten-races', 'tone:silver': 'ranked',
+    'wing:swan': 'ten-races', 'wing:twin': 'top10', 'wing:drag': 'trailblazer', 'scoop:louvres': 'clean', 'splitter:canards': 'week',
+    'roof:scoop': 'clean', 'roof:snorkel': 'trailblazer', 'roof:fin': 'week',
+    'diffuser:fins': 'three-days', 'diffuser:race': 'top10', 'diffuser:blade': 'podium',
+    'wheels:multi': 'first-lap', 'wheels:mesh': 'jumper', 'wheels:dish': 'ranked', 'wheels:aero': 'top10',
+    'wheelcol:silver': 'clean', 'wheelcol:white': 'three-days', 'wheelcol:bronze': 'trailblazer', 'wheelcol:teal': 'ranked', 'wheelcol:orange': 'ten-races', 'wheelcol:gold': 'podium'
   };
   /** the achievement that unlocks a part option, or '' if it is free */
   function needs(key, val) { return UNLOCK[key + ':' + val] || ''; }
@@ -4222,15 +4261,20 @@ var TGKGarage = (function () {
   }
 
   /** casts rays at the car's real body mesh (wheels excluded) so stickers and parts sit on the actual surface */
-  function makeProbe(THREE, car) {
-    var rc = new THREE.Raycaster(), targets = [], wheelObjs = car.wheels || [];
+  var PROBE_MEMO = {};
+  function makeProbe(THREE, car, memoKey) {
+    var memo = memoKey ? (PROBE_MEMO[memoKey] || (PROBE_MEMO[memoKey] = {})) : null, rc = new THREE.Raycaster(), targets = [], wheelObjs = car.wheels || [];
     car.body.traverse(function (o) { if (!o.isMesh || o.name === 'stockExhaust' || o.name === 'stockWing') return; for (var p = o; p && p !== car.body; p = p.parent) if (wheelObjs.indexOf(p) >= 0) return; targets.push(o); });
     return function (ox, oy, oz, dx, dy, dz) {
+      var mk = memo ? [ox, oy, oz, dx, dy, dz].map(function (v) { return Math.round(v * 2000); }).join(',') : null; if (mk && memo[mk] !== undefined) return memo[mk];
+      var res = rawProbe(ox, oy, oz, dx, dy, dz); if (mk) memo[mk] = res; return res;
+    };
+    function rawProbe(ox, oy, oz, dx, dy, dz) {
       car.group.updateMatrixWorld(true); var M = car.body.matrixWorld, o = new THREE.Vector3(ox, oy, oz).applyMatrix4(M), dl = new THREE.Vector3(dx, dy, dz).normalize(), d = dl.clone().transformDirection(M);
       rc.set(o, d); rc.far = 30; var hits = rc.intersectObjects(targets, false); if (!hits.length) return null;
       var h = hits[0], p = car.body.worldToLocal(h.point.clone()), inv = new THREE.Matrix4().copy(M).invert();
       var n = h.face.normal.clone().transformDirection(h.object.matrixWorld).transformDirection(inv).normalize(); if (n.dot(dl) > 0) n.negate(); return { p: p, n: n };
-    };
+    }
   }
   var ANCHOR = { 'side-r': [3, 0.78, -0.2, -1, 0, 0], 'side-l': [-3, 0.78, -0.2, 1, 0, 0], hood: [0, 3, 1.88, 0, -1, 0], roof: [0, 3, -0.7, 0, -1, 0], trunk: [0, 3, -2.2, 0, -1, 0] };
   /** decal anchors: the Sentinel's are fixed; the other cars supply their own (spec.anchor) */
@@ -4275,10 +4319,10 @@ var TGKGarage = (function () {
         mesh.position.copy(hit.p); mesh.renderOrder = 3; mesh.userData.decal = d.id;
         /* conform to the body: a grid of points is cast onto the real surface along the decal's normal and sat 5 mm off it, so the sticker hugs a flank, hood or trunk instead of standing off it
            as a flat card; where there is no paint within reach (window line, wheel arch, panel edge) it is cut off cleanly. The shape is remembered, so only a decal you change is recomputed. */
-        var key = (car.carId || 's') + '|' + zone + '|' + d.scale + '|' + d.rot + '|' + (d.flip ? 1 : 0) + '|' + (d.pos || 0) + '|' + w.toFixed(3) + '|' + h.toFixed(3), shape = GEO_CACHE[key];
+        var key = (car.carId || 's') + '|' + zone + '|' + d.scale + '|' + d.rot + '|' + (d.flip ? 1 : 0) + '|' + (d.pos || 0) + '|' + w.toFixed(3) + '|' + h.toFixed(3) + (assets.fast ? '|F' : ''), shape = GEO_CACHE[key];
         if (!shape) {
           mesh.updateMatrix(); var ax = new THREE.Vector3(1, 0, 0).applyQuaternion(mesh.quaternion), ay = new THREE.Vector3(0, 1, 0).applyQuaternion(mesh.quaternion), sx = d.flip ? -1 : 1, o = new THREE.Vector3(), nn = n.clone().negate();
-          shape = conformShape(w, h, Math.max(10, Math.min(18, Math.ceil(Math.max(w, h) / 0.085))), function (lx, ly) {
+          shape = conformShape(w, h, assets.fast ? 6 : Math.max(10, Math.min(18, Math.ceil(Math.max(w, h) / 0.085))), function (lx, ly) {
             o.copy(hit.p).addScaledVector(ax, lx * sx).addScaledVector(ay, ly).addScaledVector(n, 0.25);
             var hk = probe(o.x, o.y, o.z, nn.x, nn.y, nn.z); return hk ? hk.p.clone().sub(hit.p).dot(n) + 0.004 : null;
           });
@@ -4385,7 +4429,7 @@ var TGKGarage = (function () {
   }
   /** (re)build everything on a car. assets: { logo: Image, png: {customId: dataURL}, bodyHex } */
   function build(THREE, car, cfg, assets) {
-    remove(car); assets = assets || {}; var probe = makeProbe(THREE, car), dec = buildDecals(THREE, car, cfg, assets, probe), parts = buildParts(THREE, car, cfg, assets, probe);
+    remove(car); assets = assets || {}; var probe = makeProbe(THREE, car, assets.memo ? (car.carId || 's') : null), dec = buildDecals(THREE, car, cfg, assets, probe), parts = buildParts(THREE, car, cfg, assets, probe);
     car.body.add(dec); car.body.add(parts.group); if (parts.glow) car.group.add(parts.glow);
     car.body.traverse(function (o) { if (o.name === 'stockExhaust') o.visible = cfg.acc.exhaust === 'none'; if (o.name === 'stockWing') o.visible = cfg.acc.wing === 'none'; });       // fitted tips replace the stock ones, they do not add to them
     applyWheels(THREE, car, cfg);
@@ -4796,7 +4840,7 @@ var TGKPages = (function () {
 
   /* ---------------- camera ---------------- */
   var camMode = parseInt(store.get('tgk.cam'), 10) || 0, camNames = ['Chase', 'Far chase', 'Bumper'];
-  var cam = { x: 0, y: 0, z: 0, yaw: 0, fov: 62, shake: 0, init: false, az: 0.6, el: 0.22, drag: false };
+  var cam = { x: 0, y: 0, z: 0, yaw: 0, fov: 62, shake: 0, init: false, az: 0.6, el: 0.22, drag: false, zoom: 1, zoomT: 1, manual: false };
   function cycleCamera() { camMode = (camMode + 1) % 3; store.set('tgk.cam', String(camMode)); cam.init = false; toast('Camera: ' + camNames[camMode], false, 'key'); }
   function angDiff(a, b) { var d = a - b; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
   var sfTmp = {};
@@ -4810,6 +4854,7 @@ var TGKPages = (function () {
   /** while the garage is open: where the car should sit (the space the panel leaves free) and how far back the camera must be for the whole car to fit there */
   function garageView() {
     if (!HAS_G || $('garageView').classList.contains('hidden')) return null;
+    if (document.body.classList.contains('gview')) { var tv = Math.tan(camera.fov * Math.PI / 360), kv = Math.min(window.innerWidth, window.innerHeight) / window.innerHeight; return { ox: 0, oy: 0, r: C.clamp(5.8 / (2 * tv * kv), 6, 34) }; }      // panel hidden: the car has the whole screen
     var c = document.querySelector('#menu .mcard'); if (!c) return null;
     var r = c.getBoundingClientRect(), w = window.innerWidth, h = window.innerHeight, fcx = w / 2, fcy = h / 2, fw = w, fh = h;
     if (r.width >= w * 0.85) { fh = Math.max(h * 0.25, r.top); fcy = fh / 2; }                    // a sheet along the bottom: the car goes in the space above it
@@ -4828,13 +4873,17 @@ var TGKPages = (function () {
     if (!shakeOn) cam.shake = 0;
     var speed = Math.hypot(sim.u, sim.v);
     if (state === 'menu') {
-      var gf = garageFocus();
-      if (gf && !cam.drag) { cam.az += angDiff(gf.az, cam.az) * Math.min(1, dt * 3); cam.el += (gf.el - cam.el) * Math.min(1, dt * 3); gWas = true; }
+      var gf = garageFocus(), inG = !!garageView();
+      if (!inG) { cam.manual = false; cam.zoomT = 1; if (document.body.classList.contains('gview')) document.body.classList.remove('gview'); }                                                      // leaving the garage hands the camera back
+      cam.zoom += (cam.zoomT - cam.zoom) * Math.min(1, dt * 9);
+      if (inG && cam.manual && !cam.drag) { /* the player's own view: no auto-turn, no snap back to a preset angle */ }
+      else if (gf && !cam.drag) { cam.az += angDiff(gf.az, cam.az) * Math.min(1, dt * 3); cam.el += (gf.el - cam.el) * Math.min(1, dt * 3); gWas = true; }
       else if (!cam.drag) { if (gWas) { cam.el += (0.22 - cam.el) * Math.min(1, dt * 3); if (Math.abs(cam.el - 0.22) < 0.01) gWas = false; } cam.az += dt * 0.25; }
       var pSmall = window.innerHeight > window.innerWidth && window.innerWidth < 560, r = pSmall ? 17 : 8.4, cx = v.x, cz = v.z, cy = v.y + 0.75;
       var gv0 = garageView(), baseR = r;                                                              // while the garage is open, pull back (smoothly) until the car fits beside the panel; ease back out afterwards
       if (gv0) { garageR = garageR ? garageR + (Math.max(baseR, gv0.r) - garageR) * Math.min(1, dt * 4) : baseR; r = garageR; }
       else if (garageR) { garageR += (baseR - garageR) * Math.min(1, dt * 4); r = garageR; if (Math.abs(garageR - baseR) < 0.05) garageR = 0; }
+      r *= cam.zoom;
       var px = cx + Math.sin(cam.az) * Math.cos(cam.el) * r, pz = cz + Math.cos(cam.az) * Math.cos(cam.el) * r, py = cy + Math.sin(cam.el) * r + 0.6;
       py = Math.max(py, groundAt(px, pz) + 0.6);
       cam.fov += ((pSmall ? 58 : 40) - cam.fov) * Math.min(1, dt * 4); camera.fov = cam.fov;
@@ -4866,11 +4915,28 @@ var TGKPages = (function () {
     var look = 3.5 + speed * 0.05, sh = cam.shake * 0.12; cam.shake *= Math.exp(-8 * dt);
     placeCamera(cam.x + (Math.random() - 0.5) * sh, cam.y + (Math.random() - 0.5) * sh, cam.z, v.x + fx * look, v.y + 1.15, v.z + fz * look);
   }
+  /* turn the car with one finger / the mouse, zoom with a pinch or the mouse wheel (zoom and a held view are for the garage; the menu just turns) */
   (function dragOrbit() {
-    var c = null, lx = 0, ly = 0;
-    window.addEventListener('pointerdown', function (e) { if (state !== 'menu' || e.target.id !== 'gl') return; cam.drag = true; lx = e.clientX; ly = e.clientY; });
-    window.addEventListener('pointermove', function (e) { if (!cam.drag) return; cam.az -= (e.clientX - lx) * 0.008; cam.el = C.clamp(cam.el + (e.clientY - ly) * 0.005, 0.03, 0.9); lx = e.clientX; ly = e.clientY; });
-    window.addEventListener('pointerup', function () { cam.drag = false; });
+    var pts = {}, lx = 0, ly = 0, pinch0 = 0, zoom0 = 1;
+    function count() { return Object.keys(pts).length; }
+    function dist() { var k = Object.keys(pts); if (k.length < 2) return 0; var a = pts[k[0]], b = pts[k[1]]; return Math.hypot(a.x - b.x, a.y - b.y) || 1; }
+    window.addEventListener('pointerdown', function (e) {
+      if (state !== 'menu' || !e.target || e.target.id !== 'gl') return; pts[e.pointerId] = { x: e.clientX, y: e.clientY }; var n = count();
+      if (n === 1) { cam.drag = true; lx = e.clientX; ly = e.clientY; if (garageView()) cam.manual = true; }
+      else if (n === 2 && garageView()) { pinch0 = dist(); zoom0 = cam.zoomT; cam.manual = true; }
+    });
+    window.addEventListener('pointermove', function (e) {
+      var p = pts[e.pointerId]; if (!p) return; p.x = e.clientX; p.y = e.clientY;
+      if (count() >= 2) { if (garageView() && pinch0) cam.zoomT = C.clamp(zoom0 * pinch0 / dist(), 0.28, 1.5); return; }
+      cam.az -= (e.clientX - lx) * 0.008; cam.el = C.clamp(cam.el + (e.clientY - ly) * 0.005, 0.02, 1.25); lx = e.clientX; ly = e.clientY;
+    });
+    function up(e) { delete pts[e.pointerId]; if (!count()) cam.drag = false; else { var k = Object.keys(pts)[0]; lx = pts[k].x; ly = pts[k].y; } }
+    window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+    window.addEventListener('wheel', function (e) { if (state !== 'menu' || !garageView() || !e.target || e.target.id !== 'gl') return; cam.manual = true; cam.zoomT = C.clamp(cam.zoomT * (e.deltaY > 0 ? 1.1 : 0.9), 0.28, 1.5); e.preventDefault(); }, { passive: false });
+    window.__gcam = function (what) {                                  // the on-screen buttons
+      if (what === 'in') cam.zoomT = C.clamp(cam.zoomT * 0.8, 0.28, 1.5); else if (what === 'out') cam.zoomT = C.clamp(cam.zoomT * 1.25, 0.28, 1.5); else { cam.zoomT = 1; cam.manual = false; }
+      if (what !== 'reset') cam.manual = true;
+    };
   })();
 
   /* ---------------- car visuals ---------------- */
@@ -5055,7 +5121,7 @@ var TGKPages = (function () {
     var onl = online.configured, li = loggedIn();
     $('setAcctRow').style.display = onl ? '' : 'none';
     $('setAcctText').textContent = li ? 'Signed in as ' + auth.name : 'Not logged in. Practice mode.';
-    $('setLogin').textContent = li ? 'Log out' : 'Log in'; $('setLogin').style.display = (li || online.canLogin) ? '' : 'none'; $('setName').style.display = li ? '' : 'none';
+    $('setLogin').textContent = li ? 'Log out' : 'Log in'; $('setLogin').classList.toggle('login', !li); $('setLogin').style.display = (li || online.canLogin) ? '' : 'none'; $('setName').style.display = li ? '' : 'none';
     $('hapticRow').style.display = navigator.vibrate ? '' : 'none';
   }
   function openSettings() { syncSettingsUi(); $('infoSheet').classList.add('hidden'); $('settingsSheet').classList.remove('hidden'); $('settingsSheet').querySelector('.body').scrollTop = 0; }
@@ -5565,7 +5631,7 @@ var TGKPages = (function () {
     return parRun();
   }
   /** exactly what the server's submit-run function expects (no network call yet: the backend is not connected) */
-  function submissionFor(run) { return { raceDate: raceDate, attempt: track.attempt, cd: run.cd || C.COUNTDOWN_TICKS, log: run.log, claimedMs: run.ms, clientCanary: C.canary(), paintHex: run.hex, car: normCar(run.car) }; }
+  function submissionFor(run) { return { raceDate: raceDate, attempt: track.attempt, cd: run.cd || C.COUNTDOWN_TICKS, log: run.log, claimedMs: run.ms, clientCanary: C.canary(), paintHex: run.hex, car: normCar(run.car), garage: run.garage || null }; }
   function bestOfLast() { var a = loadRuns(); return a.length ? a[a.length - 1] : null; }
   function ghostMenuLine() {
     if (store.get('tgk.ghost') === '0') return 'Ghost off';
@@ -5828,7 +5894,7 @@ var TGKPages = (function () {
     if (!row || !Array.isArray(row.inputs) || row.inputs.length < 1 || row.inputs.length > 6000) return null;
     if (row.cd_ticks !== 120 && row.cd_ticks !== 360) return null; if (!Number.isInteger(row.ms) || row.ms < 10000 || row.ms > 180000) return null;
     var log = []; for (var i = 0; i < row.inputs.length; i++) { var e = row.inputs[i]; if (!Array.isArray(e) || e.length !== 2 || !Number.isInteger(e[0]) || !Number.isInteger(e[1]) || e[1] < 0 || e[1] > 63) return null; log.push([e[0], e[1]]); }
-    return { ms: row.ms, log: log, cd: row.cd_ticks, hex: /^#[0-9a-fA-F]{6}$/.test(row.paint_hex || '') ? row.paint_hex : '#5fd6cf', name: String(row.display_name || 'Racer').slice(0, 24), car: normCar(row.car), t: 'ext-' + id, ext: true, id: id };
+    return { ms: row.ms, log: log, cd: row.cd_ticks, hex: /^#[0-9a-fA-F]{6}$/.test(row.paint_hex || '') ? row.paint_hex : '#5fd6cf', name: String(row.display_name || 'Racer').slice(0, 24), car: normCar(row.car), garage: cleanGarage(row.garage), t: 'ext-' + id, ext: true, id: id };
   }
   function fetchRun(id) {
     return api('/rest/v1/rpc/get_ghost', { method: 'POST', body: { p_run_id: id } }).then(function (r) { var run = Array.isArray(r.body) ? validRun(r.body[0], id) : null; if (!run) throw new Error('bad run'); return run; });
@@ -5911,7 +5977,7 @@ var TGKPages = (function () {
   function loadRuns() { try { var a = JSON.parse(store.get(runsKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
   function curHex() { var p = paintPreset(); return (paintId === 'custom' && paintHex) ? paintHex : (p ? p.hex : '#d10a0a'); }
   function saveRun(ms) {
-    var a = loadRuns(); a.push({ ms: ms, log: recorder.log.slice(), hex: curHex(), car: curCar(), t: Date.now(), cd: sim.cdTicks, gates: runGates.slice() });
+    var a = loadRuns(); a.push({ ms: ms, log: recorder.log.slice(), hex: curHex(), car: curCar(), garage: snapGarage(), t: Date.now(), cd: sim.cdTicks, gates: runGates.slice() });
     if (a.length > 20) a = a.slice(a.length - 20);
     store.set(runsKey(), JSON.stringify(a));
   }
@@ -5932,7 +5998,7 @@ var TGKPages = (function () {
     if (s.phase !== 'finished' || s.finishMs !== run.ms) return null;
     if (!buf.length) snap();
     snap();
-    return { f: new Float32Array(buf), n: buf.length / 6, ms: run.ms, jumped: s.jumps > 0, hex: run.hex, car: normCar(run.car), jx: ((C.hashSeed(String(run.id)) % 1000) / 1000 - 0.5) * 2.4, name: run.name, mine: !!run.mine, curS: 0, fin: false };
+    return { f: new Float32Array(buf), n: buf.length / 6, ms: run.ms, jumped: s.jumps > 0, hex: run.hex, car: normCar(run.car), garage: run.garage || null, jx: ((C.hashSeed(String(run.id)) % 1000) / 1000 - 0.5) * 2.4, name: run.name, mine: !!run.mine, curS: 0, fin: false };
   }
   var dayCache = null;
   /** every player's best verified run today (the server clamps the count), from the public day_runs function */
@@ -6058,7 +6124,7 @@ var TGKPages = (function () {
     var serverMode = online.configured && !ov.watch;                 // live: every verified run of today. Offline/practice build: only your own runs on this device
     var mine = ov.watch ? [ov.watch] : (serverMode ? [] : loadRuns());
     mine.forEach(function (r, i) {
-      var s = new C.Sim(track), c = W.buildCar(THREE, qName, normCar(r.car)); W.setPaint(c, r.hex, presetForHex(r.hex)); world.root.add(c.group);
+      var s = new C.Sim(track), c = W.buildCar(THREE, qName, normCar(r.car)); W.setPaint(c, r.hex, presetForHex(r.hex)); dressCar(c, r.garage || (r.ext ? null : snapGarage()), r.hex); world.root.add(c.group);
       var name = ov.watch ? ov.watch.name : (mine.length > 1 ? 'You ' + (i + 1) : 'You'), m = makeMarker(r.hex); world.root.add(m);
       var lab = document.createElement('div'); lab.className = 'ovlabel mine'; lab.textContent = name; $('ovLabels').appendChild(lab);
       ov.real.push({ run: r, log: shiftLog(r, C.COUNTDOWN_TICKS), name: name, sim: s, car: c, marker: m, label: lab, li: 0, bits: 0, spin: 0, txt: name, stopped: false, prev: { x: s.x, y: s.y, z: s.z, yaw: s.yaw } });
@@ -6091,8 +6157,20 @@ var TGKPages = (function () {
   /* ---- real cars in the replay ----
      The field is drawn as light instanced silhouettes (cheap for 100 cars). The cars nearest the camera are swapped for the real detailed model, in that racer's own car and paint,
      and their silhouette is hidden. A small pool of real cars is reused, and at most one new one is built per frame, so there is no hitch. */
+  /** a compact copy of the garage as it is now (parts, wheels, decals, and only the custom decals actually used): saved with each run so a replay shows that racer's real car */
+  function snapGarage() {
+    if (!HAS_G || !garage) return null; var used = {}; garage.decals.forEach(function (d) { if (d && /^c\d+$/.test(d.id)) used[d.id] = 1; });
+    return { v: 1, car: curCar(), acc: JSON.parse(JSON.stringify(garage.acc)), decals: garage.decals.map(function (d) { return d ? JSON.parse(JSON.stringify(d)) : null; }), customs: garage.customs.filter(function (c) { return used[c.id]; }).map(function (c) { return { id: c.id, name: c.name, png: c.png }; }) };
+  }
+  function cleanGarage(raw) { if (!HAS_G || !raw || typeof raw !== 'object') return null; try { return TGKGarage.sanitize(raw); } catch (e) { return null; } }       // no unlock check: a replay shows what was actually driven
+  /** put a garage snapshot on a car object (parts, wheels, decals); the fast path fits decals on a coarse grid and reuses body measurements per car type */
+  function dressCar(obj, gar, hex) {
+    if (!HAS_G || !gar || !obj) return; var png = {}; (gar.customs || []).forEach(function (c) { png[c.id] = c.png; });
+    try { TGKGarage.build(THREE, obj, gar, { logo: document.querySelector('img.logo'), png: png, bodyHex: parseInt(String(hex || '#2cbcb4').replace('#', ''), 16) || 0x2cbcb4, fast: true, memo: true }); obj.dressed = true; } catch (e) { /* a cosmetic problem never stops a replay */ }
+  }
+  function undressCar(obj) { if (obj && obj.dressed) { try { TGKGarage.remove(obj); } catch (e) { } obj.dressed = false; } }
   var HERO_MAX = coarse ? 8 : 14;
-  function heroRelease(h) { world.root.remove(h.obj.group); var p = ov.heroPool[h.id] || (ov.heroPool[h.id] = []); p.push(h.obj); h.c.hero = false; }
+  function heroRelease(h) { undressCar(h.obj); world.root.remove(h.obj.group); var p = ov.heroPool[h.id] || (ov.heroPool[h.id] = []); p.push(h.obj); h.c.hero = false; }
   function updateHeroes(dt, scale, tRace) {
     if (!ov.heroes) { ov.heroes = []; ov.heroPool = {}; } var sw = ov.swarm, H = ov.heroes, i, built = 0;
     if (!sw || !sw.cars.length || scale > 1.8) { while (H.length) heroRelease(H.pop()); return; }          // pulled back: the silhouettes are all you can see anyway
@@ -6101,8 +6179,10 @@ var TGKPages = (function () {
     order.sort(function (a, b) { return a[0] - b[0]; }); var want = {}; for (i = 0; i < Math.min(HERO_MAX, order.length); i++) want[order[i][1]] = true;
     for (i = H.length - 1; i >= 0; i--) if (!want[cars.indexOf(H[i].c)]) { heroRelease(H[i]); H.splice(i, 1); }
     for (var k in want) { var cc = cars[k]; if (cc.hero || built) continue; var id = normCar(cc.car), pool = ov.heroPool[id], obj = pool && pool.length ? pool.pop() : W.buildCar(THREE, qName, id); built++;
-      if (obj.heroHex !== cc.hex) { W.setPaint(obj, cc.hex, presetForHex(cc.hex)); obj.heroHex = cc.hex; } world.root.add(obj.group); obj.group.traverse(function (o) { if (o.isMesh) o.castShadow = false; });
+      undressCar(obj); if (obj.heroHex !== cc.hex) { W.setPaint(obj, cc.hex, presetForHex(cc.hex)); obj.heroHex = cc.hex; } world.root.add(obj.group); obj.group.traverse(function (o) { if (o.isMesh) o.castShadow = false; });
       cc.hero = true; H.push({ c: cc, id: id, obj: obj, px: null, pz: null, spin: 0 }); }
+    var nowMs = performance.now();                                                           // dress at most one racer per ~200 ms, so a replay never stalls
+    if (nowMs - (ov.lastDress || 0) > 200) for (i = 0; i < H.length; i++) { if (!H[i].dressed && H[i].c.garage) { dressCar(H[i].obj, H[i].c.garage, H[i].c.hex); H[i].dressed = true; ov.lastDress = nowMs; break; } else if (!H[i].dressed) H[i].dressed = true; }
     for (i = 0; i < H.length; i++) {
       var h = H[i], S = sampleCar(h.c, tRace), cy = Math.cos(S.yaw), sy = Math.sin(S.yaw), x = S.x + cy * h.c.jx, z = S.z - sy * h.c.jx, g2 = h.obj.group;
       if (h.px !== null) { var step = Math.hypot(x - h.px, z - h.pz); if (step < 20) h.spin += step / 0.381; }                                       // wheels turn with the distance covered
@@ -6294,7 +6374,7 @@ var TGKPages = (function () {
     $('ovSpeedCycle').addEventListener('click', function () { if (ov) $('ovS' + ({ 1: 2, 2: 4, 4: 1 }[ov.speed] || 1)).click(); });
     $('ovListBtn').addEventListener('click', function () { $('ov').classList.toggle('showlist'); $('ovListBtn').classList.toggle('on', $('ov').classList.contains('showlist')); if (ov) ov.freeT = 0; });
     $('ovCamPack').addEventListener('click', function () { if (ov) setOvMode('pack'); }); $('ovCamOver').addEventListener('click', function () { if (ov) setOvMode('over'); }); $('ovCamLead').addEventListener('click', function () { if (ov) setOvMode('lead'); });
-    $('garageBtn').addEventListener('click', function () { $('mainView').classList.add('hidden'); $('garageView').classList.remove('hidden'); $('menu').classList.add('gopen'); refreshGarage(); });
+    $('garageBtn').addEventListener('click', function () { $('mainView').classList.add('hidden'); $('garageView').classList.remove('hidden'); $('menu').classList.add('gopen'); refreshGarage(); if (!store.get('tgk.gcamHint')) { store.set('tgk.gcamHint', '1'); toast('Drag to turn the car. Pinch or scroll to zoom'); } });
     $('garageBack').addEventListener('click', function () { $('garageView').classList.add('hidden'); $('mainView').classList.remove('hidden'); $('menu').classList.remove('gopen'); });
     $('againBtn').addEventListener('click', function () { startRace(true); });
     $('shareBtn').addEventListener('click', shareResult);
@@ -6362,9 +6442,14 @@ var TGKPages = (function () {
     window.addEventListener('keydown', function (e) { if (e.code !== 'Escape') return; var id = openDismissable(); if (!id) return; var b = $(DISMISS[id]); if (b) { b.click(); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
   }
   wireDismiss();
+  [['gcIn', 'in'], ['gcOut', 'out'], ['gcReset', 'reset'], ['gcfIn', 'in'], ['gcfOut', 'out'], ['gcfReset', 'reset']].forEach(function (p) { var b = $(p[0]); if (b) b.addEventListener('click', function () { window.__gcam(p[1]); }); });
+  function setGView(on) { document.body.classList.toggle('gview', !!on); if (on) { cam.manual = true; } }
+  if ($('gcView')) $('gcView').addEventListener('click', function () { setGView(true); });
+  if ($('gcShow')) $('gcShow').addEventListener('click', function () { setGView(false); });
+  window.addEventListener('keydown', function (e) { if (e.code === 'Escape' && document.body.classList.contains('gview')) { setGView(false); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
   function ensureCar() { if (carObj && world && carObj.carId !== curCar()) swapCar(); }
   ensureCar();
-  window.__tgk = { dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
+  window.__tgk = { setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
     aerial: function (cx, cy, cz, tx, ty, tz) { camera.near = 0.6; camera.position.set(-cx, cy, cz); camera.lookAt(-tx, ty, tz); camera.updateProjectionMatrix(); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); } };
 })();
 
