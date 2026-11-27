@@ -1318,10 +1318,11 @@ var TGKCore = (function () {
   }
 
   /** hint.attempt: the sub-seed that won on an earlier build of this date (server-published in Phase 3, cached in the browser until then) */
-  var GEN_FROM = '2026-12-03';             // from this race day on: every course hides at least one shortcut, dirt trails can carry a pop-jump creek, trail candidates are searched properly. Earlier days are generated exactly as before.
+  var GEN_FROM = '2026-11-27';             // from this race day on: every course hides at least one shortcut, dirt trails can carry a pop-jump creek, trail candidates are searched properly. Earlier days are generated exactly as before.
+  var REROLL = {};                         // race day -> salt: a day whose course was re-rolled by hand (empty unless the organiser asks for one)
   function generateTrack(raceDate, hint) {
-    var base = 'TGK-DAILY-' + raceDate, lastValid = null, newgen = typeof raceDate === 'string' && raceDate >= GEN_FROM;
-    if (hint && hint.attempt > 0 && hint.attempt < 80) {
+    var base = 'TGK-DAILY-' + raceDate + (REROLL[raceDate] ? '~' + REROLL[raceDate] : ''), lastValid = null, newgen = typeof raceDate === 'string' && raceDate >= GEN_FROM;
+    if (hint && hint.attempt > 0 && hint.attempt < 130) {
       var h = candidate(base + '#' + hint.attempt);
       if (h && validate(h).ok) {
         h.attempt = hint.attempt; h.raceDate = raceDate; h.validation = validate(h); prepTrack(h);
@@ -2321,7 +2322,7 @@ var TGKCore = (function () {
     BITS: { THR: B_THR, BRK: B_BRK, LEFT: B_LEFT, RIGHT: B_RIGHT, HB: B_HB, RECOVER: B_RECOVER },
     hashSeed: hashSeed, mulberry32: mulberry32, smoothstep: smoothstep, clamp: clamp,
     generateTrack: generateTrack, finalizeTrack: finalizeTrack, validateTrack: validate, nearest: nearest, surface: surface, groundAt: groundAt, terrainH: terrainH, rampY: rampY, waterDepthAt: waterDepthAt, cutDist: cutDist, PCELL: PCELL, launchTest: launchTest,
-    internals: { CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
+    internals: { reroll: REROLL, CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
     Sim: Sim, replay: replay, chicagoDate: chicagoDate, msUntilChicagoMidnight: msUntilChicagoMidnight, fmtTime: fmtTime,
     BIOMES: BIOMES
   };
@@ -4716,7 +4717,7 @@ if (typeof module !== 'undefined') module.exports = TGKCore;
 
 var TGKCores = (function () {
   'use strict';
-  var cur = TGKCore, NEW_FROM = '2026-11-26', V28_FROM = '2026-12-03';
+  var cur = TGKCore, NEW_FROM = '2026-11-26', V28_FROM = '2026-11-27';
   /** the frozen v26 core with the current interface (anything it lacks falls back to the current helper) */
   function adapt(L, tag) { var A = {}, k; for (k in cur) A[k] = cur[k]; for (k in L) A[k] = L[k]; A.version = tag; return A; }
   var V26 = adapt(TGKCoreV26, 'v26'), V27 = adapt(TGKCoreV27, 'v27');
