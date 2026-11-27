@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>TGK Daily Race · Admin</title>
+<style>
+:root{--bg:#0f0f10;--card:#19191b;--line:#2c2c30;--txt:#f2f2f3;--dim:#9a9aa2;--teal:#2ec4b6;--org:#e8731c;--red:#e5484d;--grn:#3fb950;--yel:#d9a31f}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+#login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px;max-width:420px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--dim);margin:0 0 20px;font-size:14px}
+input[type=password],input[type=text],input[type=date]{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#111;color:var(--txt);font:inherit}
+button{min-height:46px;padding:0 16px;border:1px solid var(--line);border-radius:8px;background:#222226;color:var(--txt);font:600 15px inherit;font-family:inherit;cursor:pointer}
+button.pri{background:var(--org);border-color:var(--org);color:#1a0d02}button.ok{background:#1f3a26;border-color:var(--grn);color:#bdf0c8}button.bad{background:#3a1f21;border-color:var(--red);color:#ffc9cb}button.teal{background:#13302d;border-color:var(--teal);color:#b6f0ea}
+button:disabled{opacity:.5}
+#err{color:var(--red);min-height:22px;margin:10px 0 0;font-size:14px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;background:#0f0f10ee;border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+header b{font-size:17px}header small{color:var(--dim);display:block;font-size:12px}header button{min-height:38px;font-size:13px}
+main{padding:12px 12px calc(env(safe-area-inset-bottom,0px) + 90px);max-width:720px;margin:0 auto}
+nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:#121214;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav button{border:0;border-radius:0;background:transparent;min-height:56px;color:var(--dim);font-size:14px}nav button.on{color:var(--org);box-shadow:inset 0 3px 0 var(--org)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.wrap button{flex:1 1 130px}
+.dim{color:var(--dim);font-size:13px}.big{font-size:20px;font-weight:700}.mono{font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line)}
+.chip.held{color:var(--yel);border-color:var(--yel)}.chip.approved{color:var(--teal);border-color:var(--teal)}.chip.issued{color:var(--grn);border-color:var(--grn)}.chip.void,.chip.banned{color:var(--red);border-color:var(--red)}.chip.none{color:var(--dim)}
+.who{font-weight:700;word-break:break-word}a{color:var(--teal)}
+.rank{width:34px;text-align:center;color:var(--dim);font-weight:700}
+.line{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.line:first-child{border-top:0}.line .grow{flex:1;min-width:0}
+.tools{display:flex;gap:8px;margin:0 0 12px}.tools input{flex:1}
+pre{margin:6px 0 0;white-space:pre-wrap;word-break:break-word;color:var(--dim);font-size:12px}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);z-index:9;background:#222;border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:8px;padding:12px 14px;max-width:560px;margin:0 auto}
+.toast.err{border-left-color:var(--red)}
+</style>
+</head>
+<body>
+<section id="login">
+  <h1>TGK Daily Race</h1>
+  <p class="sub">Admin. Review winners, ban players, remove runs.</p>
+  <input id="key" type="password" autocomplete="current-password" placeholder="Admin key" aria-label="Admin key">
+  <div style="height:12px"></div>
+  <button id="go" class="pri">Sign in</button>
+  <p id="err" role="alert"></p>
+</section>
+
+<div id="app" hidden>
+  <header><div><b>Admin</b><small id="today"></small></div><button id="out">Sign out</button></header>
+  <main id="view"></main>
+  <nav aria-label="Sections"><button data-tab="winners" class="on">Winners</button><button data-tab="day">Day</button><button data-tab="players">Players</button><button data-tab="log">Log</button></nav>
+</div>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://keltorhzisxuzbzdamfw.supabase.co/functions/v1/admin';                 // the admin Edge Function (never taken from the address bar)
+  var SITE = 'https://race.tgkmotorsport.com/';
+  var $ = function (id) { return document.getElementById(id); };
+  var key = '', tab = 'winners', dayDate = '', toastT = 0;
+  try { key = sessionStorage.getItem('tgk-admin-key') || ''; } catch (e) { }
+
+  function el(tag, attrs) {                                                               // text only: names and notes come from players and are never parsed as HTML
+    var n = document.createElement(tag), i;
+    if (attrs) for (var k in attrs) { if (k === 'class') n.className = attrs[k]; else if (k === 'text') n.textContent = attrs[k]; else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), attrs[k]); else n.setAttribute(k, attrs[k]); }
+    for (i = 2; i < arguments.length; i++) { var c = arguments[i]; if (c == null || c === false) continue; n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
+    return n;
+  }
+  function fmt(ms) { if (ms == null) return '–'; var m = Math.floor(ms / 60000), s = (ms - m * 60000) / 1000; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(3); }
+  function toast(msg, bad) { var t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' err' : ''); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, bad ? 6000 : 2800); }
+  function api(action, body) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key }, body: JSON.stringify(Object.assign({ action: action }, body || {})) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (r.status === 401) { signOut('Wrong key.'); throw new Error('auth'); } if (r.status === 429) { signOut(j.error || 'Locked out for a few minutes.'); throw new Error('auth'); } if (!r.ok) { throw new Error(j.error || ('error ' + r.status)); } return j; }); });
+  }
+  function act(action, body, done) { return api(action, body).then(function (j) { if (done) done(j); return j; }).catch(function (e) { if (e.message !== 'auth') toast(e.message, true); }); }
+  function ask(msg, min) { var r = window.prompt(msg); if (r === null) return null; r = r.trim(); if (r.length < (min || 0)) { toast('Please give a short reason (' + (min || 3) + '+ characters).', true); return null; } return r; }
+
+  function signOut(msg) { key = ''; try { sessionStorage.removeItem('tgk-admin-key'); } catch (e) { } $('app').hidden = true; $('login').hidden = false; $('err').textContent = msg || ''; $('key').value = ''; }
+  function signIn() {
+    var k = $('key').value.trim(); if (!k) { $('err').textContent = 'Enter the admin key.'; return; }
+    key = k; $('err').textContent = ''; $('go').disabled = true;
+    api('overview', { days: 1 }).then(function (j) { try { sessionStorage.setItem('tgk-admin-key', key); } catch (e) { } start(j); })
+      .catch(function (e) { if (e.message !== 'auth') $('err').textContent = e.message; }).then(function () { $('go').disabled = false; });
+  }
+  function start(first) { $('login').hidden = true; $('app').hidden = false; $('today').textContent = 'Chicago today: ' + first.today; dayDate = first.today; show('winners'); }
+
+  function show(t) {
+    tab = t; [].forEach.call(document.querySelectorAll('nav button'), function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === t); });
+    var v = $('view'); v.textContent = ''; v.appendChild(el('p', { class: 'dim', text: 'Loading…' }));
+    if (t === 'winners') viewWinners(); else if (t === 'day') viewDay(dayDate); else if (t === 'players') viewPlayers(); else viewLog();
+    window.scrollTo(0, 0);
+  }
+  function setView(nodes) { var v = $('view'); v.textContent = ''; nodes.forEach(function (n) { v.appendChild(n); }); }
+  function replayLink(runId, date) { return el('a', { href: SITE + '?run=' + encodeURIComponent(runId) + '&d=' + encodeURIComponent(date), target: '_blank', rel: 'noopener noreferrer', text: 'Watch' }); }
+
+  // ---------- winners ----------
+  function winnerCard(d, today) {
+    var w = d.winner, c = el('div', { class: 'card', 'data-day': d.date });
+    c.appendChild(el('div', { class: 'row' }, el('div', { class: 'big', text: d.date }), el('div', { class: 'dim', text: d.racers + ' racer' + (d.racers === 1 ? '' : 's') })));
+    if (!w) {
+      c.appendChild(el('p', { class: 'dim', text: d.date >= today ? 'Race still running. No winner is picked until the day ends.' : 'No winner has been picked for this day.' }));
+      if (d.fastest_eligible) c.appendChild(el('p', {}, 'Fastest eligible: ', el('span', { class: 'who', text: d.fastest_eligible.name }), ' · ', el('span', { class: 'mono', text: fmt(d.fastest_eligible.ms) })));
+      var b0 = el('div', { class: 'wrap' });
+      if (d.date < today && d.fastest_eligible) b0.appendChild(el('button', { class: 'pri', text: 'Pick winner', onclick: function () { act('winner', { op: 'pick', date: d.date }, function () { toast('Winner picked (held for review).'); show('winners'); }); } }));
+      b0.appendChild(el('button', { text: 'Open day', onclick: function () { dayDate = d.date; show('day'); } })); c.appendChild(b0); return c;
+    }
+    c.appendChild(el('div', { class: 'row', style: 'margin-top:8px' }, el('div', {}, el('span', { class: 'who', text: w.name }), w.banned ? el('span', { class: 'chip banned', style: 'margin-left:8px', text: 'banned' }) : null, el('div', { class: 'mono big', text: fmt(w.ms) })), el('span', { class: 'chip ' + w.status, text: w.status })));
+    if (w.discount_code) c.appendChild(el('p', {}, 'Code: ', el('b', { class: 'mono', text: w.discount_code }), el('span', { class: 'dim', text: w.issued_at ? '  · issued ' + String(w.issued_at).slice(0, 10) : '' })));
+    if (w.note) c.appendChild(el('p', { class: 'dim', text: w.note }));
+    if (w.run_status && w.run_status !== 'verified') c.appendChild(el('p', { style: 'color:var(--red)', text: 'This run is marked ' + w.run_status + '.' }));
+    if (d.fastest_eligible && d.fastest_eligible.run_id !== w.run_id && w.status !== 'issued') c.appendChild(el('p', { class: 'dim', text: 'Fastest eligible now: ' + d.fastest_eligible.name + ' ' + fmt(d.fastest_eligible.ms) }));
+    var b = el('div', { class: 'wrap' }), reload = function () { show('winners'); };
+    if (w.status === 'held') b.appendChild(el('button', { class: 'ok', text: 'Approve', onclick: function () { act('winner', { op: 'approve', date: d.date }, function () { toast('Approved.'); reload(); }); } }));
+    if (w.status === 'approved') b.appendChild(el('button', { class: 'pri', text: 'Record code', onclick: function () { var code = window.prompt('Paste the single-use discount code you created in Shopify:'); if (code === null) return; act('winner', { op: 'issue', date: d.date, code: code.trim() }, function () { toast('Code recorded. Tell the winner.'); reload(); }); } }));
+    if (w.status !== 'issued') b.appendChild(el('button', { class: 'teal', text: 'Re-pick', onclick: function () { var r = ask('Why re-pick? (this player is skipped and the next fastest clean run is held)', 3); if (r) act('winner', { op: 'repick', date: d.date, note: r }, function () { toast('Re-picked.'); reload(); }); } }));
+    if (w.status === 'held' || w.status === 'approved') b.appendChild(el('button', { class: 'bad', text: 'Void', onclick: function () { var r = ask('Why void this win?', 3); if (r) act('winner', { op: 'void', date: d.date, note: r }, function () { toast('Voided.'); reload(); }); } }));
+    b.appendChild(el('button', { text: 'Open day', onclick: function () { dayDate = d.date; show('day'); } }));
+    c.appendChild(b); c.appendChild(el('div', { class: 'dim', style: 'margin-top:8px' }, replayLink(w.run_id, d.date))); return c;
+  }
+  function viewWinners() {
+    api('overview', { days: 7 }).then(function (j) {
+      var out = [el('p', { class: 'dim', text: j.banned + ' banned player' + (j.banned === 1 ? '' : 's') + '.' })];
+      j.days.forEach(function (d) { out.push(winnerCard(d, j.today)); }); setView(out);
+    }).catch(function (e) { if (e.message !== 'auth') setView([el('p', { text: e.message })]); });
+  }
+
+  // ---------- day ----------
+  function viewDay(date) {
+    var inp = el('input', { type: 'date', value: date, 'aria-label': 'Race day' }), nodes = [el('div', { class: 'tools' }, inp, el('button', { class: 'pri', text: 'Load', onclick: function () { dayDate = inp.value; show('day'); } }))];
+    if (!date) { setView(nodes); return; }
+    api('day', { date: date }).then(function (d) {
+      nodes.push(el('p', { class: 'dim', text: d.racers + ' racers with a verified time. Best run per player.' }));
+      var card = el('div', { class: 'card' });
+      d.top.forEach(function (r, i) {
+        var line = el('div', { class: 'line' }, el('div', { class: 'rank', text: String(i + 1) }),
+          el('div', { class: 'grow' }, el('div', {}, el('span', { class: 'who', text: r.name }), r.banned ? el('span', { class: 'chip banned', style: 'margin-left:8px', text: 'banned' }) : null), el('div', { class: 'dim mono', text: fmt(r.ms) + ' · ' + r.car }), el('div', { class: 'dim' }, replayLink(r.run_id, date))));
+        var tools = el('div', { style: 'display:flex;flex-direction:column;gap:6px' });
+        tools.appendChild(el('button', { class: 'bad', text: 'Remove run', onclick: function () { var why = ask('Why remove this run? (it leaves the board; a held win on it is voided)', 3); if (why) act('run', { run_id: r.run_id, set: 'rejected', reason: why }, function (j) { toast(j.winner_voided ? 'Removed. The win on it was voided: re-pick.' : 'Removed.'); show('day'); }); } }));
+        tools.appendChild(r.banned ? el('button', { text: 'Unban', onclick: function () { act('unban', { player_id: r.player_id }, function () { toast('Unbanned.'); show('day'); }); } }) : el('button', { class: 'bad', text: 'Ban player', onclick: function () { banFlow(r.player_id, r.name, function () { show('day'); }); } }));
+        line.appendChild(tools); card.appendChild(line);
+      });
+      if (!d.top.length) card.appendChild(el('p', { class: 'dim', text: 'No verified runs that day.' }));
+      nodes.push(card); setView(nodes);
+    }).catch(function (e) { if (e.message !== 'auth') { nodes.push(el('p', { text: e.message })); setView(nodes); } });
+  }
+  function banFlow(id, name, done) {
+    var r = ask('Ban ' + name + '? Reason (kept in the log):', 3); if (!r) return;
+    act('ban', { player_id: id, reason: r }, function (j) { toast('Banned.' + (j.voided && j.voided.length ? ' Win voided on ' + j.voided.join(', ') + ': re-pick.' : '') + (j.issued_already && j.issued_already.length ? ' A prize was already issued on ' + j.issued_already.join(', ') + '.' : '')); done(); });
+  }
+
+  // ---------- players ----------
+  function viewPlayers() {
+    var q = el('input', { type: 'text', placeholder: 'Search a racer name', 'aria-label': 'Search racers', maxlength: '24' }), list = el('div'), nodes;
+    function render(players, title) {
+      list.textContent = ''; list.appendChild(el('p', { class: 'dim', text: title }));
+      var card = el('div', { class: 'card' });
+      players.forEach(function (p) {
+        var line = el('div', { class: 'line' }, el('div', { class: 'grow' }, el('div', {}, el('span', { class: 'who', text: p.display_name }), p.banned ? el('span', { class: 'chip banned', style: 'margin-left:8px', text: 'banned' }) : null),
+          p.banned ? el('div', { class: 'dim', text: (p.ban_reason || 'no reason') + (p.banned_at ? ' · ' + String(p.banned_at).slice(0, 10) : '') }) : el('div', { class: 'dim', text: 'joined ' + String(p.created_at || '').slice(0, 10) })));
+        line.appendChild(p.banned ? el('button', { text: 'Unban', onclick: function () { act('unban', { player_id: p.id }, function () { toast('Unbanned.'); search(); }); } }) : el('button', { class: 'bad', text: 'Ban', onclick: function () { banFlow(p.id, p.display_name, search); } }));
+        card.appendChild(line);
+      });
+      if (!players.length) card.appendChild(el('p', { class: 'dim', text: 'Nobody found.' })); list.appendChild(card);
+    }
+    function search() { if (q.value.trim().length < 2) { toast('Type at least 2 letters.', true); return; } act('players', { q: q.value.trim() }, function (j) { render(j.players, 'Matches'); }); }
+    function banned() { act('players', { banned: true }, function (j) { render(j.players, j.players.length + ' banned'); }); }
+    q.addEventListener('keydown', function (e) { if (e.key === 'Enter') search(); });
+    nodes = [el('div', { class: 'tools' }, q, el('button', { class: 'pri', text: 'Search', onclick: search })), el('div', { class: 'wrap', style: 'margin:0 0 12px' }, el('button', { text: 'Show banned players', onclick: banned })), list];
+    setView(nodes);
+  }
+
+  // ---------- log ----------
+  function viewLog() {
+    api('log').then(function (j) {
+      var nodes = [el('p', { class: 'dim', text: 'Latest 60 actions. Wrong-key attempts are not listed.' })], card = el('div', { class: 'card' });
+      j.log.forEach(function (l) { card.appendChild(el('div', { class: 'line', style: 'display:block' }, el('div', { class: 'row' }, el('b', { text: l.action.replace(/_/g, ' ') }), el('span', { class: 'dim', text: String(l.at).replace('T', ' ').slice(0, 16) })), el('div', { class: 'dim', text: l.target || '' }), l.detail ? el('pre', { text: JSON.stringify(l.detail) }) : null)); });
+      if (!j.log.length) card.appendChild(el('p', { class: 'dim', text: 'Nothing yet.' })); nodes.push(card); setView(nodes);
+    }).catch(function (e) { if (e.message !== 'auth') setView([el('p', { text: e.message })]); });
+  }
+
+  $('go').addEventListener('click', signIn); $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') signIn(); });
+  $('out').addEventListener('click', function () { signOut(''); });
+  [].forEach.call(document.querySelectorAll('nav button'), function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-tab')); }); });
+  if (key) { api('overview', { days: 1 }).then(start).catch(function () { signOut(''); }); }
+  window.__admin = { show: show };
+})();
+</script>
+</body>
+</html>

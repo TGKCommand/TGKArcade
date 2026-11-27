@@ -771,6 +771,55 @@ label.dcrange output{text-align:right;color:#fff;font-weight:700;letter-spacing:
 .rvtrack:focus,.rvbar button:focus{outline:none}.rvtrack:focus-visible,.rvbar button:focus-visible,.rvbtns button:focus-visible{outline:2px solid #fff;outline-offset:1px}
 body.rvmode #hud .keypill,body.rvmode #hud .rtop,body.rvmode #hud .tp,body.rvmode #hud .sp,body.rvmode #hud .tsmall,body.rvmode #tilt{display:none!important}
 @media (max-width:420px){ .rvbar{gap:5px;padding:5px} .rvbar button{min-width:40px;padding:0 6px} .rvbtns button{font-size:12px;letter-spacing:.04em} .rvtop>*{padding:7px 10px;font-size:13px} }
+
+/* ===== main menu v2: a clean stack with squared buttons (the game's own square style, icons included) ===== */
+#topbar button{border-radius:0}
+.statsrow{display:block}.shop2{display:none}.links .more{display:none}
+@media (max-width:720px) and (orientation:portrait){
+  #menu #topbar{display:flex;flex-direction:column;flex-wrap:nowrap;gap:6px}#menu #topbar #tbFull{display:none!important}
+  #menu #mainView .mcols{display:flex;flex-direction:column}
+  #menu #mainView .mcol{display:contents}
+  #menu #pastBar{order:0}
+  #menu .brandrow{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:calc(env(safe-area-inset-left,0px) + 10px);z-index:6;margin:0;pointer-events:none}#menu .brandrow .shop{display:none!important}#menu .brandrow .logo{width:44px;height:44px;margin:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+  #menu #mainView{margin:0}
+  #menu h1{order:20;font-size:30px;line-height:1;margin:0}#menu .tag{display:none}
+  #menu .facts{order:30;display:flex;gap:18px;border:0;margin:8px 0 8px;padding:0}#menu .facts div{padding:0;display:flex;align-items:baseline;gap:6px}#menu .facts small{font-size:11px}#menu .facts b{font-size:16px}
+  #menu #menuStreak{order:35;align-self:flex-start;margin:0 0 10px;padding:3px 9px;border:1px solid var(--org);font-size:12px;text-transform:uppercase;letter-spacing:.06em}#menu #menuStreak:empty{display:none}
+  #menu .mapRow{order:40;display:block;margin:0 0 12px;padding:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+  #menu #miniMap{display:none}
+  #menu .mapRow .course::before{content:"TODAY\2019S COURSE";display:block;font-size:11px;letter-spacing:.16em;color:var(--dim);margin-bottom:2px}
+  #menu .course .name{font-size:22px}#menu .course .seed{display:none}
+  #menu .course .sub{font-size:0;display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}#menu .course .sub .chip{font-size:13px;padding:4px 9px;border:1px solid var(--line);color:#d8d2cc;text-transform:none}
+  #menu #startBtn{order:50;min-height:68px;font-size:24px;letter-spacing:.14em;border-radius:0}
+  #menu #menuBest{order:60;margin-top:8px}#menu #menuGhostRow{order:70;margin-top:2px}
+  #mainView .duo{order:80;gap:8px;margin-top:8px}
+  #mainView .duo .btn2{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:56px;padding:0 12px;font-size:14px;border-radius:0;text-align:left}
+  #mainView .duo .btn2::before{content:"";width:22px;height:22px;flex:none;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+  #garageBtn{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11l2-5h14l2 5v7h-3v-2H6v2H3z'/%3E%3Ccircle cx='7.5' cy='13.5' r='1'/%3E%3Ccircle cx='16.5' cy='13.5' r='1'/%3E%3C/svg%3E")}#pastBtn{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E")}#allBtn{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4'/%3E%3Cpath d='M5 4h12l-2 4 2 4H5'/%3E%3C/svg%3E")}#lbBtn{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z'/%3E%3Cpath d='M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3'/%3E%3C/svg%3E")}
+  #menu .statsrow{order:90;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+  #menu .tally{flex:1;display:flex;justify-content:space-between;gap:8px;margin:0;font-size:0}#menu .tally:empty{display:none}
+  #menu .tally .st{font-size:12px;color:var(--dim);display:flex;flex-direction:column;line-height:1.15}#menu .tally .st b{font-size:20px;color:var(--text)}
+  #menu .shop2{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-left:auto;padding:0 14px;border:1px solid var(--teal);color:var(--teal-hi);border-radius:0}
+  #menu #acct{order:100;margin-top:8px}
+  #menu #acct.in #acctBtn{border:0;background:none;text-decoration:underline;color:var(--dim);padding:0 4px;min-height:44px;text-transform:none;letter-spacing:0;font-size:13px}
+  #menu .prize{order:110;border-radius:0}
+}
+@media (max-width:720px) and (orientation:portrait) and (min-height:761px){ #menu #mainView{margin:-6px -10px -8px} }
+@media (max-width:720px) and (orientation:portrait) and (max-height:760px){
+  #menu .mapRow{padding:9px 12px;margin-bottom:8px}#menu .mapRow .course::before{display:none}#menu .course .name{font-size:20px}#menu .course .sub{margin-top:6px}
+  #menu #startBtn{min-height:58px;font-size:22px}#menu #menuBest{margin-top:6px}
+  #mainView .duo .btn2{min-height:48px}#menu .statsrow{margin-top:8px}#menu #acct{margin-top:2px}#menu .prize{margin-top:4px;padding:7px 12px}
+  #menu #menuStreak{margin-bottom:6px}#menu .facts{margin:2px 0 6px}
+}
+@media (max-width:720px) and (orientation:portrait) and (max-height:680px){
+  #menu #startBtn{min-height:52px;font-size:21px}#mainView .duo{margin-top:6px}#mainView .duo .btn2{min-height:44px}#menu .mapRow{padding:7px 12px;margin-bottom:6px}#menu .course .name{font-size:19px}#menu .course .sub{margin-top:4px}
+  #menu #mainView{margin:-2px 0 -4px}#menu .statsrow{margin-top:6px}#menu .tally .st b{font-size:18px}#menu .shop2{min-height:40px}#menu .prize{margin-top:2px;padding:6px 12px}
+  #menu .links{margin-top:2px;padding-top:0}#menu .links a,#menu .links .more{min-height:34px}#menu #acct{margin-top:0}#menu #acct.in #acctBtn{min-height:40px}#menu #menuGhostRow{margin-top:0}
+}
+@media (max-width:720px) and (orientation:portrait){
+  #menu .links a:nth-child(n+4){display:none}#menu .links.open a{display:inline-flex}
+  #menu .links .more{display:inline-flex;align-items:center;min-height:36px;color:#b5b8bd;text-decoration:underline;background:none;border:0;padding:0}#menu .links.open .more{display:none}
+}
 </style>
 </head>
 <body>
@@ -801,7 +850,7 @@ body.rvmode #hud .keypill,body.rvmode #hud .rtop,body.rvmode #hud .tp,body.rvmod
         <div class="duo"><button type="button" class="btn2" id="garageBtn">Garage</button><button type="button" class="btn2" id="pastBtn">Past races</button></div>
         <div class="duo"><button type="button" class="btn2" id="allBtn">All races today</button><button type="button" class="btn2" id="lbBtn">Leaderboard</button></div>
         <div class="best" id="menuBest"></div>
-        <div id="menuTally" class="tally" aria-live="polite"></div>
+        <div class="statsrow"><div id="menuTally" class="tally" aria-live="polite"></div><a class="shop shop2" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
         <div id="menuGhostRow"><span id="menuGhost"></span> <button type="button" class="linkbtn" id="ghostClear" style="display:none">Use my own</button></div>
         <div id="menuStreak"></div>
         <div id="acct"><span id="acctText"></span><span class="acctbtns"><button type="button" class="btn2" id="acctRename" style="display:none">Change name</button><button type="button" class="btn2" id="acctBtn"></button></span></div>
@@ -810,7 +859,7 @@ body.rvmode #hud .keypill,body.rvmode #hud .rtop,body.rvmode #hud .tp,body.rvmod
 </div>
         <div class="legend"><span><kbd>W</kbd><kbd>↑</kbd> throttle</span><span><kbd>A</kbd><kbd>D</kbd> steer</span><span><kbd>Space</kbd> handbrake</span><span><kbd>R</kbd> recover</span><span><kbd>F</kbd> restart</span><span><kbd>C</kbd> camera</span></div>
         <div class="foot"><span>Drag the scene to look around.</span></div>
-        <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#about">About</a><a href="#support">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></nav>
+        <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#about">About</a><a href="#support">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a><button type="button" class="linkbtn more" id="linksMore" aria-expanded="false">More&hellip;</button></nav>
       </div>
       <div id="garageView" class="hidden">
         <div class="ghead">
@@ -2076,13 +2125,18 @@ var TGKCore = (function () {
       if (this.restAng === null && Math.abs(this.rollRate) > 0.5) {
         this.rollAng += this.rollRate * dt; this.rollRate *= DM.exp(-1.0 * dt);
       } else {
+        var rollFix = typeof t.raceDate === 'string' && t.raceDate >= ROLLFIX.from;
         if (this.restAng === null) {
           var q = Math.round(this.rollAng / (Math.PI / 2)) * (Math.PI / 2);
           var m = ((q % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-          if (m < 1e-6 || Math.abs(m - 2 * Math.PI) < 1e-6) q += this.rollDir * Math.PI / 2;
+          if ((m < 1e-6 || Math.abs(m - 2 * Math.PI) < 1e-6) && !rollFix) q += this.rollDir * Math.PI / 2;       // (original) never let it settle on its wheels
           this.restAng = q; this.rollRate = 0;
         }
         this.rollAng += (this.restAng - this.rollAng) * Math.min(1, dt * 9);
+        if (rollFix && this.grounded && Math.abs(this.restAng - this.rollAng) < 0.05) {                         // settled: if that is wheels-down, it is just a car again
+          var mm = ((this.restAng % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+          if (mm < 1e-6 || Math.abs(mm - 2 * Math.PI) < 1e-6) { this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.lean = 0; this.leanV = 0; }
+        }
       }
     }
 
@@ -2102,7 +2156,7 @@ var TGKCore = (function () {
     var prevGy = this.gy;
     var sf = groundAt(t, this.x, this.z, this.idx, this.surf);
     var wd = (t.water && t.water.length) ? waterDepthAt(t, this.x, this.z) : 0;
-    if (wd > 0 && !this.grounded && this.y > _wy + 0.45) wd = 0;          // (v28) a car flying over the water is not in it: no splash, no drag, no drowning while it is clear above the surface
+    if (wd > 0 && !this.grounded && this.y > _wy + 0.45 && typeof t.raceDate === 'string' && t.raceDate >= JUMP.from) wd = 0;          // (v28) a car flying over the water is not in it: no splash, no drag, no drowning while it is clear above the surface
     if (wd > 0.95) sf.gy = Math.max(sf.gy, _wy - 0.5);          // deep water: the car floats
     var gv = (sf.gy - prevGy) / dt; if (!isFinite(gv) || Math.abs(gv) > 40) gv = 0;
     this.gy = sf.gy;
@@ -2187,12 +2241,15 @@ var TGKCore = (function () {
     this.vy += 2.4; this.grounded = false; this.airTicks = 0; ev.rolled = true;
   };
   /* rock launch (v27, made to really launch in v28): a rock met at a glancing angle lifts the car off the ground, like riding up its face, and does not hurt it; a steeper or harder hit is exactly as before */
+  var ROLLFIX = { from: '2026-11-27' };    // a car that rolls over and comes to rest back on its WHEELS drives on (before this date it was always pushed over onto its side and locked until the driver pressed R)
+  var JUMP = { from: '2026-11-27' };       // JUMPING: rock launches and the fly-over-water rule apply to race days on or after this date; every earlier day keeps the original physics exactly. Set it to '2099-01-01' to switch jumping off again.
   var ROCK_POP_MAX_HIT = 16, ROCK_POP_ANGLE = 0.58, ROCK_POP_MIN_V = 12, ROCK_POP_K = 0.22, ROCK_POP_MIN_LIFT = 3.5, ROCK_POP_MAX_LIFT = 8.5, ROCK_POP_COOLDOWN = 120;      // glancing = meeting the rock at under ~30 degrees to its face (impact/along-speed <= 0.58), fast, and not a hard hit
   var CIRC = [1.8, 0.45, -0.95, -2.15];         // four contact circles down the length of the car (offsets from the centre of gravity)
   /** trees and rocks: solid. Push the car out, bounce it, spin it, dent it. Deterministic like everything else. */
   Sim.prototype.collide = function (t, ev) {
     var P = t.props, yaw = this.yaw, fx = DM.sin(yaw), fz = DM.cos(yaw), rx = fz, rz = -fx, hit = 0, pop = null;
     if (this.rockCd > 0) this.rockCd--;
+    var jumpOn = typeof t.raceDate === 'string' && t.raceDate >= JUMP.from;
     for (var ci = 0; ci < 4; ci++) {
       var cx = this.x + fx * CIRC[ci], cz = this.z + fz * CIRC[ci], gx = Math.floor(cx / PCELL), gz = Math.floor(cz / PCELL);
       for (var a = -1; a <= 1; a++) for (var b = -1; b <= 1; b++) {
@@ -2206,7 +2263,7 @@ var TGKCore = (function () {
           if (vn < 0) {
             var rock = P.kind[p] === 1, e = rock ? 0.18 : 0.08, j = -(1 + e) * vn, gl = false;
             if (rock) { var s2 = wvx * wvx + wvz * wvz, vtn = Math.sqrt(Math.max(0, s2 - vn * vn));       // speed ALONG the rock's face, before the bounce
-              if (vtn >= ROCK_POP_MIN_V && -vn <= ROCK_POP_MAX_HIT && -vn <= ROCK_POP_ANGLE * vtn) { gl = true; if (!pop || vtn > pop.vt) pop = { vt: vtn, imp: -vn }; } }
+              if (jumpOn && vtn >= ROCK_POP_MIN_V && -vn <= ROCK_POP_MAX_HIT && -vn <= ROCK_POP_ANGLE * vtn) { gl = true; if (!pop || vtn > pop.vt) pop = { vt: vtn, imp: -vn }; } }
             wvx += j * nx; wvz += j * nz; wvx *= 0.97; wvz *= 0.97;
             this.u = wvx * fx + wvz * fz; this.v = wvx * rx + wvz * rz;
             var relx = cx - this.x, relz = cz - this.z, tq = relz * nx - relx * nz;
@@ -2322,7 +2379,7 @@ var TGKCore = (function () {
     BITS: { THR: B_THR, BRK: B_BRK, LEFT: B_LEFT, RIGHT: B_RIGHT, HB: B_HB, RECOVER: B_RECOVER },
     hashSeed: hashSeed, mulberry32: mulberry32, smoothstep: smoothstep, clamp: clamp,
     generateTrack: generateTrack, finalizeTrack: finalizeTrack, validateTrack: validate, nearest: nearest, surface: surface, groundAt: groundAt, terrainH: terrainH, rampY: rampY, waterDepthAt: waterDepthAt, cutDist: cutDist, PCELL: PCELL, launchTest: launchTest,
-    internals: { reroll: REROLL, CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
+    internals: { ROLLFIX: ROLLFIX, strongPilot: strongPilot, JUMP: JUMP, reroll: REROLL, CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
     Sim: Sim, replay: replay, chicagoDate: chicagoDate, msUntilChicagoMidnight: msUntilChicagoMidnight, fmtTime: fmtTime,
     BIOMES: BIOMES
   };
@@ -4717,7 +4774,7 @@ if (typeof module !== 'undefined') module.exports = TGKCore;
 
 var TGKCores = (function () {
   'use strict';
-  var cur = TGKCore, NEW_FROM = '2026-11-26', V28_FROM = '2026-11-27';
+  var cur = TGKCore, NEW_FROM = '2026-11-27', V28_FROM = '2026-11-27';
   /** the frozen v26 core with the current interface (anything it lacks falls back to the current helper) */
   function adapt(L, tag) { var A = {}, k; for (k in cur) A[k] = cur[k]; for (k in L) A[k] = L[k]; A.version = tag; return A; }
   var V26 = adapt(TGKCoreV26, 'v26'), V27 = adapt(TGKCoreV27, 'v27');
@@ -7370,11 +7427,11 @@ var TGKPages = (function () {
     '<li><b>Keyboard:</b> <kbd>W</kbd> or <kbd>&uarr;</kbd> gas &middot; <kbd>S</kbd> or <kbd>&darr;</kbd> brake and reverse &middot; <kbd>A</kbd> <kbd>D</kbd> or <kbd>&larr;</kbd> <kbd>&rarr;</kbd> steer &middot; <kbd>Space</kbd> handbrake &middot; <kbd>R</kbd> recover &middot; <kbd>F</kbd>, <kbd>Backspace</kbd> or <kbd>Enter</kbd> restart &middot; <kbd>C</kbd> camera &middot; <kbd>Esc</kbd> pause &middot; <kbd>M</kbd> sound</li>' +
     '<li><b>Touch:</b> the arrows steer, GAS and BRAKE (hold BRAKE to reverse), HANDBRAKE, the camera button and RESET.</li></ul>' +
     '<h3>Racing tips</h3><ul>' +
-    '<li>The car can roll if you slide and steer the wrong way. Steer into the slide and ease off the gas.</li>' +
+    '<li>The car can roll if you slide and steer the wrong way. Steer into the slide and ease off the gas. If it tumbles and lands back on its wheels you can just drive on; on its side or roof, press R to recover.</li>' +
     '<li>Trees and rocks damage the car. Water drags you down and can sink you.</li>' +
-    '<li>Rocks can also launch you. Skim one at a shallow angle and at speed and it throws you into the air without a scratch; hit it square on and it still wrecks you. Use them as ramps.</li>' +
     '<li>Look for hidden rock jumps. A ramp can skip a whole stretch of road and save seconds, but you still have to land on the road.</li>' +
-    '<li>The way between checkpoints is yours. Cut corners, jump gaps and find your own shortcuts, but pass every checkpoint in order, and stray too far from the road and you are put back.</li>' +
+    '<li>Rocks can launch you. Skim one at a shallow angle and at speed and it throws you into the air without a scratch; hit it square on and it still wrecks you.</li>' +
+    '<li>The way between checkpoints is yours: cut corners, find a trail, jump a gap. A jump only helps if it truly makes your route faster, and the fastest route wins. Pass every checkpoint in order, and if you stray too far from the road you are put back.</li>' +
     '<li>Your ghost shows your best run (a par lap on your first run). Gate splits show how you compare with it.</li></ul>' +
     '<h3>Practice and ranked</h3><p>Anyone can practice as often as they like. To appear on the leaderboard and be eligible for the daily prize, log in with your TGK customer account. Only your best run of the day counts, and every run is checked before it is ranked (see Fair play).</p>' +
     '<h3>Watch and race other drivers</h3><p>Tap a name on the leaderboard to watch that run or race their ghost. <b>Show all races today</b> replays every verified run of the day at once.</p>' +
@@ -7571,7 +7628,10 @@ var TGKPages = (function () {
     track.sig = trackSig(); loadPick(); sim = new C.Sim(track); dentSig = '';
     recorder.reset();
     $('trackName').textContent = track.name;
-    $('trackMeta').textContent = (track.length / 1609.34).toFixed(2) + ' mi \u00b7 ' + track.checkpoints.length + ' gates \u00b7 ' + biomeLabel(track.biome) + ((track.shortcutCount || track.ramps.length) ? ' \u00b7 ' + (track.shortcutCount || track.ramps.length) + ' hidden shortcut' + ((track.shortcutCount || track.ramps.length) > 1 ? 's' : '') : '') + ((track.cliffs && track.cliffs.length) ? ' \u00b7 cliffs' : '');
+    (function () {                                                                           // the course details as chips (the plain text stays the same: parts separated by ' \u00b7 ')
+      var parts = [(track.length / 1609.34).toFixed(2) + ' mi', track.checkpoints.length + ' gates', biomeLabel(track.biome)]; if (track.cliffs && track.cliffs.length) parts.push('cliffs');
+      var m = $('trackMeta'); m.textContent = ''; parts.forEach(function (p, k) { if (k) m.appendChild(document.createTextNode(' \u00b7 ')); var c = document.createElement('span'); c.className = 'chip'; c.textContent = p; m.appendChild(c); });
+    })();       // no hint about hidden shortcuts: finding them is the game
     $('trackSeed').textContent = 'Seed ' + track.seedStr + (track.attempt ? ' (sub-seed ' + track.attempt + ')' : '');
     $('todayDate').textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(raceDate + 'T12:00:00Z')).toUpperCase();
     renderPastUi();
@@ -9284,8 +9344,11 @@ var TGKPages = (function () {
   function nfmt(n) { return (+n || 0).toLocaleString('en-US'); }
   function renderTally() {
     var e = $('menuTally'); if (!e) return; if (!online.configured || tally.date !== raceDate || !(tally.attempts || tally.finished)) { e.textContent = ''; return; }
-    e.textContent = ''; var b = document.createElement('b'); b.textContent = nfmt(tally.attempts); e.appendChild(b);
-    e.appendChild(document.createTextNode(' ' + (tally.attempts === 1 ? 'attempt ' : 'attempts ') + (pastDate ? 'that day' : 'today') + ' \u00b7 ' + nfmt(tally.racers) + (tally.racers === 1 ? ' racer' : ' racers') + ' \u00b7 ' + nfmt(tally.finished) + ' finished'));
+    e.textContent = '';                                                                       // three stats (the plain text reads the same: "262 attempts today \u00b7 4 racers \u00b7 129 finished")
+    function stat(n, label) { var s = document.createElement('span'); s.className = 'st'; var b = document.createElement('b'); b.textContent = nfmt(n); s.appendChild(b); s.appendChild(document.createTextNode(' ' + label)); return s; }
+    e.appendChild(stat(tally.attempts, (tally.attempts === 1 ? 'attempt ' : 'attempts ') + (pastDate ? 'that day' : 'today'))); e.appendChild(document.createTextNode(' \u00b7 '));
+    e.appendChild(stat(tally.racers, tally.racers === 1 ? 'racer' : 'racers')); e.appendChild(document.createTextNode(' \u00b7 '));
+    e.appendChild(stat(tally.finished, 'finished'));
   }
   function fetchTally(force) {
     if (!online.configured) return; if (!force && tally.date === raceDate && Date.now() - tally.t < 30000) { renderTally(); return; } var d = raceDate; tally.t = Date.now();
@@ -9711,6 +9774,7 @@ var TGKPages = (function () {
     syncSoundUi(); ['sndSel', 'sndMenu'].forEach(function (id) { $(id).addEventListener('change', function () { setSound($(id).value); }); });
     $('qSel').addEventListener('change', function () { qName = $('qSel').value; store.set('tgk.quality', qName); prPerf = 1; applyQuality(true); });
     $('qMenu').value = qName; $('lookSel').value = String(wantLook());
+    $('linksMore').addEventListener('click', function () { var n = document.querySelector('#menu .links'); n.classList.add('open'); $('linksMore').setAttribute('aria-expanded', 'true'); });
     $('lookSel').addEventListener('change', function () { store.set('tgk.look', $('lookSel').value === '1' ? '1' : '2'); window.__look = 0; applyQuality(true); });
     $('qMenu').addEventListener('change', function () { qName = $('qMenu').value; store.set('tgk.quality', qName); prPerf = 1; applyQuality(true); });
     document.body.classList.toggle('touch', coarse);
