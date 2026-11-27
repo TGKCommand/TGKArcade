@@ -820,6 +820,22 @@ body.rvmode #hud .keypill,body.rvmode #hud .rtop,body.rvmode #hud .tp,body.rvmod
   #menu .links a:nth-child(n+4){display:none}#menu .links.open a{display:inline-flex}
   #menu .links .more{display:inline-flex;align-items:center;min-height:36px;color:#b5b8bd;text-decoration:underline;background:none;border:0;padding:0}#menu .links.open .more{display:none}
 }
+
+/* ---- Every line ---- */
+#linesSheet .body{max-height:calc(100vh - 120px);max-height:calc(100dvh - 120px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#linesCv{display:block;width:100%;height:auto;aspect-ratio:1/1;max-height:62vh;object-fit:contain;background:#17130f;border:1px solid var(--line);margin:10px 0}
+.linescall{background:var(--org);color:var(--bar);padding:9px 12px;font-weight:800;letter-spacing:.03em;margin-top:8px}
+#linesList{list-style:none;margin:0 0 10px;padding:0}
+#linesList li.ln{display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 4px;border-top:1px solid var(--line);cursor:pointer;flex-wrap:wrap}
+#linesList li.ln.on{background:rgba(44,188,180,.12)}#linesList li.ln.me .nm{color:var(--teal-hi)}
+#linesList i{width:12px;height:12px;flex:none}#linesList .rk{width:22px;color:var(--dim);font-weight:700;text-align:center}
+#linesList .nm{flex:1;min-width:90px;font-weight:700;word-break:break-word}
+#linesList .sc{background:var(--org);color:var(--bar);font-size:11px;font-weight:800;padding:2px 6px;letter-spacing:.04em}
+#linesList li.ln{flex-wrap:nowrap}#linesList .nm{min-width:0}
+#linesList .rt{display:flex;align-items:center;gap:8px;margin-left:auto;flex:none}
+#linesList .tm{font-variant-numeric:tabular-nums;color:#d6d8dc;font-size:14px;min-width:58px;text-align:right}
+#linesList .ww{min-height:40px;padding:0 12px;font-size:13px}
+@media (max-width:420px){#linesList .tm{font-size:13px;min-width:52px}#linesList .sc{display:none}}
 </style>
 </head>
 <body>
@@ -999,6 +1015,7 @@ body.rvmode #hud .keypill,body.rvmode #hud .rtop,body.rvmode #hud .tp,body.rvmod
     <div class="btnrow"><button type="button" id="againBtn">Race again</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="shareBtn">Share result</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="resAllBtn">Show all races today</button></div>
+    <div class="btnrow"><button type="button" class="btn2" id="linesBtn" style="display:none">Every line (top 10)</button></div>
     <div class="btnrow"><button type="button" class="btn2" id="menuBtn">Menu</button><a class="btn2" style="text-align:center;text-decoration:none;color:inherit" href="https://tgkmotorsport.com" target="_blank" rel="noopener">Shop TGK</a></div>
     </div>
   </div></div>
@@ -1054,6 +1071,15 @@ body.rvmode #hud .keypill,body.rvmode #hud .rtop,body.rvmode #hud .tp,body.rvmod
     <div class="srow"><span>Saved times and settings on this device</span><button type="button" class="btn2" id="setReset">Erase</button></div>
     <nav class="links" aria-label="Help and legal"><a href="#how">How to play</a><a href="#fair">Fair play</a><a href="#rules">Prize rules</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a><a href="#support">Support</a></nav>
     <div class="btnrow"><button type="button" class="btn2" id="setClose">Close</button></div>
+  </div></div>
+</section>
+<section id="linesSheet" class="sheet hidden" role="dialog" aria-label="Every line">
+  <div class="card"><div class="check" aria-hidden="true"></div><div class="body">
+    <h2>Every line</h2><div class="meta" id="linesSub">The top 10 routes round today&rsquo;s course.</div>
+    <div id="linesCall" class="linescall" hidden></div>
+    <canvas id="linesCv" width="720" height="720" aria-label="Map of the top 10 routes round the course"></canvas>
+    <ol id="linesList"></ol>
+    <div class="btnrow"><button type="button" class="btn2" id="linesClose">Close</button></div>
   </div></div>
 </section>
 <section id="pastSheet" class="sheet hidden" role="dialog" aria-label="Past races">
@@ -2258,7 +2284,7 @@ var TGKCore = (function () {
     this.vy += 2.4; this.grounded = false; this.airTicks = 0; ev.rolled = true;
   };
   /* rock launch (v27, made to really launch in v28): a rock met at a glancing angle lifts the car off the ground, like riding up its face, and does not hurt it; a steeper or harder hit is exactly as before */
-  var ROLL2 = { from: '2026-11-28' };      // (v28) the full roll model: tyres keep working while the car rolls, a partly-over car falls back onto its wheels and drives on, and ONLY a car left upside down loses power and asks for a reset
+  var ROLL2 = { from: '2026-11-27' };      // (v28) the full roll model: tyres keep working while the car rolls, a partly-over car falls back onto its wheels and drives on, and ONLY a car left upside down loses power and asks for a reset
   var ROLLFIX = { from: '2026-11-27' };    // a car that rolls over and comes to rest back on its WHEELS drives on (before this date it was always pushed over onto its side and locked until the driver pressed R)
   var JUMP = { from: '2026-11-27' };       // JUMPING: rock launches and the fly-over-water rule apply to race days on or after this date; every earlier day keeps the original physics exactly. Set it to '2099-01-01' to switch jumping off again.
   var ROCK_POP_MAX_HIT = 16, ROCK_POP_ANGLE = 0.58, ROCK_POP_MIN_V = 12, ROCK_POP_K = 0.22, ROCK_POP_MIN_LIFT = 3.5, ROCK_POP_MAX_LIFT = 8.5, ROCK_POP_COOLDOWN = 120;      // glancing = meeting the rock at under ~30 degrees to its face (impact/along-speed <= 0.58), fast, and not a hard hit
@@ -8099,6 +8125,7 @@ var TGKPages = (function () {
   function resumeGame() { if (state !== 'paused') return; state = 'racing'; $('pause').classList.add('hidden'); lastTs = performance.now(); }
 
   function showResults() {
+    $('linesBtn').style.display = online.configured ? '' : 'none';
     clearNotices();
     var ms = sim.finishMs, prevBest = getPB(), isPB = !prevBest || ms < prevBest;
     if (isPB) store.set(pbKey(), String(ms));
@@ -8679,7 +8706,7 @@ var TGKPages = (function () {
     if (ev.fell) { cam.init = false; sfx('drown'); cam.shake = Math.min(3, cam.shake + 1.2); toast(noticeLevel !== 'full' ? 'Back on the road' : 'Fell off the cliff! Back on the road', false, 'key'); }
     else if (ev.drown) { cam.init = false; sfx('drown'); toast(noticeLevel !== 'full' ? 'Back on the road' : 'Sunk! Back on the road', false, 'key'); }
     else if (ev.recovered) { cam.init = false; sfx('recover'); toast(ev.oob ? 'Out of bounds. Back on the road' : 'Back on track'); }
-    if (ev.finished) { if (rv) { rv.ended = true; rvSync(); } else { state = 'finishing'; finishAt = performance.now(); $('countdown').textContent = 'FINISH'; goFlash = 1.4; } }
+    if (ev.finished) { if (rv) { rv.fin = true; } else { state = 'finishing'; finishAt = performance.now(); $('countdown').textContent = 'FINISH'; goFlash = 1.4; } }
   }
   function worldPt(lx, lz) { var s = Math.sin(sim.yaw), c = Math.cos(sim.yaw); return { x: sim.x + lx * c + lz * s, z: sim.z - lx * s + lz * c }; }
   function onCrash(mag) {
@@ -8769,7 +8796,8 @@ var TGKPages = (function () {
         var bits = curBits(); snapshot();
         if (state === 'racing' && !rv) recorder.push(sim.tick + 1, bits);
         lastBits = bits;
-        var ev = sim.step(bits); accum -= DT; if (ghost) stepGhost();
+        var ev = sim.step(bits); finishCoast(sim); accum -= DT; if (ghost) stepGhost();
+        if (rv && sim.phase === 'finished' && !rv.ended) { rv.coast = (rv.coast === undefined ? 150 : rv.coast) - 1; if (rv.coast <= 0 || Math.abs(sim.u) < 0.05) { rv.ended = true; rvSync(); } }       // the viewer lets the car glide to a stop, then ends
         if (ev.go || ev.ckpt || ev.hit || ev.land || ev.recovered || ev.finished || ev.crash || ev.splash || ev.drown || ev.fell || ev.jump || ev.launch || ev.pop || ev.save) handleEvents(ev);
       }
       if (guard >= (rv ? 60 : 14)) accum = 0;
@@ -8903,7 +8931,7 @@ var TGKPages = (function () {
     snapshot(); accum = 0; cam.init = false; cam.shake = 0; vis.pitch = vis.roll = vis.bob = vis.bobV = 0; if (FX) { FX.trails.reset(); FX.smoke.clear(); }
     W.updateGates(world, sim.nextCk); $('hudCk').textContent = sim.nextCk; paintCkBar();
     dentSig = ''; try { W.applyDents(THREE, carObj, sim.dents); if (sim.dents.length) dentSig = 'x'; } catch (e) { }
-    rv.ended = sim.tick >= rv.endTick; hud.dmg = -1; hud.t = '';
+    rv.ended = sim.tick >= rv.endTick; rv.coast = undefined; hud.dmg = -1; hud.t = '';
   }
   function rvSeekFrac(f) { rvGoTo(rv.goTick + C.clamp(f, 0, 1) * (rv.endTick - rv.goTick)); rvUi(true); }
   function rvSync() { if (!rv) return; var b = $('rvPlay'); b.textContent = rv.ended ? '\u21bb' : (rv.paused ? '\u25b6' : '\u275a\u275a'); b.setAttribute('aria-label', rv.ended ? 'Watch again' : (rv.paused ? 'Play' : 'Pause')); $('rvSpeed').textContent = RV_SPEEDS[rv.si] + 'x'; $('rvCam').textContent = camNames[camMode]; }
@@ -8965,6 +8993,9 @@ var TGKPages = (function () {
   function pickKey() { return 'tgk.ghostpick.' + raceDate + '.' + track.sig; }
   function loadPick() { ghostPick = null; try { var p = JSON.parse(store.get(pickKey()) || 'null'); if (p && p.ext && Array.isArray(p.log) && Number.isInteger(p.ms)) ghostPick = p; } catch (e) { } }
   function clearPick(silent) { ghostPick = null; try { store.set(pickKey(), 'null'); } catch (e) { } if (!silent) { toast('Back to your own ghost'); } renderGhostLine(); }
+  /** after the line the physics only brakes (and then would creep backwards): replay cars, ghosts and your own car now glide to a stop within about 16 m instead of coasting 50 m
+      to the end of the road. Purely visual: a verified time is fixed at the line and nothing after it is ever replayed or checked. */
+  function finishCoast(s) { if (s.phase === 'finished') { s.u *= 0.975; s.v *= 0.975; s.r *= 0.9; if (Math.abs(s.u) < 0.02) s.u = 0; } }
   function ghostSource() {
     if (store.get('tgk.ghost') === '0') return null;
     if (ghostPick) { if (buildGhostTrace(ghostPick).ms === ghostPick.ms) return ghostPick; ghostPick = null; toast('That run no longer matches today\'s course. Using your own ghost'); }
@@ -9012,6 +9043,16 @@ var TGKPages = (function () {
     c.group.traverse(function (o) { if (o.isMesh) { o.castShadow = false; o.renderOrder = 2; (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { m.transparent = true; m.opacity = 0.5; m.depthWrite = false; }); } });
     c.beacon = makeBeacon(); c.group.add(c.beacon); world.root.add(c.group); return c;
   }
+  /** make every part of the (dressed) ghost car see-through, so it reads as a ghost but still looks like the real thing */
+  function ghostify(c) { c.group.traverse(function (o) { if (o.isMesh) { o.castShadow = false; o.renderOrder = 2; (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { m.transparent = true; m.opacity = 0.5; m.depthWrite = false; }); } }); }
+  /** the ghost wears the real car: the paint, decals, parts and wheels of the run it replays (the par ghost stays a plain teal car) */
+  function paintGhost(run) {
+    var ghex = run.par ? '#5fd6cf' : (/^#[0-9a-fA-F]{6}$/.test(run.hex || '') ? run.hex : '#5fd6cf');
+    undressCar(ghostCar);                                                                      // whatever the last ghost wore comes off first
+    W.setPaint(ghostCar, ghex, { rough: 0.4, metal: 0.1, coat: 0 });
+    try { dressCar(ghostCar, run.par ? null : (run.garage || null), ghex); } catch (e) { }
+    ghostify(ghostCar);
+  }
   function setupGhost() {
     var run = ghostSource();
     if (!run || !run.log || !run.log.length) { ghost = null; if (ghostCar) ghostCar.group.visible = false; return; }
@@ -9021,7 +9062,7 @@ var TGKPages = (function () {
     ghost = { par: !!run.par, ext: !!run.ext, name: run.name || '', run: run, trace: trace, sim: gs, log: shiftLog(run, sim.cdTicks), li: 0, bits: 0, prev: { x: gs.x, y: gs.y, z: gs.z, yaw: gs.yaw }, spin: 0 };
     var gid = normCar(run.car); if (ghostCar && ghostCar.carId !== gid) { world.root.remove(ghostCar.group); ghostCar = null; }
     if (!ghostCar) ghostCar = makeGhostCar(gid);
-    W.setPaint(ghostCar, run.ext ? run.hex : '#5fd6cf', { rough: 0.4, metal: 0.1, coat: 0 });
+    paintGhost(run);
     ghostCar.group.visible = true; setBeaconText(ghostCar.beacon, run.ext ? String(run.name || 'GHOST').toUpperCase().slice(0, 10) : (ghost.par ? 'PAR' : 'BEST'));
   }
   function setBeaconText(sp, txt) {
@@ -9035,7 +9076,7 @@ var TGKPages = (function () {
     var gs = ghost.sim; if (gs.phase === 'finished' && Math.abs(gs.u) < 0.05) return;
     ghost.prev.x = gs.x; ghost.prev.y = gs.y; ghost.prev.z = gs.z; ghost.prev.yaw = gs.yaw;
     var k = gs.tick + 1; while (ghost.li < ghost.log.length && ghost.log[ghost.li][0] <= k) { ghost.bits = ghost.log[ghost.li][1]; ghost.li++; }
-    gs.step(ghost.bits);
+    gs.step(ghost.bits); finishCoast(gs);
   }
   function updateGhost(dt, alpha) {
     if (!ghost || !ghostCar) return;
@@ -9348,7 +9389,7 @@ var TGKPages = (function () {
     function snap() { buf.push(s.x, s.y, s.z, s.yaw, s.rolled ? s.rollAng : 0, s.s); }
     for (var k = 1; k <= maxTicks; k++) {
       while (li < log.length && log[li][0] <= k) { bits = log[li][1]; li++; }
-      s.step(bits);
+      s.step(bits); finishCoast(s);
       if (s.phase === 'racing' && s.raceTick % (120 / SR) === 0) snap();
       if (s.phase === 'finished' && Math.abs(s.u) < 0.05) break;
     }
@@ -9402,6 +9443,74 @@ var TGKPages = (function () {
     placeOvAll(); if (ov && state === 'overview') { $('ovBanner').querySelector('b').innerHTML = (ovAll ? 'EVERY ATTEMPT' : 'EVERY TGK DAILY RACE') + '<br>FROM ' + (pastDate ? dayShort(raceDate) : 'TODAY'); buildOverview(); }
   }
   var dayCache = null;
+
+  /* ---------------- Every line: the top 10 routes round the course, shown after your run ---------------- */
+  var LINE_COLS = ['#2ec4b6', '#5b8cff', '#f0566e', '#b57bff', '#f5c542', '#ff8a3d', '#53d37c', '#e86bd0', '#4fd1ff', '#c4c4c4'], LINE_MIN_SKIP = 40, LINES = null;
+  /** replay a verified run and record where it went: a point every 0.05 s, with how far along the road it was and how far it had actually driven */
+  function lineRoute(run) {
+    var s = new C.Sim(track), log = shiftLog(run, C.COUNTDOWN_TICKS), li = 0, bits = 0, half = track.width / 2, r = { pts: [], S: [], D: [], off: [], ms: run.ms }, drv = 0, px = null, pz = null;
+    for (var guard = 0; guard < Math.round(420 / DT); guard++) {
+      var k = s.tick + 1; while (li < log.length && log[li][0] <= k) { bits = log[li][1]; li++; } s.step(bits);
+      if ((s.phase === 'racing' || s.phase === 'finished') && s.raceTick % 6 === 0) { if (px !== null) drv += Math.hypot(s.x - px, s.z - pz); px = s.x; pz = s.z; r.pts.push([+s.x.toFixed(1), +s.z.toFixed(1)]); r.S.push(s.s); r.D.push(drv); r.off.push(Math.abs(s.lat) > half + 1.5 ? 1 : 0); }
+      if (s.phase === 'finished') break;
+    }
+    return (s.phase === 'finished' && s.finishMs === run.ms) ? r : null;                    // a run that does not replay to its claimed time is left off the map
+  }
+  /** the most road skipped in one go: progress along the road gained over the distance actually driven, and only if the car left the road to do it */
+  function findShortcut(route) {
+    var best = { skip: 0, i: 0, j: 0 }, minG = Infinity, minI = 0;
+    for (var j = 0; j < route.S.length; j++) { var g = route.S[j] - route.D[j]; if (g < minG) { minG = g; minI = j; } if (g - minG > best.skip) best = { skip: g - minG, i: minI, j: j }; }
+    var left = false; for (var q = best.i; q <= best.j; q++) if (route.off[q]) { left = true; break; }
+    return (best.skip >= LINE_MIN_SKIP && left) ? { meters: Math.round(best.skip), i: best.i, j: best.j } : null;
+  }
+  function drawLines(focus) {
+    var cv = $('linesCv'); if (!cv || !cv.getContext || !LINES) return; var cx = cv.getContext('2d'); if (!cx) return; var W2 = cv.width, H2 = cv.height, i, j;
+    var xs = [], zs = []; for (i = 0; i < track.N; i += 2) { xs.push(track.X[i]); zs.push(track.Z[i]); } LINES.routes.forEach(function (r) { r.pts.forEach(function (p) { xs.push(p[0]); zs.push(p[1]); }); });
+    var mnx = Math.min.apply(null, xs), mxx = Math.max.apply(null, xs), mnz = Math.min.apply(null, zs), mxz = Math.max.apply(null, zs), pad = 26, sc = Math.min((W2 - 2 * pad) / Math.max(1, mxx - mnx), (H2 - 2 * pad) / Math.max(1, mxz - mnz)), ox = (W2 - (mxx - mnx) * sc) / 2, oz = (H2 - (mxz - mnz) * sc) / 2;
+    function P(x, z) { return [ox + (x - mnx) * sc, oz + (z - mnz) * sc]; }
+    cx.fillStyle = '#17130f'; cx.fillRect(0, 0, W2, H2); cx.lineJoin = 'round'; cx.lineCap = 'round';
+    cx.beginPath(); for (i = 0; i < track.N; i += 2) { var q = P(track.X[i], track.Z[i]); if (i) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); } cx.strokeStyle = '#0c0a08'; cx.lineWidth = W2 / 36; cx.stroke(); cx.strokeStyle = '#4a423b'; cx.lineWidth = W2 / 52; cx.stroke();
+    LINES.routes.forEach(function (r, k) {
+      var dim = focus !== null && focus !== undefined && focus !== k; cx.beginPath(); r.pts.forEach(function (p, n) { var q = P(p[0], p[1]); if (n) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); });
+      cx.globalAlpha = dim ? 0.18 : 1; cx.strokeStyle = LINE_COLS[k % LINE_COLS.length]; cx.lineWidth = (r.run.mine || focus === k) ? W2 / 110 : W2 / 170; cx.stroke(); cx.globalAlpha = 1;
+    });
+    LINES.routes.forEach(function (r, k) {                                                         // the shortcuts, glowing orange on top
+      if (!r.shortcut) return; if (focus !== null && focus !== undefined && focus !== k) return; cx.beginPath();
+      for (var n = r.shortcut.i; n <= r.shortcut.j; n++) { var q = P(r.pts[n][0], r.pts[n][1]); if (n > r.shortcut.i) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); }
+      cx.save(); cx.shadowColor = 'rgba(255,150,40,.9)'; cx.shadowBlur = W2 / 40; cx.strokeStyle = '#ffc972'; cx.lineWidth = W2 / 90; cx.stroke(); cx.restore();
+    });
+    (track.checkpoints || []).forEach(function (ci) { var q = P(track.X[ci], track.Z[ci]); cx.strokeStyle = '#fff'; cx.lineWidth = 2; cx.strokeRect(q[0] - 6, q[1] - 6, 12, 12); });
+    var s0 = P(track.X[track.startIdx], track.Z[track.startIdx]), f0 = P(track.X[track.finishIdx], track.Z[track.finishIdx]); cx.fillStyle = '#fff'; cx.fillRect(s0[0] - 8, s0[1] - 8, 16, 16); cx.fillStyle = '#e8731c'; cx.fillRect(f0[0] - 8, f0[1] - 8, 16, 16);
+    cx.font = '700 ' + Math.round(W2 / 36) + 'px sans-serif'; cx.fillStyle = '#fff'; cx.fillText('START', s0[0] + 12, s0[1] + 5); cx.fillStyle = '#e8731c'; cx.fillText('FINISH', f0[0] + 12, f0[1] + 5);
+  }
+  function renderLinesList(focus) {
+    var ol = $('linesList'); ol.textContent = ''; var best = LINES.routes[0] ? LINES.routes[0].run.ms : 0;
+    LINES.routes.forEach(function (r, k) {
+      var li = document.createElement('li'); li.className = 'ln' + (focus === k ? ' on' : '') + (r.run.mine ? ' me' : ''); li.setAttribute('data-k', String(k));
+      var sw = document.createElement('i'); sw.style.background = LINE_COLS[k % LINE_COLS.length]; li.appendChild(sw);
+      var rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = String(k + 1); li.appendChild(rk);
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = r.run.name + (r.run.mine ? ' (you)' : ''); li.appendChild(nm);
+      if (r.shortcut) { var sc = document.createElement('span'); sc.className = 'sc'; sc.textContent = 'SHORTCUT \u2212' + r.shortcut.meters + ' m'; li.appendChild(sc); }
+      var rt = document.createElement('span'); rt.className = 'rt';                                           // time (the winner's full time, then the gap) and Watch stay together on the right
+      var tm = document.createElement('span'); tm.className = 'tm'; tm.textContent = k ? '+' + ((r.run.ms - best) / 1000).toFixed(3) : C.fmtTime(r.run.ms); tm.title = C.fmtTime(r.run.ms); rt.appendChild(tm);
+      var wb = document.createElement('button'); wb.type = 'button'; wb.className = 'btn2 ww'; wb.textContent = 'Watch'; wb.setAttribute('aria-label', 'Watch ' + r.run.name + '\u2019s run, ' + C.fmtTime(r.run.ms)); wb.addEventListener('click', function (e) { e.stopPropagation(); closeLines(); $('results').classList.add('hidden'); if (state !== 'menu') toMenu(); startWatch(r.run); }); rt.appendChild(wb); li.appendChild(rt);
+      li.addEventListener('click', function () { var on = LINES.focus === k ? null : k; LINES.focus = on; drawLines(on); renderLinesList(on); });
+      ol.appendChild(li);
+    });
+  }
+  function closeLines() { $('linesSheet').classList.add('hidden'); }
+  function openLines() {
+    if (!online.configured || !track) return; var sh = $('linesSheet'); sh.classList.remove('hidden'); sh.querySelector('.body').scrollTop = 0;
+    $('linesSub').textContent = 'Loading the top 10\u2026'; $('linesList').textContent = ''; $('linesCall').hidden = true;
+    return fetchDayRuns().then(function (dc) {
+      var runs = dc.runs.slice(0, 10); if (runs.length < 2) { $('linesSub').textContent = 'Not enough runs yet today. Come back when more racers have finished.'; LINES = null; return; }
+      var routes = []; runs.forEach(function (run) { try { var r = lineRoute(run); if (r && r.pts.length > 10) { r.run = run; r.shortcut = findShortcut(r); routes.push(r); } } catch (e) { } });
+      LINES = { routes: routes, focus: null }; var sc = routes.filter(function (r) { return r.shortcut; }).sort(function (a, b) { return b.shortcut.meters - a.shortcut.meters; });
+      $('linesSub').textContent = 'The top ' + routes.length + ' routes round today\u2019s course. Tap a racer to follow their line.';
+      var call = $('linesCall'); if (sc.length) { call.hidden = false; call.textContent = 'SHORTCUT: ' + sc[0].run.name + ' skips ' + sc[0].shortcut.meters + ' m of road' + (sc.length > 1 ? ' (' + sc.length + ' racers found one)' : ''); }
+      drawLines(null); renderLinesList(null);
+    }).catch(function () { $('linesSub').textContent = 'Could not load the top 10 right now.'; });
+  }
   /** every player's best verified run today (the server clamps the count), from the public day_runs function */
   function fetchDayRuns() {
     if (dayCache && dayCache.date === raceDate && Date.now() - dayCache.t < 60000) return Promise.resolve(dayCache);
@@ -9619,7 +9728,7 @@ var TGKPages = (function () {
       var k = s.tick + 1, log = c.log;
       while (c.li < log.length && log[c.li][0] <= k) { c.bits = log[c.li][1]; c.li++; }
       c.prev.x = s.x; c.prev.y = s.y; c.prev.z = s.z; c.prev.yaw = s.yaw;
-      s.step(c.bits);
+      s.step(c.bits); finishCoast(s);
     }
     ov.tick++;
   }
@@ -9769,7 +9878,7 @@ var TGKPages = (function () {
   }
   function wireUi() {
     $('startBtn').addEventListener('click', startRace);
-    $('ovAllBtn').addEventListener('click', function () { setOvAll(!ovAll); }); $('allBtn').addEventListener('click', openOverview); $('resAllBtn').addEventListener('click', openOverview);
+    $('ovAllBtn').addEventListener('click', function () { setOvAll(!ovAll); }); $('allBtn').addEventListener('click', openOverview); $('resAllBtn').addEventListener('click', openOverview); $('linesBtn').addEventListener('click', openLines); $('linesClose').addEventListener('click', closeLines); window.addEventListener('keydown', function (e) { if (e.code === 'Escape' && !$('linesSheet').classList.contains('hidden')) { closeLines(); e.stopImmediatePropagation(); e.preventDefault(); } }, true);
     $('ovBack').addEventListener('click', closeOverview); $('ovRestart').addEventListener('click', ovRestart);
     $('ovZin').addEventListener('click', function () { ovZoom(0.7); }); $('ovZout').addEventListener('click', function () { ovZoom(1 / 0.7); });
     $('ovPause').addEventListener('click', function () { if (ov) { ov.paused = !ov.paused; $('ovPause').textContent = ov.paused ? 'Play' : 'Pause'; } });
@@ -9855,7 +9964,7 @@ var TGKPages = (function () {
   window.addEventListener('keydown', function (e) { if (e.code === 'Escape' && document.body.classList.contains('gview')) { setGView(false); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
   function ensureCar() { if (carObj && world && carObj.carId !== curCar()) swapCar(); }
   ensureCar();
-  window.__tgk = { worldLook: function () { return world ? world.look : 0; }, fogNear: function () { return scene.fog ? scene.fog.near : 0; }, setWaterStyle: function (n) { W.setWaterStyle(world, n); }, openShared: openSharedRun, rvSeekFrac: function (f) { return rvSeekFrac(f); }, ghostInfo: function () { return ghost ? { name: ghost.name, ext: !!ghost.ext } : null; }, rv: function () { return rv; }, openReplay: openReplay, rvGoTo: rvGoTo, rvBits: function () { return lastBits; }, tally: function () { return tally; }, ovAll: function () { return ovAll; }, setOvAll: setOvAll, ov: function () { return ov; }, fetchTally: fetchTally, makeCarCode: makeCarCode, loadCarCode: loadCarCode, loadDay: function (d) { loadDaily(d); loadWorld(); sim.reset(); snapshot(); }, gv: garageView, snap: function () { renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); }, syncProfile: syncProfile, profileLocal: profileLocal, gstamp: function () { return gstamp; }, syncState: function () { return syncState; }, setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
+  window.__tgk = { clearDayCache: function () { dayCache = null; attCache = null; }, paintGhost: function (run) { if (!ghostCar) ghostCar = makeGhostCar(normCar(run.car)); paintGhost(run); return ghostCar; }, openLines: openLines, lines: function () { return LINES; }, findShortcut: findShortcut, finishCoast: finishCoast, ghostCar: function () { return ghostCar; }, worldLook: function () { return world ? world.look : 0; }, fogNear: function () { return scene.fog ? scene.fog.near : 0; }, setWaterStyle: function (n) { W.setWaterStyle(world, n); }, openShared: openSharedRun, rvSeekFrac: function (f) { return rvSeekFrac(f); }, ghostInfo: function () { return ghost ? { name: ghost.name, ext: !!ghost.ext } : null; }, rv: function () { return rv; }, openReplay: openReplay, rvGoTo: rvGoTo, rvBits: function () { return lastBits; }, tally: function () { return tally; }, ovAll: function () { return ovAll; }, setOvAll: setOvAll, ov: function () { return ov; }, fetchTally: fetchTally, makeCarCode: makeCarCode, loadCarCode: loadCarCode, loadDay: function (d) { loadDaily(d); loadWorld(); sim.reset(); snapshot(); }, gv: garageView, snap: function () { renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); }, syncProfile: syncProfile, profileLocal: profileLocal, gstamp: function () { return gstamp; }, syncState: function () { return syncState; }, setGView: setGView, camState: function () { return { az: cam.az, el: cam.el, zoom: cam.zoom, zoomT: cam.zoomT, manual: cam.manual }; }, dismissable: openDismissable, pins: function () { return pins; }, coreVersion: function () { return C.version || 'current'; }, notices: function () { return noticeLevel; }, toast: function (m, b, k) { return toast(m, b, k); }, steer: function () { return { mode: steerMode, val: steerVal, bits: steerBitsNow() }; }, setSteerMode: setSteerMode, setCar: function (id) { pickCar(id); }, carId: function () { return carObj && carObj.carId; }, buildCarsPane: buildCarsPane, ach: function () { return ach; }, stats: function () { return stats; }, checkAch: checkAch, garage: function () { return garage; }, car: function () { return carObj; }, setGTab: setGTab, cam: function () { return cam; }, openPage: openPage, pastDate: function () { return pastDate; }, raceDate: function () { return raceDate; }, dayCacheClear: function () { dayCache = null; }, audio: function () { return aud; }, soundLevel: function () { return soundLevel; }, pick: function () { return ghostPick; }, online: function () { return { online: online, auth: auth, loggedIn: loggedIn() }; }, returnFromLogin: function (q) { return handleLoginReturn(q); }, submission: function () { var b = bestRun(); return b ? submissionFor(b) : null; }, persisted: function () { return persisted; }, share: function () { return lastShare; }, ghost: function () { return ghost; }, ghostCar: function () { return ghostCar; }, sim: function () { return sim; }, track: function () { return track; }, state: function () { return state; }, fx: function () { return FX; }, ov: function () { return ov; }, camera: function () { return camera; }, car: function () { return carObj; },
     aerial: function (cx, cy, cz, tx, ty, tz) { camera.near = 0.6; camera.position.set(-cx, cy, cz); camera.lookAt(-tx, ty, tz); camera.updateProjectionMatrix(); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); } };
 })();
 
