@@ -1318,8 +1318,9 @@ var TGKCore = (function () {
   }
 
   /** hint.attempt: the sub-seed that won on an earlier build of this date (server-published in Phase 3, cached in the browser until then) */
+  var GEN_FROM = '2026-12-03';             // from this race day on: every course hides at least one shortcut, dirt trails can carry a pop-jump creek, trail candidates are searched properly. Earlier days are generated exactly as before.
   function generateTrack(raceDate, hint) {
-    var base = 'TGK-DAILY-' + raceDate, lastValid = null;
+    var base = 'TGK-DAILY-' + raceDate, lastValid = null, newgen = typeof raceDate === 'string' && raceDate >= GEN_FROM;
     if (hint && hint.attempt > 0 && hint.attempt < 80) {
       var h = candidate(base + '#' + hint.attempt);
       if (h && validate(h).ok) {
@@ -1328,7 +1329,7 @@ var TGKCore = (function () {
       }
     }
     var wantBiome = BIOMES[hashSeed(base + ':biome') % BIOMES.length];        // the day's biome is decided first, so every biome (mountains and their cliffs included) comes up in turn
-    for (var attempt = 0; attempt < 80; attempt++) {
+    for (var attempt = 0; attempt < (newgen ? 130 : 80); attempt++) {
       var seedStr = attempt === 0 ? base : base + '#' + attempt;
       if (attempt < 30 && biomeOfSeed(seedStr) !== wantBiome) continue;       // skip the wrong biome before doing any work
       var t = candidate(seedStr);
@@ -1338,9 +1339,10 @@ var TGKCore = (function () {
       t.attempt = attempt; t.raceDate = raceDate; t.validation = v;
       prepTrack(t);
       var cands = findShortcutCandidates(t);
-      t.water = []; t.ramps = []; if (!cands.length && !planCuts(t, mulberry32(hashSeed(t.seedStr + ':cutpre'))).length && attempt < 60) continue;      // nothing to hide a shortcut in: do not build this one
+      t.water = []; t.ramps = []; if (!cands.length && !planCuts(t, mulberry32(hashSeed(t.seedStr + ':cutpre')), newgen).length && attempt < (newgen ? 100 : 60)) continue;      // nothing to hide a shortcut in: do not build this one
       buildFeatures(t, cands);
       var cliffy = t.biome === 'mountain' || t.biome === 'canyon';
+      if (newgen) { if (t.shortcutCount > 0 || attempt >= 125) return t; lastValid = t; continue; }       // new rule: keep searching until the course really hides a shortcut
       if (t.shortcutCount > 0 || attempt >= 60 || (cliffy && attempt >= 45)) return t;            // nearly every day hides a shortcut (a rock jump or a dirt trail); cliff days settle for their cliffs after a long search
       lastValid = t;
     }
@@ -1575,7 +1577,61 @@ var TGKCore = (function () {
   }
   /** a hidden dirt trail across the middle of a long loop in the road: shorter than the road, but only for a driver who finds it */
   var CUTP = { minRatio: 1.25, minLen: 38, maxLen: 200, minDs: 130, maxDs: 520, clear: 6, tension: 1.15 };
-  function planCuts(t, rng) {
+
+  /* ---- the pop-jump creek (new-rule days): a creek across the middle of a dirt trail, with a launch rock on its near bank.
+     Drive in and the car drowns; graze the rock fast at a shallow angle and it pops clean over the water. Only a driver who finds the trick takes the trail. ---- */
+  var POP_CREEK = false;                   // the pop-jump creek is built and tested but never produced a drivable course in 60 tries (see notes): off until the generator can place it reliably
+  function planCreeks(t) {
+    var half = t.width / 2, tmp = {}, rng = mulberry32(hashSeed(t.seedStr + ':creek'));
+    (t.cuts || []).forEach(function (cu) {
+      var pts = cu.pts, bestQ = -1, bestTurn = 9, q;
+      for (q = 9; q <= 15; q++) {                                     // the straightest bit between 37% and 62% of the trail (the car must come at the rock in a straight line)
+        var a = pts[q - 3], b = pts[q], d = pts[q + 3], t1x = b[0] - a[0], t1z = b[1] - a[1], t2x = d[0] - b[0], t2z = d[1] - b[1], turn = Math.abs(DM.atan2(t1x * t2z - t1z * t2x, t1x * t2x + t1z * t2z));
+        if (turn < bestTurn) { bestTurn = turn; bestQ = q; }
+      }
+      if (bestQ < 0 || bestTurn > 0.38) return;
+      q = bestQ; var tx = pts[q + 1][0] - pts[q - 1][0], tz = pts[q + 1][1] - pts[q - 1][1], tl = DM.hypot(tx, tz) || 1; tx /= tl; tz /= tl;
+      var rz = 5.2, rx = 24, cx = pts[q][0], cz = pts[q][1], ac = -tz, as = tx, good = true, k, f;
+      for (f = -1.1; f <= 1.1001 && good; f += 0.275) { var px = cx + ac * rx * f, pz = cz + as * rx * f; if (roadDist(t, px, pz, tmp) < half + rz * 1.6 + 9) good = false; }       // the creek never reaches the road
+      for (k = 0; k < t.water.length && good; k++) if (DM.hypot(cx - t.water[k].x, cz - t.water[k].z) < rx * 1.45 + Math.sqrt(t.water[k].R2) + 8) good = false;
+      for (k = 0; k < (t.ramps || []).length && good; k++) { var r = t.ramps[k], lx = r.x + DM.sin(r.yaw) * (r.len + r.Rt), lz = r.z + DM.cos(r.yaw) * (r.len + r.Rt); if (segDist(cx, cz, r.x, r.z, lx, lz) < rx * 1.45 + 14) good = false; }
+      if (!good) return;
+      var w = { x: cx, z: cz, rx: rx, rz: rz, c: ac, s: as, depth: 2.4 + rng() * 0.6, yw: 0, R2: rx * 1.45 * rx * 1.45, popCreek: true };
+      t.water.push(w); cu.pop = { w: w, cx: cx, cz: cz, tx: tx, tz: tz, side: rng() < 0.5 ? -1 : 1 };
+    });
+  }
+  /** a fresh car on the trail's approach (the same start the trail test uses) */
+  function trailSim(t, c) {
+    var s = new Sim(t); s.phase = 'racing'; s.tick = COUNTDOWN_TICKS + 1; s.raceTick = 1;
+    var i0 = Math.max(t.startIdx + 2, c.i - 50), x = t.X[i0], z = t.Z[i0]; s.x = x; s.z = z; s.yaw = DM.atan2(t.TX[i0], t.TZ[i0]); s.u = 34;
+    var sf = groundAt(t, x, z, i0, s.surf); s.y = sf.gy; s.gy = sf.gy; s.idx = i0; s.s = sf.s; s._prevS = s.s; s.lat = sf.lat; s.nextCk = t.checkpoints.length - 1; s.lastCkIdx = i0;
+    return s;
+  }
+  /** the launch rock goes beside the line the car ACTUALLY drives (not the geometric centre line, which the driver cuts), 3.5 m before the water, so it brushes it at a shallow angle (about 25 cm of overlap: the middle of the launching window) */
+  function addPopRocks(t) {
+    var P = t.props; if (!P) return;
+    (t.cuts || []).forEach(function (cu) {
+      if (!cu.pop) return; var p = cu.pop, w = p.w, R = 1.7, off = 0.98 + R - 0.25, back = 3.5, s = trailSim(t, cu), hist = [], entered = false;
+      for (var k = 0; k < 120 * 45; k++) {
+        s.step(cutPilot(s, t, cu)); hist.push([s.x, s.z]);
+        if (s.rolled || s.recoveries || s.damage > 0.25) break;
+        var ex = s.x - w.x, ez = s.z - w.z, u = ex * w.c + ez * w.s, ww = -ex * w.s + ez * w.c;
+        if ((u / w.rx) * (u / w.rx) + (ww / w.rz) * (ww / w.rz) < 1.0) { entered = true; break; }
+      }
+      if (!entered) { p.noRock = true; return; }
+      var m = hist.length - 1, dist = 0; while (m > 4 && dist < back) { dist += DM.hypot(hist[m][0] - hist[m - 1][0], hist[m][1] - hist[m - 1][1]); m--; }
+      var hx = hist[m + 4][0] - hist[m][0], hz = hist[m + 4][1] - hist[m][1], hl = DM.hypot(hx, hz) || 1; hx /= hl; hz /= hl;
+      var x = hist[m][0] + (-hz) * p.side * off, z = hist[m][1] + hx * p.side * off, n = P.n++;
+      P.x.push(x); P.z.push(z); P.r.push(R); P.kind.push(1); P.sc.push(1); P.rot.push(0.7); P.y.push(terrainH(t, x, z)); P.h.push(R);
+      var key = Math.floor(x / PCELL) + ',' + Math.floor(z / PCELL); (P.grid[key] || (P.grid[key] = [])).push(n); p.rock = { n: n, x: x, z: z, r: R };
+    });
+  }
+  function dropCreek(t, cu) {                                          // the jump could not be driven: take the creek (and its rock) away and fall back to the plain trail
+    var p = cu.pop; if (!p) return; var i = t.water.indexOf(p.w); if (i >= 0) t.water.splice(i, 1);
+    if (p.rock && t.props) { var n = p.rock.n; t.props.r[n] = 0.001; t.props.h[n] = -100; }          // collides with nothing, draws as nothing
+    delete cu.pop;
+  }
+  function planCuts(t, rng, more) {
     var half = t.width / 2, fi = t.finishIdx, all = [], tmp = {}, maxLen = Math.round(CUTP.maxDs / DS), minLen = Math.round(CUTP.minDs / DS);
     for (var i = t.startIdx + 45; i < fi - 90; i += 3) {
       for (var j = i + minLen; j <= Math.min(fi - 40, i + maxLen); j += 3) {
@@ -1591,13 +1647,14 @@ var TGKCore = (function () {
         for (q = 8; q <= 16 && ok; q++) if (roadDist(t, pts[q][0], pts[q][1], tmp) < half + CUTP.clear) ok = false;       // the middle stays clear of the road (the ends hug it, so a car can turn on and off)
         for (q = 0; q < t.water.length && ok; q++) { var wp = t.water[q]; for (var f = 0; f <= 24 && ok; f += 2) { var wu = (pts[f][0] - wp.x) * wp.c + (pts[f][1] - wp.z) * wp.s, ww = -(pts[f][0] - wp.x) * wp.s + (pts[f][1] - wp.z) * wp.c; if ((wu / (wp.rx + 10)) * (wu / (wp.rx + 10)) + (ww / (wp.rz + 10)) * (ww / (wp.rz + 10)) < 1) ok = false; } }
         for (q = 0; q < (t.ramps || []).length && ok; q++) if (i < t.ramps[q].j + 40 && j > t.ramps[q].i - 40) ok = false;
+        if (ok && more) { var far = 0; for (q = 0; q <= 24; q += 2) far = Math.max(far, roadDist(t, pts[q][0], pts[q][1], tmp)); if (far > 105) ok = false; }       // a trail that strays towards the 140 m out-of-bounds limit can never be driven: do not offer it
         if (!ok) continue;
         all.push({ i: i, j: j, pts: pts, cum: cum, len: len, w: 6.5, ya: t.Y[i], yb: t.Y[j], dS: dS, score: dS / len + dS * 0.004 });
       }
     }
     all.sort(function (a, b) { return b.score - a.score; });
-    var out = [], want = rng() < 0.35 ? 2 : 1;
-    for (var n = 0; n < all.length && out.length < want; n++) { var cd = all[n], fine = true; for (var mm = 0; mm < out.length; mm++) if (cd.i < out[mm].j + 60 && cd.j > out[mm].i - 60) fine = false; if (fine) out.push(cd); }
+    var out = [], want = rng() < 0.35 ? 2 : 1; out.want = want;
+    for (var n = 0; n < all.length && out.length < (more ? 4 : want); n++) { var cd = all[n], fine = true; for (var mm = 0; mm < out.length; mm++) if (cd.i < out[mm].j + 60 && cd.j > out[mm].i - 60) fine = false; if (fine) out.push(cd); }
     return out;
   }
   function cutPilot(s, t, c) {
@@ -1616,11 +1673,11 @@ var TGKCore = (function () {
       var s = new Sim(t); s.phase = 'racing'; s.tick = COUNTDOWN_TICKS + 1; s.raceTick = 1;
       var i0 = Math.max(t.startIdx + 2, c.i - 50), x = t.X[i0], z = t.Z[i0]; s.x = x; s.z = z; s.yaw = DM.atan2(t.TX[i0], t.TZ[i0]); s.u = 34;
       var sf = groundAt(t, x, z, i0, s.surf); s.y = sf.gy; s.gy = sf.gy; s.idx = i0; s.s = sf.s; s._prevS = s.s; s.lat = sf.lat; s.nextCk = t.checkpoints.length - 1; s.lastCkIdx = i0;
-      var target = t.S[c.j] + 70, t0 = s.raceTick;
+      var target = t.S[c.j] + 70, t0 = s.raceTick, popped = false, wetMax = 0, needPop = useCut && !!c.pop;
       for (var k = 0; k < 120 * 45; k++) {
-        s.step(useCut ? cutPilot(s, t, c) : strongPilot(s, t));
+        var ev = s.step(useCut ? cutPilot(s, t, c) : strongPilot(s, t)); if (ev.pop > 0) popped = true; if (s.wet > wetMax) wetMax = s.wet;
         if (s.rolled || s.recoveries || s.damage > 0.25) return -1;
-        if (s.s >= target && s.grounded && s.idx > c.j) return (s.raceTick - t0) * DT;
+        if (s.s >= target && s.grounded && s.idx > c.j) return (needPop && (!popped || wetMax > 0.3)) ? -1 : (s.raceTick - t0) * DT;
       }
       return -1;
     }
@@ -1844,9 +1901,9 @@ var TGKCore = (function () {
       var yaw = DM.atan2(qx - ox, qz - oz), len = 10, lipD = DM.hypot(qx - ox, qz - oz) - len;
       return { i: c.i, j: c.j, x: ox, z: oz, yaw: yaw, len: len, wid: 8.4, H: 2, baseY: 0, dS: c.dS, Rt: lipD, D0: c.D0 };
     });
-    t.water = []; planPonds(t, rng); t.cuts = planCuts(t, rng); planCliffs(t, rng);
+    var ng = typeof t.raceDate === 'string' && t.raceDate >= GEN_FROM; t.water = []; planPonds(t, rng); t.cuts = planCuts(t, rng, ng); if (ng && POP_CREEK) planCreeks(t); planCliffs(t, rng);
     buildTerrain(t);
-    buildProps(t, rng);
+    buildProps(t, rng); if (ng && POP_CREEK) addPopRocks(t);
     t.designLog = []; t.ramps = t.ramps.filter(function (r) { var ok = designRamp(t, r); t.designLog.push(ok ? 'ok' : r.fail); return ok; });
     t.baseCheckpoints = t.checkpoints.slice();
     for (var pass = 0; pass < 3 && t.ramps.length; pass++) {
@@ -1861,7 +1918,15 @@ var TGKCore = (function () {
     var cutsBefore = t.cuts.length;
     t.cutLog = [];
     t.cutsRejected = [];
-    t.cuts = t.cuts.filter(function (cc) { cc.gain = cutGain(t, cc); t.cutLog.push(+cc.gain.toFixed(2)); var keep = cc.gain >= MIN_GAIN && cc.gain <= MAX_GAIN; if (!keep) t.cutsRejected.push(cc); return keep; });
+    if (ng) { var wantN = t.cuts.want || 1, kept = [], dropped = false;
+      t.cuts.forEach(function (cc) {
+        if (kept.length >= wantN) { dropCreek(t, cc); dropped = true; t.cutsRejected.push(cc); return; }
+        cc.gain = cutGain(t, cc); t.cutLog.push(+cc.gain.toFixed(2));
+        if (!(cc.gain >= MIN_GAIN && cc.gain <= MAX_GAIN) && cc.pop) { dropCreek(t, cc); dropped = true; buildTerrain(t); cc.gain = cutGain(t, cc); t.cutLog.push(+cc.gain.toFixed(2)); }     // no clean pop: fall back to the plain trail
+        if (cc.gain >= MIN_GAIN && cc.gain <= MAX_GAIN) kept.push(cc); else { dropCreek(t, cc); dropped = true; t.cutsRejected.push(cc); }
+      });
+      t.cuts = kept; if (dropped) cutsBefore = -1;
+    } else t.cuts = t.cuts.filter(function (cc) { cc.gain = cutGain(t, cc); t.cutLog.push(+cc.gain.toFixed(2)); var keep = cc.gain >= MIN_GAIN && cc.gain <= MAX_GAIN; if (!keep) t.cutsRejected.push(cc); return keep; });
     if (t.cuts.length !== cutsBefore) buildTerrain(t);
     t.checkpoints = t.baseCheckpoints.slice(); if (t.ramps.length || t.cuts.length) adjustGates(t);      // gates stay out of every shortcut, on trail-only days too
     t.shortcutCount = t.ramps.length + t.cuts.length;
@@ -2036,6 +2101,7 @@ var TGKCore = (function () {
     var prevGy = this.gy;
     var sf = groundAt(t, this.x, this.z, this.idx, this.surf);
     var wd = (t.water && t.water.length) ? waterDepthAt(t, this.x, this.z) : 0;
+    if (wd > 0 && !this.grounded && this.y > _wy + 0.45) wd = 0;          // (v28) a car flying over the water is not in it: no splash, no drag, no drowning while it is clear above the surface
     if (wd > 0.95) sf.gy = Math.max(sf.gy, _wy - 0.5);          // deep water: the car floats
     var gv = (sf.gy - prevGy) / dt; if (!isFinite(gv) || Math.abs(gv) > 40) gv = 0;
     this.gy = sf.gy;
@@ -2119,8 +2185,8 @@ var TGKCore = (function () {
     this.rollRate = dirL * clamp(3.2 + Math.abs(this.leanV) * 1.0 + au * 0.04, 3.5, 8);
     this.vy += 2.4; this.grounded = false; this.airTicks = 0; ev.rolled = true;
   };
-  /* rock launch (v27): a rock met at a glancing angle lifts the car off the ground, like riding up its face, and does not hurt it; a steeper or harder hit is exactly as before */
-  var ROCK_POP_MAX_HIT = 16, ROCK_POP_ANGLE = 0.58, ROCK_POP_MIN_V = 12, ROCK_POP_K = 0.22, ROCK_POP_MIN_LIFT = 2.0, ROCK_POP_MAX_LIFT = 8.5, ROCK_POP_COOLDOWN = 120;      // glancing = meeting the rock at under ~30 degrees to its face (impact/along-speed <= 0.58), fast, and not a hard hit
+  /* rock launch (v27, made to really launch in v28): a rock met at a glancing angle lifts the car off the ground, like riding up its face, and does not hurt it; a steeper or harder hit is exactly as before */
+  var ROCK_POP_MAX_HIT = 16, ROCK_POP_ANGLE = 0.58, ROCK_POP_MIN_V = 12, ROCK_POP_K = 0.22, ROCK_POP_MIN_LIFT = 3.5, ROCK_POP_MAX_LIFT = 8.5, ROCK_POP_COOLDOWN = 120;      // glancing = meeting the rock at under ~30 degrees to its face (impact/along-speed <= 0.58), fast, and not a hard hit
   var CIRC = [1.8, 0.45, -0.95, -2.15];         // four contact circles down the length of the car (offsets from the centre of gravity)
   /** trees and rocks: solid. Push the car out, bounce it, spin it, dent it. Deterministic like everything else. */
   Sim.prototype.collide = function (t, ev) {
@@ -2169,7 +2235,7 @@ var TGKCore = (function () {
     }
     if (pop && hit <= ROCK_POP_MAX_HIT && this.grounded && !this.rolled && this.rockCd === 0 && pop.vt >= ROCK_POP_MIN_V) {
       var lift = clamp(ROCK_POP_K * pop.vt, ROCK_POP_MIN_LIFT, ROCK_POP_MAX_LIFT) * (1 - 0.35 * pop.imp / ROCK_POP_MAX_HIT);
-      this.vy += lift; this.grounded = false; this.airTicks = 0; this.rockCd = ROCK_POP_COOLDOWN; ev.pop = lift;
+      this.vy += lift; this.y = Math.max(this.y, this.gy + 0.25); this.grounded = false; this.airTicks = 0; this.rockCd = ROCK_POP_COOLDOWN; ev.pop = lift;       // (v28) lift the car clear of the ground check, or the next tick lands it again and the launch is wiped out
     }
   };
 
@@ -2251,7 +2317,7 @@ var TGKCore = (function () {
 
   return {
     DM: DM, canary: canary, DT: DT, CAR: CAR, DS: DS, OOB: OOB, GATE_SLACK: GATE_SLACK, COUNTDOWN_TICKS: COUNTDOWN_TICKS,
-    version: 'v27',
+    version: 'v28',
     BITS: { THR: B_THR, BRK: B_BRK, LEFT: B_LEFT, RIGHT: B_RIGHT, HB: B_HB, RECOVER: B_RECOVER },
     hashSeed: hashSeed, mulberry32: mulberry32, smoothstep: smoothstep, clamp: clamp,
     generateTrack: generateTrack, finalizeTrack: finalizeTrack, validateTrack: validate, nearest: nearest, surface: surface, groundAt: groundAt, terrainH: terrainH, rampY: rampY, waterDepthAt: waterDepthAt, cutDist: cutDist, PCELL: PCELL, launchTest: launchTest,
@@ -3451,16 +3517,1212 @@ var TGKCore = (function () {
 if (typeof module !== 'undefined') module.exports = TGKCore;
 
  return TGKCore; })();
+var TGKCoreV27 = (function () { var module = undefined; /* TGK DAILY RACE - simulation core
+ * Pure JS, no DOM, no Three.js. This exact file is meant to run in the browser AND
+ * (Phase 5) in a Supabase Edge Function to re-simulate recorded inputs.
+ * Everything here is deterministic for a given (seed, input log).
+ */
+var TGKCore = (function () {
+  'use strict';
+
+
+  /* ---------------- deterministic math ----------------
+     JavaScript lets every engine compute DM.sin / cos / atan2 / pow / exp / hypot with its own last-digit rounding, so a phone's Safari and the
+     verifying server could drift apart over a 50 s run (and a crash can then resolve differently). Everything the simulation and the track
+     generator need is rebuilt here from + - * / and sqrt only, which IEEE-754 pins to the exact same bits in every engine (JS forbids fused
+     multiply-add). Accuracy is about 1e-16: far better than a game needs; the point is that it is IDENTICAL everywhere. */
+  var DM = (function () {
+    var PI = Math.PI, HALF_PI = PI / 2, TWO_OVER_PI = 2 / PI;
+    var PA = Math.round(HALF_PI * 1048576) / 1048576, PB = HALF_PI - PA, PT = 6.123233995736766e-17;      // pi/2 = PA + PB + PT (PA, PB short enough that k*PA, k*PB are exact)
+    var LN2_HI = 6.93147180369123816490e-01, LN2_LO = 1.90821492927058770002e-10, LOG2E = 1.4426950408889634;
+    var SIN_C = [], COS_C = [], i, f = 1;
+    for (i = 1; i <= 23; i++) { f *= i; if (i % 2 === 1) SIN_C[(i - 1) / 2] = ((i - 1) / 2 % 2 === 0 ? 1 : -1) / f; else COS_C[i / 2] = (i / 2 % 2 === 0 ? 1 : -1) / f; }
+    COS_C[0] = 1;
+    function sinK(r) { var r2 = r * r, p = SIN_C[11]; for (var n = 10; n >= 0; n--) p = p * r2 + SIN_C[n]; return r * p; }
+    function cosK(r) { var r2 = r * r, p = COS_C[11]; for (var n = 10; n >= 0; n--) p = p * r2 + COS_C[n]; return p; }
+    function reduce(x) {                                         // x = k*(pi/2) + r with |r| <= ~pi/4
+      if (x > 1e5 || x < -1e5) x = x - 6.283185307179586 * Math.floor(x / 6.283185307179586);
+      var k = Math.round(x * TWO_OVER_PI), r = x - k * PA; r = r - k * PB; r = r - k * PT;
+      return { k: k, r: r };
+    }
+    function sin(x) { var q = reduce(x), n = ((q.k % 4) + 4) % 4; return n === 0 ? sinK(q.r) : n === 1 ? cosK(q.r) : n === 2 ? -sinK(q.r) : -cosK(q.r); }
+    function cos(x) { var q = reduce(x), n = ((q.k % 4) + 4) % 4; return n === 0 ? cosK(q.r) : n === 1 ? -sinK(q.r) : n === 2 ? -cosK(q.r) : sinK(q.r); }
+    var ATAN_C = []; for (i = 0; i <= 14; i++) ATAN_C[i] = (i % 2 === 0 ? 1 : -1) / (2 * i + 1);
+    function atanK(t) { var t2 = t * t, p = ATAN_C[14]; for (var n = 13; n >= 0; n--) p = p * t2 + ATAN_C[n]; return t * p; }
+    function atan(x) {
+      var neg = x < 0, a = neg ? -x : x, inv = a > 1; if (inv) a = 1 / a;
+      a = a / (1 + Math.sqrt(1 + a * a)); a = a / (1 + Math.sqrt(1 + a * a));       // atan(x) = 4 * atan(x / (1 + sqrt(1+x^2)) applied twice)
+      var r = 4 * atanK(a); if (inv) r = HALF_PI - r;
+      return neg ? -r : r;
+    }
+    function atan2(y, x) {
+      if (x === 0 && y === 0) return 0;
+      var ax = x < 0 ? -x : x, ay = y < 0 ? -y : y, a;
+      if (ax >= ay) { a = atan(ay / ax); if (x < 0) a = PI - a; } else { a = HALF_PI - atan(ax / ay); if (x < 0) a = PI - a; }
+      return y < 0 ? -a : a;
+    }
+    function pow2(k) { var p = 1, b = k >= 0 ? 2 : 0.5, n = k >= 0 ? k : -k; while (n > 0) { if (n & 1) p *= b; b *= b; n = n >> 1; } return p; }
+    var EXP_C = []; f = 1; EXP_C[0] = 1; for (i = 1; i <= 18; i++) { f *= i; EXP_C[i] = 1 / f; }
+    function exp(x) {
+      if (x < -700) return 0; if (x > 700) return Infinity;
+      var k = Math.round(x * LOG2E), r = (x - k * LN2_HI) - k * LN2_LO, p = EXP_C[18];
+      for (var n = 17; n >= 0; n--) p = p * r + EXP_C[n];
+      return p * pow2(k);
+    }
+    function log(x) {
+      if (!(x > 0)) return x === 0 ? -Infinity : NaN;
+      var e = 0, m = x; while (m >= 2) { m *= 0.5; e++; } while (m < 1) { m *= 2; e--; }
+      if (m > 1.4142135623730951) { m *= 0.5; e++; }
+      var z = (m - 1) / (m + 1), z2 = z * z, p = 1 / 23; for (var n = 10; n >= 0; n--) p = p * z2 + 1 / (2 * n + 1);
+      return (e * LN2_HI) + ((e * LN2_LO) + 2 * z * p);
+    }
+    function pow(x, y) {                                          // x >= 0 only (all the sim ever needs)
+      if (y === 0) return 1; if (x === 0) return 0; if (y === 1) return x; if (y === 2) return x * x; if (y === 0.5) return Math.sqrt(x); if (y === 1.5) return x * Math.sqrt(x);
+      return exp(y * log(x));
+    }
+    function hypot(a, b) { return Math.sqrt(a * a + b * b); }
+    return { sin: sin, cos: cos, atan: atan, atan2: atan2, exp: exp, log: log, pow: pow, hypot: hypot };
+  })();
+
+  /* ---------------- seeded PRNG ---------------- */
+  function hashSeed(str) {            // xmur3-style string hash -> uint32
+    var h = 1779033703 ^ str.length;
+    for (var i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return (h ^ (h >>> 16)) >>> 0;
+  }
+  function mulberry32(a) {
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function smoothstep(a, b, x) { var t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+  function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
+
+  /* ---------------- ONE vehicle configuration (identical for every player) ---------------- */
+  var DT = 1 / 120;
+  var CAR = Object.freeze({
+    wheelbase: 2.91, a1: 1.34, a2: 1.57,   // CG to front / rear axle
+    frontShare: 0.54,                      // static front weight share
+    cgHeight: 0.55,
+    kz: 2.4,                               // yaw inertia / mass
+    vMax: 67, engine: 9.6, tractionLaunch: 8.6,
+    brake: 21, reverseAcc: 4.5, vReverse: 11,
+    grip: 18.5,                            // peak lateral acceleration (m/s^2)
+    rollRes: 0.5, engineBrake: 1.3, drag: 0.0006,
+    steerMax: 0.52, steerMin: 0.03, steerSpeed: 11,
+    handbrakeRear: 0.26, handbrakeDecel: 3.0,
+    halfWidth: 0.95, length: 4.94
+  });
+
+  /* ---------------- track generation ---------------- */
+  var BIOMES = ['forest', 'desert', 'mountain', 'canyon', 'countryside', 'industrial'];
+  var BIOME_ELEV = { forest: 1.0, desert: 0.55, mountain: 1.9, canyon: 1.3, countryside: 0.8, industrial: 0.25 };
+  var DS = 3; // metres between track samples
+
+  /** the biome of a candidate is its very first random draw, so it can be known without building the road */
+  function biomeOfSeed(seedStr) { return BIOMES[Math.floor(mulberry32(hashSeed(seedStr))() * BIOMES.length)]; }
+  function candidate(seedStr) {
+    var rng = mulberry32(hashSeed(seedStr));
+    var biome = BIOMES[Math.floor(rng() * BIOMES.length)];
+    var width = 13 + rng() * 5;
+    var targetLen = 1200 + rng() * 600;
+    var runout = 120;
+    var X = [0], Z = [0], K = [0], head = 0;
+    var x = 0, z = 0;
+    var grid = {}, CELL = 40;
+    function key(cx, cz) { return cx + ',' + cz; }
+    function gridAdd(i) {
+      var k = key(Math.floor(X[i] / CELL), Math.floor(Z[i] / CELL));
+      (grid[k] || (grid[k] = [])).push(i);
+    }
+    function gridRemove(i) {
+      var k = key(Math.floor(X[i] / CELL), Math.floor(Z[i] / CELL));
+      var a = grid[k]; if (a) a.pop();
+    }
+    var minSep = width * 1.9 + 10;           // centreline separation for non-adjacent road
+    var minSepIdx = Math.ceil(160 / DS);     // "adjacent" = within 160 m of arc length
+    function overlaps(i) {
+      var cx = Math.floor(X[i] / CELL), cz = Math.floor(Z[i] / CELL);
+      for (var a = -2; a <= 2; a++) for (var b = -2; b <= 2; b++) {
+        var cell = grid[key(cx + a, cz + b)]; if (!cell) continue;
+        for (var q = 0; q < cell.length; q++) {
+          var j = cell[q];
+          if (i - j < minSepIdx) continue;
+          var dx = X[i] - X[j], dz = Z[i] - Z[j];
+          if (dx * dx + dz * dz < minSep * minSep) return true;
+        }
+      }
+      return false;
+    }
+    gridAdd(0);
+    var lastDir = rng() < 0.5 ? -1 : 1;
+    var total = 0, guard = 0, fails = 0;
+    var segLog = [];
+
+    function makeSeg() {
+      var r = rng(), type, len, kmax, dir;
+      dir = rng() < 0.6 ? -lastDir : lastDir;
+      if (r < 0.24) { type = 'straight'; len = 70 + rng() * 260; kmax = 0; }
+      else if (r < 0.68) { type = 'corner'; var R = 38 + rng() * 150, th = (25 + rng() * 85) * Math.PI / 180; len = th * R / 0.75; kmax = dir / R; }
+      else if (r < 0.86) { type = 'chicane'; var R2 = 45 + rng() * 45, th2 = (18 + rng() * 14) * Math.PI / 180; len = th2 * R2 / 0.75; kmax = dir / R2; }
+      else if (r < 0.93) { type = 'hairpin'; var R3 = 26 + rng() * 10, th3 = (140 + rng() * 40) * Math.PI / 180; len = th3 * R3 / 0.75; kmax = dir / R3; }
+      else { type = 'sweeper'; var R4 = 140 + rng() * 160, th4 = (30 + rng() * 40) * Math.PI / 180; len = th4 * R4 / 0.75; kmax = dir / R4; }
+      return { type: type, len: len, kmax: kmax, dir: dir };
+    }
+
+    var needLen = targetLen + runout;
+    while (total < needLen && guard++ < 400) {
+      var seg = makeSeg();
+      var segs = seg.type === 'chicane' ? [seg, { type: 'chicane', len: seg.len, kmax: -seg.kmax, dir: -seg.dir }] : [seg];
+      var startN = X.length, startHead = head, sx = x, sz = z, ok = true;
+      for (var si = 0; si < segs.length && ok; si++) {
+        var sg = segs[si], n = Math.max(2, Math.round(sg.len / DS));
+        for (var s = 0; s < n; s++) {
+          var t = (s + 0.5) / n, ramp = 0.25;
+          var prof = t < ramp ? t / ramp : (t > 1 - ramp ? (1 - t) / ramp : 1);
+          prof = prof * prof * (3 - 2 * prof);
+          var k = sg.kmax * prof;
+          head += k * DS;
+          x += DM.sin(head) * DS; z += DM.cos(head) * DS;
+          X.push(x); Z.push(z); K.push(k);
+          gridAdd(X.length - 1);
+          if (overlaps(X.length - 1)) { ok = false; break; }
+        }
+      }
+      if (!ok) {                       // rewind this segment, deterministic RNG moves on
+        while (X.length > startN) { gridRemove(X.length - 1); X.pop(); Z.pop(); K.pop(); }
+        head = startHead; x = sx; z = sz; fails++;
+        if (fails > 60) return null;
+        continue;
+      }
+      total = (X.length - 1) * DS;
+      lastDir = seg.dir > 0 ? 1 : -1;
+      segLog.push(seg.type);
+    }
+    if (total < needLen) return null;
+
+    var N = X.length;
+    // headings from consecutive points
+    var TX = new Array(N), TZ = new Array(N), S = new Array(N);
+    for (var i = 0; i < N; i++) {
+      var i0 = Math.max(0, i - 1), i1 = Math.min(N - 1, i + 1);
+      var dx = X[i1] - X[i0], dz = Z[i1] - Z[i0], l = DM.hypot(dx, dz);
+      TX[i] = dx / l; TZ[i] = dz / l; S[i] = i * DS;
+    }
+    // elevation
+    var em = BIOME_ELEV[biome];
+    var A1 = rng() * 8 * em, W1 = 600 + rng() * 600, P1 = rng() * 6.283;
+    var A2 = rng() * 4 * em, W2 = 250 + rng() * 250, P2 = rng() * 6.283;
+    var A3 = rng() * 0.9 * em, W3 = 120 + rng() * 90, P3 = rng() * 6.283;
+    var Y = new Array(N), maxSlope = 0;
+    function elev(s) {
+      var ramp = smoothstep(0, 120, s);
+      return ramp * (A1 * DM.sin(s / W1 * 6.283 + P1) + A2 * DM.sin(s / W2 * 6.283 + P2) + A3 * DM.sin(s / W3 * 6.283 + P3));
+    }
+    for (var j = 0; j < N; j++) Y[j] = elev(S[j]);
+    for (var m = 1; m < N; m++) maxSlope = Math.max(maxSlope, Math.abs(Y[m] - Y[m - 1]) / DS);
+    if (maxSlope > 0.13) { var f = 0.12 / maxSlope; for (var q2 = 0; q2 < N; q2++) Y[q2] *= f; maxSlope = 0.12; }
+
+    // checkpoints + finish
+    var finishIdx = N - 1 - Math.round(runout / DS);
+    var nCk = Math.max(3, Math.round((finishIdx * DS) / 300));
+    var checkpoints = [];
+    for (var c = 1; c <= nCk; c++) checkpoints.push(Math.round(finishIdx * c / (nCk + 1)));
+    checkpoints.push(finishIdx);            // last gate is the finish line
+    var names = { forest: 'Pine Ridge', desert: 'Dry Wash', mountain: 'Summit Pass', canyon: 'Red Canyon', countryside: 'Hedgerow Road', industrial: 'Foundry District' };
+    return {
+      seedStr: seedStr, biome: biome, name: names[biome], width: width, N: N, ds: DS,
+      X: X, Z: Z, Y: Y, TX: TX, TZ: TZ, S: S, K: K,
+      length: S[finishIdx], totalLength: S[N - 1], finishIdx: finishIdx,
+      checkpoints: checkpoints, maxSlope: maxSlope, segments: segLog,
+      startIdx: 5, rngState: rng()
+    };
+  }
+
+  function validate(t) {
+    var errs = [], N = t.N, minR = 1e9;
+    for (var i = 1; i < N; i++) {
+      var d = DM.hypot(t.X[i] - t.X[i - 1], t.Z[i] - t.Z[i - 1]);
+      if (Math.abs(d - DS) > 0.01) { errs.push('gap@' + i); break; }
+    }
+    for (var j = 1; j < N; j++) { var k = Math.abs(t.K[j]); if (k > 1e-6) minR = Math.min(minR, 1 / k); }
+    if (minR < Math.max(24, t.width * 1.3)) errs.push('radius ' + minR.toFixed(1));
+    if (t.maxSlope > 0.13) errs.push('slope');
+    for (var c = 1; c < t.checkpoints.length; c++) if (t.checkpoints[c] <= t.checkpoints[c - 1]) errs.push('ckpt order');
+    if (t.checkpoints[t.checkpoints.length - 1] !== t.finishIdx) errs.push('finish');
+    // independent overlap re-check (brute force on a stride)
+    var sep = t.width * 1.9 + 10, idxGap = Math.ceil(160 / DS);
+    outer: for (var a = 0; a < N; a += 2) for (var b = a + idxGap; b < N; b += 2) {
+      var dx = t.X[a] - t.X[b], dz = t.Z[a] - t.Z[b];
+      if (dx * dx + dz * dz < (sep - 2) * (sep - 2)) { errs.push('overlap ' + a + '/' + b); break outer; }
+    }
+    return { ok: errs.length === 0, errors: errs, minRadius: minR };
+  }
+
+  /** hint.attempt: the sub-seed that won on an earlier build of this date (server-published in Phase 3, cached in the browser until then) */
+  function generateTrack(raceDate, hint) {
+    var base = 'TGK-DAILY-' + raceDate, lastValid = null;
+    if (hint && hint.attempt > 0 && hint.attempt < 80) {
+      var h = candidate(base + '#' + hint.attempt);
+      if (h && validate(h).ok) {
+        h.attempt = hint.attempt; h.raceDate = raceDate; h.validation = validate(h); prepTrack(h);
+        var hc = findShortcutCandidates(h); buildFeatures(h, hc); if (h.shortcutCount > 0) return h;
+      }
+    }
+    var wantBiome = BIOMES[hashSeed(base + ':biome') % BIOMES.length];        // the day's biome is decided first, so every biome (mountains and their cliffs included) comes up in turn
+    for (var attempt = 0; attempt < 80; attempt++) {
+      var seedStr = attempt === 0 ? base : base + '#' + attempt;
+      if (attempt < 30 && biomeOfSeed(seedStr) !== wantBiome) continue;       // skip the wrong biome before doing any work
+      var t = candidate(seedStr);
+      if (!t) continue;
+      var v = validate(t);
+      if (!v.ok) continue;
+      t.attempt = attempt; t.raceDate = raceDate; t.validation = v;
+      prepTrack(t);
+      var cands = findShortcutCandidates(t);
+      t.water = []; t.ramps = []; if (!cands.length && !planCuts(t, mulberry32(hashSeed(t.seedStr + ':cutpre'))).length && attempt < 60) continue;      // nothing to hide a shortcut in: do not build this one
+      buildFeatures(t, cands);
+      var cliffy = t.biome === 'mountain' || t.biome === 'canyon';
+      if (t.shortcutCount > 0 || attempt >= 60 || (cliffy && attempt >= 45)) return t;            // nearly every day hides a shortcut (a rock jump or a dirt trail); cliff days settle for their cliffs after a long search
+      lastValid = t;
+    }
+    if (lastValid) return lastValid;
+    throw new Error('track generation failed for ' + raceDate);
+  }
+
+  function prepTrack(t) {
+    // spatial hash for fast nearest queries (used by terrain + sim fallback)
+    var CELL = 60, g = {};
+    for (var i = 0; i < t.N; i++) {
+      var k = (Math.floor(t.X[i] / CELL) + 4096) * 8192 + (Math.floor(t.Z[i] / CELL) + 4096);      // numeric key: same cells, much faster than building a string for every lookup
+      (g[k] || (g[k] = [])).push(i);
+    }
+    t.hash = g; t.hashCell = CELL;
+    var x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+    for (var j = 0; j < t.N; j++) { x0 = Math.min(x0, t.X[j]); x1 = Math.max(x1, t.X[j]); z0 = Math.min(z0, t.Z[j]); z1 = Math.max(z1, t.Z[j]); }
+    t.bbox = { x0: x0, x1: x1, z0: z0, z1: z1 };
+  }
+  /** plain track (tests, synthetic roads): hash + bbox + terrain, no rocks / ponds / ramps */
+  function finalizeTrack(t) { prepTrack(t); if (!t.water) t.water = []; if (!t.ramps) t.ramps = []; buildTerrain(t); }
+
+  /* ---------------- terrain (deterministic, shared by physics and renderer) ---------------- */
+  var BIOME_RELIEF = { forest: 9, desert: 6, mountain: 34, canyon: 22, countryside: 6, industrial: 1.5 };
+  var TCELL = 12, TMARGIN = 170;
+  var _pt = {};
+  function buildTerrain(t) {
+    var rng = mulberry32(hashSeed(t.seedStr + ':terrain'));
+    var p1 = rng() * 6.2832, p2 = rng() * 6.2832, p3 = rng() * 6.2832;
+    var rel = BIOME_RELIEF[t.biome] || 1.5, half = t.width / 2, bb = t.bbox;
+    var x0 = bb.x0 - TMARGIN, z0 = bb.z0 - TMARGIN;
+    var nx = Math.ceil((bb.x1 - bb.x0 + 2 * TMARGIN) / TCELL) + 1, nz = Math.ceil((bb.z1 - bb.z0 + 2 * TMARGIN) / TCELL) + 1;
+    var H = new Float32Array(nx * nz), tmp = {}, cliffs = t.cliffs || [];
+    for (var j = 0; j < nz; j++) for (var i = 0; i < nx; i++) {
+      var x = x0 + i * TCELL, z = z0 + j * TCELL;
+      var sf = surface(t, x, z, undefined, tmp), d = DM.hypot(x - t.X[sf.idx], z - t.Z[sf.idx]);
+      var n = DM.sin(x * 0.0042 + p1) * DM.cos(z * 0.0036 + p2) + 0.5 * DM.sin(x * 0.011 + z * 0.009 + p3) + 0.25 * DM.sin(x * 0.027 - z * 0.023 + p1);
+      var far = n * rel * 0.55 + (rel > 15 ? rel * 0.25 + sf.y * 0.4 : 0);
+      var w = smoothstep(half + 4, half + 70, d);
+      var road = sf.y - 0.12 * (1 - smoothstep(half, half + 3, d));
+      var hh = road * (1 - w) + far * w;
+      for (var ck = 0; ck < cliffs.length; ck++) {
+        var cl = cliffs[ck]; if (sf.idx < cl.i0 - 6 || sf.idx > cl.i1 + 6 || sf.lat * cl.side <= 0) continue;
+        var cu = Math.abs(sf.lat) - half, ce = smoothstep(cl.i0, cl.i0 + 14, sf.idx) * (1 - smoothstep(cl.i1 - 14, cl.i1, sf.idx)); if (ce <= 0) continue;
+        hh = Math.min(hh, sf.y - 0.12 - cl.depth * smoothstep(cl.shoulder, cl.shoulder + cl.face, cu) * ce);
+      }
+      H[j * nx + i] = hh;
+    }
+    t.terrain = { x0: x0, z0: z0, cell: TCELL, nx: nx, nz: nz, H: H };
+    var ramps = t.ramps || [], ponds = t.water || [], cuts = t.cuts || [], k;
+    // ramp platforms: level the ground around each launch rock so the approach is smooth
+    for (k = 0; k < ramps.length; k++) ramps[k].baseY = terrainH(t, ramps[k].x, ramps[k].z);
+    // water level of each pond = the lowest point of its shore, so the bank always stays dry
+    for (k = 0; k < ponds.length; k++) {
+      var p = ponds[k], m = 1e9;
+      for (var a = 0; a < 12; a++) {
+        var ang = a * 0.5236, lx = DM.cos(ang) * p.rx * 1.12, lz = DM.sin(ang) * p.rz * 1.12;
+        m = Math.min(m, terrainH(t, p.x + lx * p.c - lz * p.s, p.z + lx * p.s + lz * p.c));
+      }
+      p.yw = m - 0.05;
+    }
+    for (j = 0; j < nz; j++) for (i = 0; i < nx; i++) {
+      var xx = x0 + i * TCELL, zz = z0 + j * TCELL, h = H[j * nx + i], q;
+      for (k = 0; k < ramps.length; k++) {
+        var r = ramps[k], dx = xx - r.x, dz = zz - r.z; if (dx * dx + dz * dz > 900) continue;
+        var fx = DM.sin(r.yaw), fz = DM.cos(r.yaw), u = dx * fx + dz * fz, ww = Math.abs(dx * fz - dz * fx);
+        var wu = smoothstep(-16, -6, u) * (1 - smoothstep(r.len + 3, r.len + 12, u)), wl = 1 - smoothstep(r.wid / 2 + 2, r.wid / 2 + 8, ww);
+        h = h * (1 - wu * wl) + r.baseY * wu * wl;
+      }
+      for (k = 0; k < cuts.length; k++) {
+        var cu = cuts[k], pq = polyNear(cu, xx, zz, _pt); if (pq.d > cu.w / 2 + 22) continue;
+        // a band at least one terrain cell wide is level, so the visible surface and the physical ground agree on the trail
+        var wc = 1 - smoothstep(cu.w / 2 + 8, cu.w / 2 + 21, pq.d), ht = cu.ya + (cu.yb - cu.ya) * (pq.s / cu.len) - 0.15;
+        var rs = surface(t, xx, zz, undefined, tmp), rd = DM.hypot(xx - t.X[rs.idx], zz - t.Z[rs.idx]);      // (this is the second pass over the grid: the road distance has to be worked out here)
+        wc *= smoothstep(half + 14, half + 30, rd);                     // only reshape ground well clear of ANY road: near a road the natural, road-following terrain stays, so it always sits just under the tarmac
+        h = h * (1 - wc) + ht * wc;
+      }
+      for (k = 0; k < ponds.length; k++) {
+        var pp = ponds[k], ex = xx - pp.x, ez = zz - pp.z; if (ex * ex + ez * ez > pp.R2) continue;
+        var pu = ex * pp.c + ez * pp.s, pw = -ex * pp.s + ez * pp.c, rho = Math.sqrt((pu / pp.rx) * (pu / pp.rx) + (pw / pp.rz) * (pw / pp.rz));
+        if (rho > 1.4) continue;
+        if (rho <= 1) h = Math.min(h, pp.yw - pp.depth * (1 - rho * rho));
+        else { var sh = Math.min(h, pp.yw); h = sh + (h - sh) * smoothstep(1, 1.4, rho); }
+      }
+      H[j * nx + i] = h;
+    }
+  }
+  function terrainH(t, x, z) {
+    var T = t.terrain, fx = (x - T.x0) / T.cell, fz = (z - T.z0) / T.cell;
+    var i = Math.max(0, Math.min(T.nx - 2, Math.floor(fx))), j = Math.max(0, Math.min(T.nz - 2, Math.floor(fz)));
+    var tx = clamp(fx - i, 0, 1), tz = clamp(fz - j, 0, 1), H = T.H, nx = T.nx;
+    var a = H[j * nx + i], b = H[j * nx + i + 1], c = H[(j + 1) * nx + i], d = H[(j + 1) * nx + i + 1];
+    return (a * (1 - tx) + b * tx) * (1 - tz) + (c * (1 - tx) + d * tx) * tz;
+  }
+
+  /** nearest track sample to (x,z). If hint is given, searches a local window (fast + continuous). */
+  function nearest(t, x, z, hint) {
+    var best = -1, bd = 1e18, i;
+    if (hint !== undefined && hint >= 0) {
+      var lo = Math.max(0, hint - 40), hi = Math.min(t.N - 1, hint + 40);
+      for (i = lo; i <= hi; i++) {
+        var dx = x - t.X[i], dz = z - t.Z[i], d = dx * dx + dz * dz;
+        if (d < bd) { bd = d; best = i; }
+      }
+      if (bd < 60 * 60) return best;     // still plausibly on the same stretch
+    }
+    var CELL = t.hashCell, cx = Math.floor(x / CELL), cz = Math.floor(z / CELL), R = 1;
+    for (; R <= 12 && best < 0; R++) {
+      for (var a = -R; a <= R; a++) for (var b = -R; b <= R; b++) {
+        var cell = t.hash[(cx + a + 4096) * 8192 + (cz + b + 4096)]; if (!cell) continue;
+        for (var q = 0; q < cell.length; q++) {
+          i = cell[q];
+          var ex = x - t.X[i], ez = z - t.Z[i], dd = ex * ex + ez * ez;
+          if (dd < bd) { bd = dd; best = i; }
+        }
+      }
+    }
+    if (best < 0) { best = 0; }
+    return best;
+  }
+
+  /** Surface info at (x,z): nearest index, signed lateral offset (+ = right), arc-length s, ground height. */
+  function surface(t, x, z, hint, out) {
+    var i = nearest(t, x, z, hint);
+    var tx = t.TX[i], tz = t.TZ[i];
+    var dx = x - t.X[i], dz = z - t.Z[i];
+    var along = dx * tx + dz * tz;
+    var lat = dx * tz - dz * tx;
+    var i0 = Math.max(0, i - 1), i1 = Math.min(t.N - 1, i + 1);
+    var slope = (t.Y[i1] - t.Y[i0]) / ((i1 - i0) * DS);
+    var j = along >= 0 ? i1 : i0, fr = Math.min(1, Math.abs(along) / DS);
+    out = out || {};
+    out.idx = i; out.lat = lat; out.along = along; out.s = t.S[i] + along;
+    out.y = j === i ? t.Y[i] : t.Y[i] + (t.Y[j] - t.Y[i]) * fr;
+    out.slope = slope; out.tx = tx; out.tz = tz;
+    return out;
+  }
+
+  /** Physical ground height: exact road surface on the tarmac, terrain beyond it (blended over 2 m). */
+  function groundAt(t, x, z, hint, out) {
+    out = surface(t, x, z, hint, out);
+    var half = t.width / 2, wt = smoothstep(half + 0.5, half + 2.5, Math.abs(out.lat));
+    out.gy = wt <= 0 ? out.y : out.y * (1 - wt) + terrainH(t, x, z) * wt;
+    out.onRamp = false;
+    if (t.ramps && t.ramps.length) { var ry = rampY(t, x, z); if (ry > out.gy) { out.gy = ry; out.onRamp = true; } }
+    return out;
+  }
+  /** launch-rock surface: a wedge that rises from the levelled ground to a lip; -1e9 if (x,z) is not on a ramp */
+  function rampY(t, x, z) {
+    var R = t.ramps, best = -1e9;
+    for (var k = 0; k < R.length; k++) {
+      var r = R[k], dx = x - r.x, dz = z - r.z; if (dx * dx + dz * dz > 400) continue;
+      var fx = DM.sin(r.yaw), fz = DM.cos(r.yaw), u = dx * fx + dz * fz; if (u < 0 || u > r.len) continue;
+      var aw = Math.abs(dx * fz - dz * fx); if (aw > r.wid / 2) continue;
+      var e = smoothstep(r.wid / 2, r.wid / 2 - 0.9, aw), y = r.baseY + r.H * (u / r.len) * e;
+      if (y > best) best = y;
+    }
+    return best;
+  }
+  var _wy = 0;
+  /** depth of water over the pond bed at (x,z); 0 on dry land (also leaves the water level in _wy) */
+  function waterDepthAt(t, x, z) {
+    var W = t.water; if (!W || !W.length) return 0;
+    for (var k = 0; k < W.length; k++) {
+      var p = W[k], dx = x - p.x, dz = z - p.z; if (dx * dx + dz * dz > p.R2) continue;
+      var u = dx * p.c + dz * p.s, w = -dx * p.s + dz * p.c;
+      if ((u / p.rx) * (u / p.rx) + (w / p.rz) * (w / p.rz) > 1.7) continue;
+      var d = p.yw - terrainH(t, x, z); if (d > 0) { _wy = p.yw; return d; }
+    }
+    return 0;
+  }
+
+
+  /* ---------------- world features: hidden rock-jump shortcuts, ponds, trees and rocks ---------------- */
+  var PCELL = 24;
+  function roadDist(t, x, z, tmp) { var sf = surface(t, x, z, undefined, tmp || {}); return DM.hypot(x - t.X[sf.idx], z - t.Z[sf.idx]); }
+  function segDist(px, pz, ax, az, bx, bz) {
+    var dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz, u = l2 > 0 ? clamp(((px - ax) * dx + (pz - az) * dz) / l2, 0, 1) : 0;
+    return DM.hypot(px - (ax + dx * u), pz - (az + dz * u));
+  }
+
+  /** Where does leaving the road at the end of a straight (a little off the tangent) put you in line with a much later piece of road? */
+  function findShortcutCandidates(t) {
+    var half = t.width / 2, fi = t.finishIdx, all = [], tmp = {}, cosLand = DM.cos(27 * Math.PI / 180), deltas = [-18, -9, 0, 9, 18];
+    for (var i = t.startIdx + 40; i < fi - 110; i += 2) {
+      var k0 = 0, q; for (q = i - 8; q <= i; q++) k0 = Math.max(k0, Math.abs(t.K[q]));
+      if (k0 > 0.004) continue;                                   // the car is on a straight ...
+      var k1 = 0; for (q = i + 4; q <= i + 16; q++) k1 = Math.max(k1, Math.abs(t.K[q]));
+      if (k1 < 0.006) continue;                                   // ... that runs into a bend
+      var th = DM.atan2(t.TX[i], t.TZ[i]);
+      for (var di = 0; di < deltas.length; di++) {
+        var psi = th + deltas[di] * Math.PI / 180, fx = DM.sin(psi), fz = DM.cos(psi), D0 = -1;
+        for (var d = 6; d <= 70; d += 2) {                        // where the line has really left the road: that is where the rock goes
+          var bx = t.X[i] + fx * d, bz = t.Z[i] + fz * d, sb = surface(t, bx, bz, undefined, tmp);
+          if (DM.hypot(bx - t.X[sb.idx], bz - t.Z[sb.idx]) >= half + 7) { D0 = d; break; }
+        }
+        if (D0 < 0) continue;
+        for (var D = D0 + 10 + 40; D <= D0 + 10 + 150; D += 4) {
+          var qx = t.X[i] + fx * D, qz = t.Z[i] + fz * D, j = nearest(t, qx, qz);
+          var dist = DM.hypot(qx - t.X[j], qz - t.Z[j]), dS = t.S[j] - t.S[i], dot = t.TX[j] * fx + t.TZ[j] * fz;
+          if (dist > 11 || dS < 150 || j > fi - 30 || dot < cosLand || Math.abs(t.Y[j] - t.Y[i]) > 7) continue;
+          all.push({ i: i, j: j, D: D, D0: D0, ox: t.X[i] + fx * D0, oz: t.Z[i] + fz * D0, dS: dS, dist: dist, score: dS / D + 40 * (dot - cosLand) - Math.abs(deltas[di]) * 0.4 });
+        }
+      }
+    }
+    all.sort(function (a, b) { return b.score - a.score; });
+    var rng = mulberry32(hashSeed(t.seedStr + ':sc')), want = rng() < 0.4 ? 2 : 1, out = [];
+    for (var n = 0; n < all.length && out.length < want; n++) {
+      var c = all[n], ok = true;
+      for (var m = 0; m < out.length; m++) { var o = out[m]; if (Math.abs(c.i - o.i) < 60 || (c.i < o.j + 30 && c.j > o.i - 30)) ok = false; }
+      if (ok) out.push(c);
+    }
+    return out;
+  }
+
+  /** nearest point of a trail's centre line to (x,z): distance, arc position and the index of the segment */
+  function polyNear(cu, x, z, out) {
+    var P = cu.pts, best = 1e18, bs = 0, bk = 0;
+    for (var k = 0; k < P.length - 1; k++) {
+      var ax = P[k][0], az = P[k][1], dx = P[k + 1][0] - ax, dz = P[k + 1][1] - az, l2 = dx * dx + dz * dz, u = l2 > 0 ? clamp(((x - ax) * dx + (z - az) * dz) / l2, 0, 1) : 0;
+      var ex = x - (ax + dx * u), ez = z - (az + dz * u), d2 = ex * ex + ez * ez;
+      if (d2 < best) { best = d2; bk = k; bs = cu.cum[k] + u * (cu.cum[k + 1] - cu.cum[k]); }
+    }
+    out = out || {}; out.d = Math.sqrt(best); out.s = bs; out.k = bk; return out;
+  }
+  var _pn = {};
+  /** distance from (x,z) to the nearest cut-through trail (1e9 if the course has none) */
+  function cutDist(t, x, z) {
+    var C2 = t.cuts, best = 1e9; if (!C2) return best;
+    for (var k = 0; k < C2.length; k++) { var d = polyNear(C2[k], x, z, _pn).d; if (d < best) best = d; }
+    return best;
+  }
+  /** a hidden dirt trail across the middle of a long loop in the road: shorter than the road, but only for a driver who finds it */
+  var CUTP = { minRatio: 1.25, minLen: 38, maxLen: 200, minDs: 130, maxDs: 520, clear: 6, tension: 1.15 };
+  function planCuts(t, rng) {
+    var half = t.width / 2, fi = t.finishIdx, all = [], tmp = {}, maxLen = Math.round(CUTP.maxDs / DS), minLen = Math.round(CUTP.minDs / DS);
+    for (var i = t.startIdx + 45; i < fi - 90; i += 3) {
+      for (var j = i + minLen; j <= Math.min(fi - 40, i + maxLen); j += 3) {
+        var ax = t.X[i], az = t.Z[i], bx = t.X[j], bz = t.Z[j], dx = bx - ax, dz = bz - az, chord = DM.hypot(dx, dz), dS = t.S[j] - t.S[i];
+        if (chord < CUTP.minLen || chord > CUTP.maxLen || dS / chord < CUTP.minRatio || Math.abs(t.Y[j] - t.Y[i]) > Math.max(6, 0.09 * chord)) continue;
+        var m = chord * CUTP.tension, t0x = t.TX[i] * m, t0z = t.TZ[i] * m, t1x = t.TX[j] * m, t1z = t.TZ[j] * m, pts = [], cum = [0], q, ok = true, len = 0;
+        for (q = 0; q <= 24; q++) {                                           // cubic Hermite: starts along the road at A, arrives along the road at B
+          var u = q / 24, u2 = u * u, u3 = u2 * u, h00 = 2 * u3 - 3 * u2 + 1, h10 = u3 - 2 * u2 + u, h01 = -2 * u3 + 3 * u2, h11 = u3 - u2;
+          pts.push([h00 * ax + h10 * t0x + h01 * bx + h11 * t1x, h00 * az + h10 * t0z + h01 * bz + h11 * t1z]);
+          if (q > 0) { len += DM.hypot(pts[q][0] - pts[q - 1][0], pts[q][1] - pts[q - 1][1]); cum.push(len); }
+        }
+        if (len > dS * 0.8) continue;                                           // not clearly shorter than the road: no shortcut
+        for (q = 8; q <= 16 && ok; q++) if (roadDist(t, pts[q][0], pts[q][1], tmp) < half + CUTP.clear) ok = false;       // the middle stays clear of the road (the ends hug it, so a car can turn on and off)
+        for (q = 0; q < t.water.length && ok; q++) { var wp = t.water[q]; for (var f = 0; f <= 24 && ok; f += 2) { var wu = (pts[f][0] - wp.x) * wp.c + (pts[f][1] - wp.z) * wp.s, ww = -(pts[f][0] - wp.x) * wp.s + (pts[f][1] - wp.z) * wp.c; if ((wu / (wp.rx + 10)) * (wu / (wp.rx + 10)) + (ww / (wp.rz + 10)) * (ww / (wp.rz + 10)) < 1) ok = false; } }
+        for (q = 0; q < (t.ramps || []).length && ok; q++) if (i < t.ramps[q].j + 40 && j > t.ramps[q].i - 40) ok = false;
+        if (!ok) continue;
+        all.push({ i: i, j: j, pts: pts, cum: cum, len: len, w: 6.5, ya: t.Y[i], yb: t.Y[j], dS: dS, score: dS / len + dS * 0.004 });
+      }
+    }
+    all.sort(function (a, b) { return b.score - a.score; });
+    var out = [], want = rng() < 0.35 ? 2 : 1;
+    for (var n = 0; n < all.length && out.length < want; n++) { var cd = all[n], fine = true; for (var mm = 0; mm < out.length; mm++) if (cd.i < out[mm].j + 60 && cd.j > out[mm].i - 60) fine = false; if (fine) out.push(cd); }
+    return out;
+  }
+  function cutPilot(s, t, c) {
+    var pn = polyNear(c, s.x, s.z, {}), d0 = DM.hypot(s.x - c.pts[0][0], s.z - c.pts[0][1]);
+    if (s.idx >= c.i - 22 && pn.d < 18 && pn.s < c.len - 4 && s.s < t.S[c.j] + 25 && (pn.s > 0.5 || d0 < 26)) {
+      var want = Math.min(c.len, pn.s + 8 + 0.4 * Math.abs(s.u)), k = pn.k;
+      while (k < c.pts.length - 2 && c.cum[k + 1] < want) k++;
+      var tx = c.pts[k + 1][0], tz = c.pts[k + 1][1], dx = tx - s.x, dz = tz - s.z, fx = DM.sin(s.yaw), fz = DM.cos(s.yaw), ang = DM.atan2(dx * fz - dz * fx, dx * fx + dz * fz);
+      return (s.u < 31 ? B_THR : (s.u > 36 ? B_BRK : 0)) | (ang > 0.03 ? B_RIGHT : (ang < -0.03 ? B_LEFT : 0));
+    }
+    return strongPilot(s, t);
+  }
+  /** seconds the trail saves a strong driver (same start, same speed, same finish line); -1 if the trail cannot be driven cleanly */
+  function cutGain(t, c) {
+    function run(useCut) {
+      var s = new Sim(t); s.phase = 'racing'; s.tick = COUNTDOWN_TICKS + 1; s.raceTick = 1;
+      var i0 = Math.max(t.startIdx + 2, c.i - 50), x = t.X[i0], z = t.Z[i0]; s.x = x; s.z = z; s.yaw = DM.atan2(t.TX[i0], t.TZ[i0]); s.u = 34;
+      var sf = groundAt(t, x, z, i0, s.surf); s.y = sf.gy; s.gy = sf.gy; s.idx = i0; s.s = sf.s; s._prevS = s.s; s.lat = sf.lat; s.nextCk = t.checkpoints.length - 1; s.lastCkIdx = i0;
+      var target = t.S[c.j] + 70, t0 = s.raceTick;
+      for (var k = 0; k < 120 * 45; k++) {
+        s.step(useCut ? cutPilot(s, t, c) : strongPilot(s, t));
+        if (s.rolled || s.recoveries || s.damage > 0.25) return -1;
+        if (s.s >= target && s.grounded && s.idx > c.j) return (s.raceTick - t0) * DT;
+      }
+      return -1;
+    }
+    var a = run(false), b = run(true);
+    return (a < 0 || b < 0) ? -1 : a - b;
+  }
+  function planPonds(t, rng) {
+    var half = t.width / 2, bb = t.bbox, base = { forest: 3, countryside: 3, mountain: 3, industrial: 1, desert: 2, canyon: 1 }[t.biome] || 0;
+    var count = base ? (rng() < 0.7 ? base : base - 1) : 0, ponds = [], tries = 0, tmp = {};
+    while (ponds.length < count && tries++ < 80) {
+      var lake = rng() < 0.3, rx = lake ? 26 + rng() * 18 : 11 + rng() * 13, rz = rx * (lake ? 0.55 + rng() * 0.35 : 0.65 + rng() * 0.35), rot = rng() * Math.PI;
+      var cx = bb.x0 - 60 + rng() * (bb.x1 - bb.x0 + 120), cz = bb.z0 - 60 + rng() * (bb.z1 - bb.z0 + 120), R = Math.max(rx, rz) * 1.45;
+      var d = roadDist(t, cx, cz, tmp); if (d < half + R + 6 || d > half + R + (lake ? 80 : 55)) continue;      // close enough to matter, never on the road
+      var ok = true, k;
+      for (k = 0; k < ponds.length; k++) if (DM.hypot(cx - ponds[k].x, cz - ponds[k].z) < R + Math.sqrt(ponds[k].R2) + 10) ok = false;
+      for (k = 0; k < (t.ramps || []).length; k++) {
+        var r = t.ramps[k], lx = r.x + DM.sin(r.yaw) * (r.len + r.Rt), lz = r.z + DM.cos(r.yaw) * (r.len + r.Rt);
+        if (segDist(cx, cz, r.x, r.z, lx, lz) < R + 14) ok = false;
+      }
+      if (ok) ponds.push({ x: cx, z: cz, rx: rx, rz: rz, c: DM.cos(rot), s: DM.sin(rot), depth: 2.6 + rng() * 1.0, yw: 0, R2: R * R });
+    }
+    // a river: a long, narrow channel that runs alongside the road (never across it), a few metres off the shoulder
+    var rivBiome = { forest: 0.7, countryside: 0.7, mountain: 0.6, desert: 0.35, canyon: 0.3, industrial: 0 }[t.biome] || 0;
+    if (rng() < rivBiome) {
+      for (var rt = 0; rt < 50; rt++) {
+        var ri = t.startIdx + 60 + Math.floor(rng() * (t.finishIdx - t.startIdx - 160)), rside = rng() < 0.5 ? -1 : 1, rrx = 65 + rng() * 60, rrz = 6 + rng() * 5, off = half + rrz * 1.4 + 9 + rng() * 14;
+        var rcx = t.X[ri] + t.TZ[ri] * rside * off, rcz = t.Z[ri] - t.TX[ri] * rside * off, th = DM.atan2(t.TX[ri], t.TZ[ri]);
+        var cs = DM.sin(th), cc = DM.cos(th), good = true, q;       // local x runs along the road's heading
+        for (q = -1; q <= 1.0001 && good; q += 0.04) { var px = rcx + cs * rrx * 1.05 * q, pz = rcz + cc * rrx * 1.05 * q, rd = roadDist(t, px, pz, tmp); if (rd < half + rrz * 1.6 + 6) good = false; }       // fine steps: a river must never reach the road
+        for (q = 0; q < ponds.length && good; q++) if (DM.hypot(rcx - ponds[q].x, rcz - ponds[q].z) < rrx + Math.sqrt(ponds[q].R2) * 0.6) good = false;
+        for (q = 0; q < (t.ramps || []).length && good; q++) { var rr = t.ramps[q], rlx = rr.x + DM.sin(rr.yaw) * (rr.len + rr.Rt), rlz = rr.z + DM.cos(rr.yaw) * (rr.len + rr.Rt); for (var w2 = -1; w2 <= 1; w2 += 0.25) if (segDist(rcx + cs * rrx * w2, rcz + cc * rrx * w2, rr.x, rr.z, rlx, rlz) < rrz + 16) good = false; }
+        if (!good) continue;
+        ponds.push({ x: rcx, z: rcz, rx: rrx, rz: rrz, c: cs, s: cc, depth: 2.2 + rng() * 0.8, yw: 0, R2: rrx * rrx * 2.4, river: true });
+        break;
+      }
+    }
+    t.water = ponds;
+  }
+
+  /** cliffs: on the OUTSIDE of a bend the ground beyond the shoulder drops away. Leave the road there and you fall. */
+  function planCliffs(t, rng) {
+    var half = t.width / 2, want = { mountain: 2 + (rng() < 0.6 ? 1 : 0), canyon: 1 + (rng() < 0.4 ? 1 : 0), forest: rng() < 0.12 ? 1 : 0 }[t.biome] || 0, out = [], tries = 0;
+    for (var tr = 0; tr < 140 && out.length < want; tr++) {
+      var n = Math.round((150 + rng() * 170) / DS), lo = t.startIdx + 50, hi = t.finishIdx - 50 - n; if (hi <= lo) break;
+      var i0 = lo + Math.floor(rng() * (hi - lo)), i1 = i0 + n, ok = true, k;
+      for (k = 0; k < out.length; k++) if (i0 < out[k].i1 + 40 && i1 > out[k].i0 - 40) ok = false;
+      for (k = 0; k < (t.ramps || []).length; k++) if (i0 < t.ramps[k].j + 50 && i1 > t.ramps[k].i - 50) ok = false;
+      for (k = 0; k < (t.cuts || []).length; k++) if (i0 < t.cuts[k].j + 50 && i1 > t.cuts[k].i - 50) ok = false;
+      for (k = 0; k < t.water.length && ok; k++) { var wp = t.water[k]; for (var q = i0; q <= i1; q += 8) { var wu = (t.X[q] - wp.x) * wp.c + (t.Z[q] - wp.z) * wp.s, ww = -(t.X[q] - wp.x) * wp.s + (t.Z[q] - wp.z) * wp.c; if ((wu / (wp.rx + 50)) * (wu / (wp.rx + 50)) + (ww / (wp.rz + 50)) * (ww / (wp.rz + 50)) < 1) { ok = false; break; } } }
+      if (!ok) continue;
+      var d0 = DM.atan2(t.TX[i0], t.TZ[i0]), d1 = DM.atan2(t.TX[i1], t.TZ[i1]), dth = DM.atan2(DM.sin(d1 - d0), DM.cos(d1 - d0));
+      var side = Math.abs(dth) > 0.12 ? (dth > 0 ? -1 : 1) : (rng() < 0.5 ? -1 : 1);       // the outside of the turn: where a car that runs wide goes over
+      out.push({ i0: i0, i1: i1, side: side, depth: 34 + rng() * 26, shoulder: 3.2, face: 9 });
+    }
+    t.cliffs = out;
+  }
+
+  function buildProps(t, rng) {
+    var half = t.width / 2, N = t.N, cfg = { forest: [1.0, 0.18], mountain: [0.45, 0.55], desert: [0.25, 0.5], canyon: [0.12, 0.7], countryside: [0.55, 0.12], industrial: [0.30, 0.25] }[t.biome] || [0.5, 0.3];
+    var total = Math.min(520, Math.round(t.totalLength / 6.5 * (cfg[0] + cfg[1]))), pRock = cfg[1] / (cfg[0] + cfg[1]);
+    var P = { n: 0, x: [], z: [], y: [], r: [], h: [], kind: [], sc: [], rot: [], grid: {} }, tries = 0, tmp = {};
+    function near(x, z, rr) {
+      var cx = Math.floor(x / PCELL), cz = Math.floor(z / PCELL);
+      for (var a = -1; a <= 1; a++) for (var b = -1; b <= 1; b++) { var l = P.grid[(cx + a) + ',' + (cz + b)]; if (!l) continue; for (var q = 0; q < l.length; q++) { var p = l[q]; if (DM.hypot(x - P.x[p], z - P.z[p]) < rr + P.r[p] + 1.4) return true; } }
+      return false;
+    }
+    while (P.n < total && tries++ < total * 10) {
+      var i = t.startIdx + 25 + Math.floor(rng() * (N - t.startIdx - 60)), kk = t.K[i];
+      if (rng() > 0.32 + Math.min(1, Math.abs(kk) * 70)) continue;                         // more of them where people run wide
+      var side = Math.abs(kk) > 0.004 && rng() < 0.68 ? (kk > 0 ? -1 : 1) : (rng() < 0.5 ? -1 : 1);
+      var d = half + 3.4 + DM.pow(rng(), 1.7) * 38, x = t.X[i] + t.TZ[i] * side * d, z = t.Z[i] - t.TX[i] * side * d, onCliff = false;
+      for (var cq = 0; cq < (t.cliffs || []).length; cq++) { var cc2 = t.cliffs[cq]; if (side * cc2.side > 0 && i >= cc2.i0 - 8 && i <= cc2.i1 + 8 && d > half + cc2.shoulder - 0.5) onCliff = true; }
+      if (onCliff) continue;
+      var rock = rng() < pRock, r = rock ? 1.1 + DM.pow(rng(), 1.8) * 2.6 : 0.38 + rng() * 0.22;
+      if (roadDist(t, x, z, tmp) < half + 2.6 + r * 0.8) continue;
+      var ok = true, k;
+      for (k = 0; k < t.water.length; k++) { var w = t.water[k], u = (x - w.x) * w.c + (z - w.z) * w.s, ww = -(x - w.x) * w.s + (z - w.z) * w.c; if ((u / w.rx) * (u / w.rx) + (ww / w.rz) * (ww / w.rz) < 1.8) ok = false; }
+      for (k = 0; k < t.ramps.length; k++) {
+        var rp = t.ramps[k], lx = rp.x + DM.sin(rp.yaw) * (rp.len + rp.Rt + 30), lz = rp.z + DM.cos(rp.yaw) * (rp.len + rp.Rt + 30);
+        if (segDist(x, z, rp.x - DM.sin(rp.yaw) * (rp.D0 + 34), rp.z - DM.cos(rp.yaw) * (rp.D0 + 34), lx, lz) < 8 + r) ok = false;    // keep approach and flight path clear
+      }
+      for (k = 0; k < (t.cuts || []).length; k++) { var cu2 = t.cuts[k]; if (polyNear(cu2, x, z, _pt).d < cu2.w / 2 + 4 + r) ok = false; }
+      if (!ok || near(x, z, r)) continue;
+      var n = P.n++; P.x.push(x); P.z.push(z); P.r.push(r); P.kind.push(rock ? 1 : 0); P.sc.push(0.8 + rng() * 0.6); P.rot.push(rng() * 6.283);
+      P.y.push(terrainH(t, x, z)); P.h.push(rock ? r * 1.0 : 6.5);
+      var key = Math.floor(x / PCELL) + ',' + Math.floor(z / PCELL); (P.grid[key] || (P.grid[key] = [])).push(n);
+    }
+    t.props = P;
+  }
+
+  /** pure-pursuit steering bits toward the road ahead (a competent driver); used to judge jumps and by bots */
+  function autoSteer(s, t, look) {
+    var j = Math.min(t.N - 1, s.idx + Math.round((look || 12) / DS)), dx = t.X[j] - s.x, dz = t.Z[j] - s.z, fx = DM.sin(s.yaw), fz = DM.cos(s.yaw);
+    var ang = DM.atan2(dx * fz - dz * fx, dx * fx + dz * fz);
+    return ang > 0.03 ? B_RIGHT : (ang < -0.03 ? B_LEFT : 0);
+  }
+  /** braking-profile target speed along the road (what a sensible driver aims for) */
+  function speedProfile(t) {
+    if (t._prof) return t._prof;
+    var v = new Array(t.N), i;
+    for (i = 0; i < t.N; i++) v[i] = Math.min(CAR.vMax - 3, Math.sqrt(CAR.grip * 0.55 / Math.max(Math.abs(t.K[i]), 1e-4)));
+    v[t.N - 1] = 0;
+    for (i = t.N - 2; i >= 0; i--) v[i] = Math.min(v[i], Math.sqrt(v[i + 1] * v[i + 1] + 2 * CAR.brake * 0.6 * DS));
+    return (t._prof = v);
+  }
+  /** after touchdown: follow the road, lift and brake gently for the next corner */
+  function landingPilot(s, t) {
+    var vt = speedProfile(t)[Math.min(t.N - 1, s.idx + 4)], b = autoSteer(s, t, 14);
+    return b | (s.u < vt ? B_THR : (s.u > vt + 5 ? B_BRK : 0));
+  }
+  /** what a competent driver does around a jump: flat out on the approach, nose along the flight path in the air, follow the road after touchdown */
+  function jumpPilot(s, t, landed) {
+    if (!s.grounded && !landed) {
+      var wvx = s.u * DM.sin(s.yaw) + s.v * DM.cos(s.yaw), wvz = s.u * DM.cos(s.yaw) - s.v * DM.sin(s.yaw), d = DM.atan2(wvx, wvz) - s.yaw;
+      d = DM.atan2(DM.sin(d), DM.cos(d)); return B_THR | (d > 0.05 ? B_RIGHT : (d < -0.05 ? B_LEFT : 0));
+    }
+    return B_THR | (landed ? autoSteer(s, t, 14) : 0);
+  }
+  /** a car launched at the ramp at speed U (m/s), lined up with the rock; once airborne a competent driver squares up and follows the road */
+  function launchTest(t, r, U) {
+    var s = new Sim(t), fx = DM.sin(r.yaw), fz = DM.cos(r.yaw), back = r.D0 + 22;
+    s.phase = 'racing'; s.tick = COUNTDOWN_TICKS + 1; s.raceTick = 1;
+    s.x = r.x - fx * back; s.z = r.z - fz * back; s.yaw = r.yaw; s.u = U;                    // on the road, lined up with the rock
+    var i0 = nearest(t, s.x, s.z), sf = groundAt(t, s.x, s.z, i0, s.surf); s.y = sf.gy; s.gy = sf.gy; s.idx = i0; s.s = sf.s; s._prevS = s.s; s.lat = sf.lat;
+    s.nextCk = t.checkpoints.length - 1; s.lastCkIdx = i0;
+    var lipX = r.x + fx * r.len, lipZ = r.z + fz * r.len, res = { ok: false, crashed: false }, after = 0;
+    for (var k = 0; k < 120 * 12; k++) {
+      s.step(jumpPilot(s, t, !!s.lastLanding));
+      if (s.events.crash > 0 && !s.lastLanding) res.crashed = true;
+      if (s.lastLanding && !res.landed) { res.landed = true; res.landU = (s.lastLanding.x - lipX) * fx + (s.lastLanding.z - lipZ) * fz; res.s = s.lastLanding.s; res.lat = s.lastLanding.lat; res.u = s.lastLanding.u; }
+      if (res.landed && ++after > 150) break;
+    }
+    if (res.landed) { res.rolled = s.rolled; res.damage = s.damage; res.ok = !res.crashed; }
+    return res;
+  }
+  /** pick the ramp height that lands a car at the design speed on the target road, then record how forgiving it is */
+  function designRamp(t, r) {
+    var half = t.width / 2, U = r.U = 44, why = function (m) { r.fail = m; return false; };
+    r.H = clamp(r.Rt * 9.81 * r.len / (2 * U * U), 0.9, 6.4);
+    var res = null;
+    for (var it = 0; it < 8; it++) {
+      res = launchTest(t, r, U);
+      if (!res.landed) return why('no landing');
+      if (res.crashed) return why('hit something in flight');
+      var err = res.landU - r.Rt; if (Math.abs(err) < 3.5) break;
+      r.H = clamp(r.H * DM.pow(r.Rt / Math.max(15, res.landU), 0.8), 0.9, 6.4);
+    }
+    var sj = t.S[r.j];
+    if (res.rolled) return why('rolled on landing'); if (res.damage > 0.3) return why('damage ' + res.damage.toFixed(2));
+    if (res.s < sj - 25 || res.s > sj + 70) return why('landed at s offset ' + Math.round(res.s - sj));
+    if (Math.abs(res.lat) > half + 3) return why('landed off the tarmac lat ' + res.lat.toFixed(1)); if (res.u < 22) return why('lost speed ' + res.u.toFixed(0));
+    r.curve = []; var maxS = res.s, minReach = null;
+    for (var v = 32; v <= 52; v += 6) {
+      var q = launchTest(t, r, v); r.curve.push({ U: v, s: q.landed ? q.s : -1, ok: !!q.ok });
+      if (q.landed && v >= U && q.s > maxS) maxS = q.s;
+      if (q.landed && q.s >= sj - 25 && minReach === null) minReach = v;
+    }
+    r.Umin = minReach === null ? U : minReach; r.sLandMax = maxS;
+    return true;
+  }
+  function adjustGates(t) {
+    var fin = t.finishIdx, cps = t.checkpoints.slice(0, -1), forb = t.ramps.map(function (r) { return [r.i - 4, Math.min(fin - 25, Math.round(r.sLandMax / DS) + 10)]; }).concat((t.cuts || []).map(function (c) { return [c.i - 4, Math.min(fin - 25, c.j + 10)]; }));
+    cps = cps.map(function (g) {
+      for (var k = 0; k < forb.length; k++) if (g > forb[k][0] && g < forb[k][1]) return (g - forb[k][0] < forb[k][1] - g) ? forb[k][0] - 1 : forb[k][1] + 1;
+      return g;
+    }).sort(function (a, b) { return a - b; });
+    var out = [];
+    cps.forEach(function (g) { if (g < fin - 20 && (!out.length || g - out[out.length - 1] >= 25)) out.push(g); });
+    t.checkpoints = out.concat([fin]);
+  }
+  /** the whole story with the FINAL gates: jump, land, drive on, and the next gate must count (no 'missed gate', no wreck) */
+  function endToEnd(t, r) {
+    var s = new Sim(t), fx = DM.sin(r.yaw), fz = DM.cos(r.yaw), back = r.D0 + 22, gi = 0;
+    while (gi < t.checkpoints.length - 1 && t.checkpoints[gi] <= r.i) gi++;
+    s.phase = 'racing'; s.tick = COUNTDOWN_TICKS + 1; s.raceTick = 1; s.x = r.x - fx * back; s.z = r.z - fz * back; s.yaw = r.yaw; s.u = r.U;
+    var i0 = nearest(t, s.x, s.z), sf = groundAt(t, s.x, s.z, i0, s.surf); s.y = sf.gy; s.gy = sf.gy; s.idx = i0; s.s = sf.s; s._prevS = s.s; s.lat = sf.lat;
+    s.nextCk = gi; s.lastCkIdx = t.checkpoints[Math.max(0, gi - 1)];
+    var landedAt = -1;
+    for (var k = 0; k < 120 * 16; k++) {
+      s.step(landedAt >= 0 && s.tick - landedAt > 150 ? landingPilot(s, t) : jumpPilot(s, t, !!s.lastLanding));
+      if (s.lastLanding && landedAt < 0) landedAt = s.tick;
+      if (landedAt >= 0 && (s.rolled || s.damage > 0.4 || s.missed || s.recoveries)) return false;
+      if (landedAt >= 0 && s.events.ckpt && s.nextCk > gi) return true;
+    }
+    return false;
+  }
+  /** a good driver on the road: corners at 75% of the grip and brakes late (the jump has to beat THIS, not a cautious bot) */
+  function strongProfile(t) {
+    if (t._profS) return t._profS;
+    var v = new Array(t.N), i;
+    for (i = 0; i < t.N; i++) v[i] = Math.min(CAR.vMax - 1, Math.sqrt(CAR.grip * 0.75 / Math.max(Math.abs(t.K[i]), 1e-4)));
+    v[t.N - 1] = 0;
+    for (i = t.N - 2; i >= 0; i--) v[i] = Math.min(v[i], Math.sqrt(v[i + 1] * v[i + 1] + 2 * CAR.brake * 0.8 * DS));
+    return (t._profS = v);
+  }
+  function strongPilot(s, t) { var vt = strongProfile(t)[Math.min(t.N - 1, s.idx + 4)], b = autoSteer(s, t, 13); return b | (s.u < vt ? B_THR : (s.u > vt + 2.5 ? B_BRK : 0)); }
+  /** seconds the jump saves over staying on the road, between the same two points, for a competent driver at the design speed */
+  function jumpGain(t, r) {
+    function run(useJump) {
+      var s = new Sim(t); s.phase = 'racing'; s.tick = COUNTDOWN_TICKS + 1; s.raceTick = 1;
+      var x, z, yaw;
+      if (useJump) { x = r.x - DM.sin(r.yaw) * (r.D0 + 22); z = r.z - DM.cos(r.yaw) * (r.D0 + 22); yaw = r.yaw; }
+      else { var i1 = Math.max(t.startIdx + 2, r.i - Math.round((r.D0 + 22) / DS)); x = t.X[i1]; z = t.Z[i1]; yaw = DM.atan2(t.TX[i1], t.TZ[i1]); }
+      s.x = x; s.z = z; s.yaw = yaw; s.u = r.U;
+      var i0 = nearest(t, x, z), sf = groundAt(t, x, z, i0, s.surf); s.y = sf.gy; s.gy = sf.gy; s.idx = i0; s.s = sf.s; s._prevS = s.s; s.lat = sf.lat; s.nextCk = t.checkpoints.length - 1; s.lastCkIdx = i0;
+      var target = t.S[r.j] + 80, t0 = s.raceTick;
+      for (var k = 0; k < 120 * 40; k++) {
+        s.step(useJump ? (s.lastLanding && s.tick - s.lastLanding.tick > 150 ? strongPilot(s, t) : jumpPilot(s, t, !!s.lastLanding)) : strongPilot(s, t));
+        if (s.rolled || s.recoveries) return -1;
+        if (s.s >= target && s.grounded) return (s.raceTick - t0) * DT;
+      }
+      return -1;
+    }
+    var a = run(false), b = run(true);
+    return (a < 0 || b < 0) ? -1 : a - b;
+  }
+  function buildFeatures(t, cands) {
+    var rng = mulberry32(hashSeed(t.seedStr + ':feat')), half = t.width / 2;
+    t.ramps = cands.map(function (c) {
+      var ox = c.ox, oz = c.oz, qx = t.X[c.j], qz = t.Z[c.j];
+      var yaw = DM.atan2(qx - ox, qz - oz), len = 10, lipD = DM.hypot(qx - ox, qz - oz) - len;
+      return { i: c.i, j: c.j, x: ox, z: oz, yaw: yaw, len: len, wid: 8.4, H: 2, baseY: 0, dS: c.dS, Rt: lipD, D0: c.D0 };
+    });
+    t.water = []; planPonds(t, rng); t.cuts = planCuts(t, rng); planCliffs(t, rng);
+    buildTerrain(t);
+    buildProps(t, rng);
+    t.designLog = []; t.ramps = t.ramps.filter(function (r) { var ok = designRamp(t, r); t.designLog.push(ok ? 'ok' : r.fail); return ok; });
+    t.baseCheckpoints = t.checkpoints.slice();
+    for (var pass = 0; pass < 3 && t.ramps.length; pass++) {
+      adjustGates(t);
+      var keep = t.ramps.filter(function (r) { return endToEnd(t, r); });
+      if (keep.length === t.ramps.length) break;
+      t.ramps = keep; t.checkpoints = t.baseCheckpoints.slice();
+      if (!keep.length) break;
+    }
+    t.ramps = t.ramps.filter(function (r) { r.gain = jumpGain(t, r); return r.gain >= MIN_GAIN && r.gain <= MAX_GAIN; });          // a shortcut that is not clearly faster (against a STRONG driver) is not worth hiding
+    // the trails: keep only the ones a strong driver can take cleanly and that are clearly (but not absurdly) faster
+    var cutsBefore = t.cuts.length;
+    t.cutLog = [];
+    t.cutsRejected = [];
+    t.cuts = t.cuts.filter(function (cc) { cc.gain = cutGain(t, cc); t.cutLog.push(+cc.gain.toFixed(2)); var keep = cc.gain >= MIN_GAIN && cc.gain <= MAX_GAIN; if (!keep) t.cutsRejected.push(cc); return keep; });
+    if (t.cuts.length !== cutsBefore) buildTerrain(t);
+    t.checkpoints = t.baseCheckpoints.slice(); if (t.ramps.length || t.cuts.length) adjustGates(t);      // gates stay out of every shortcut, on trail-only days too
+    t.shortcutCount = t.ramps.length + t.cuts.length;
+  }
+
+  /* ---------------- vehicle + race simulation ---------------- */
+  var COUNTDOWN_TICKS = 360;       // 3 seconds
+  var B_THR = 1, B_BRK = 2, B_LEFT = 4, B_RIGHT = 8, B_HB = 16, B_RECOVER = 32;
+  var MAX_GAIN = 9.0;                            // ... and not so much that the leaderboard is decided by the shortcut alone
+  var MIN_GAIN = 2.0;                            // seconds a hidden shortcut must save a strong driver
+  var LAUNCH_MIN = 24, LAUNCH_ASSIST = 44;      // m/s (the speed every rock is designed for, so an assisted jump flies exactly the designed arc)
+  var OOB = 140;                   // metres from the road before the car is put back automatically
+  var GATE_SLACK = 10;             // a gate only counts if crossed within road half-width + this
+
+  function Sim(track) { this.track = track; this.surf = {}; this.g1 = {}; this.g2 = {}; this.cdTicks = COUNTDOWN_TICKS; this.reset(); }
+
+  Sim.prototype.reset = function () {
+    var t = this.track, i = t.startIdx;
+    this.x = t.X[i]; this.z = t.Z[i]; this.yaw = DM.atan2(t.TX[i], t.TZ[i]);
+    this.u = 0; this.v = 0; this.r = 0; this.steer = 0;
+    var sf = groundAt(t, this.x, this.z, i, this.surf);
+    this.y = sf.gy; this.gy = sf.gy; this.vy = 0; this.grounded = true; this.airTicks = 0;
+    this.idx = i; this.s = sf.s; this.lat = 0; this.gx = 0; this.gz = 0;
+    this.tick = 0; this.phase = 'countdown'; this.raceTick = 0;
+    this.nextCk = 0; this.lastCkIdx = i; this.finishMs = -1;
+    this.ax = 0; this.ay = 0; this.prevBits = 0; this._prevS = undefined;
+    this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.rollDir = 1;
+    this.missed = false; this.offroad = 0; this.slideAmt = 0; this.recoveries = 0;
+    this.lean = 0; this.leanV = 0; this.leanPeak = 0; this.saves = 0;
+    this.damage = 0; this.dents = []; this.crashes = 0; this.dmgSide = 1; this.jumps = 0; this.skipped = 0;
+    this.wet = 0; this.wd = 0; this.wetTicks = 0; this.waterTicks = 0; this.launchActive = false; this.launchS = 0; this.lastLanding = null; this.lastImpact = null; this.rockCd = 0;
+    this.events = { pop: 0, hit: 0, land: 0, ckpt: false, recovered: false, finished: false, go: false, rolled: false, oob: false, fell: false, crash: 0, splash: 0, drown: false, launch: false, jump: 0, save: 0 };
+  };
+
+  Sim.prototype.recover = function () {
+    var t = this.track, i = this.lastCkIdx;
+    this.x = t.X[i]; this.z = t.Z[i]; this.yaw = DM.atan2(t.TX[i], t.TZ[i]);
+    this.u = 0; this.v = 0; this.r = 0; this.steer = 0;
+    var sf = groundAt(t, this.x, this.z, i, this.surf);
+    this.y = sf.gy + 0.1; this.gy = sf.gy; this.vy = 0; this.grounded = false; this.airTicks = 0;
+    this.idx = i; this.s = sf.s; this.lat = 0; this.recoveries++; this._prevS = this.s;
+    this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null;
+    this.wetTicks = 0; this.wet = 0; this.launchActive = false; this.lean = 0; this.leanV = 0; this.leanPeak = 0;
+    this.events.recovered = true;
+  };
+
+  Sim.prototype.step = function (bits) {
+    var ev = this.events; ev.hit = 0; ev.land = 0; ev.ckpt = false; ev.recovered = false; ev.finished = false; ev.go = false; ev.rolled = false; ev.oob = false; ev.fell = false;
+    var t = this.track, dt = DT, half = t.width / 2;
+    var wasGrounded = this.grounded, sPrev = this.s, onRampPrev = this.surf.onRamp, airPrev = this.airTicks, yaw0 = this.yaw;
+    ev.crash = 0; ev.splash = 0; ev.drown = false; ev.launch = false; ev.jump = 0; ev.save = 0; ev.pop = 0;
+    this.tick++;
+
+    if (this.phase === 'countdown') {
+      if (this.tick >= this.cdTicks) { this.phase = 'racing'; this.raceTick = 0; ev.go = true; }
+      bits = 0;
+    } else if (this.phase === 'finished') {
+      bits = B_BRK;                  // auto-brake to a stop after the line
+    } else if ((bits & B_RECOVER) && !(this.prevBits & B_RECOVER)) {
+      this.recover();
+    }
+    this.prevBits = bits;
+    if (this.phase === 'countdown') return ev;                    // parked on the grid: nothing moves (not even a creep on the start slope) until the lights go out
+    var racing = this.phase === 'racing';
+    if (racing) this.raceTick++;
+
+    var rolled = this.rolled;
+    var thr = (bits & B_THR) !== 0, brk = (bits & B_BRK) !== 0, hb = (bits & B_HB) !== 0;
+    var tgt = ((bits & B_RIGHT) ? 1 : 0) - ((bits & B_LEFT) ? 1 : 0);
+    if (rolled) { thr = false; brk = false; hb = false; tgt = 0; }
+    var u = this.u, v = this.v, r = this.r;
+    var au = Math.abs(u);
+
+    // surface under the car (from last tick): tarmac -> dirt shoulder -> grass
+    var off = smoothstep(0, 6, Math.max(0, Math.abs(this.lat) - half)); if (off > 0 && t.cuts && t.cuts.length) off *= smoothstep(t.cuts[0].w / 2 - 0.5, t.cuts[0].w / 2 + 3.5, cutDist(t, this.x, this.z)); this.offroad = off;
+    var gs = 1 - 0.38 * off;
+    var wet = this.wet || 0; gs *= 1 - 0.62 * wet; var dmg = this.damage || 0;
+
+    // --- steering (speed-sensitive, rate limited) ---
+    var rate = (tgt !== 0 && Math.sign(tgt) === Math.sign(this.steer || tgt)) ? 4.6 : 8.0;
+    var d = tgt - this.steer, step = rate * dt;
+    this.steer += clamp(d, -step, step);
+    var lim = CAR.steerMax / (1 + DM.pow(au / CAR.steerSpeed, 1.5)) + CAR.steerMin;
+    var delta = this.steer * lim;
+
+    // --- longitudinal force request ---
+    var acc = 0, drive = 0;
+    if (thr && !brk) {
+      if (u >= -0.5) {
+        drive = CAR.engine * (1 - DM.pow(Math.max(u, 0) / CAR.vMax, 2.2));
+        drive = Math.min(drive, CAR.tractionLaunch) * (0.6 + 0.4 * gs) * (1 - 0.22 * dmg) * (1 - 0.35 * wet);
+        acc += drive;
+      } else acc += CAR.brake * gs;
+    } else if (brk) {
+      if (u > 0.4) acc -= CAR.brake * (0.5 + 0.5 * gs);
+      else acc -= CAR.reverseAcc * Math.max(0, 1 - DM.pow(Math.max(-u, 0) / CAR.vReverse, 1.5));
+    }
+    if (!thr && !brk && au > 0.05) acc -= Math.sign(u) * CAR.engineBrake;
+    if (au > 0.05) acc -= Math.sign(u) * (CAR.rollRes + CAR.drag * au * au + 4.2 * off + wet * (7 + au * 0.32));
+    if (hb) acc -= Math.sign(u) * CAR.handbrakeDecel;
+    if (!thr && !brk || hb) {
+      var maxDec = au / dt;
+      if (Math.sign(acc) !== Math.sign(u) && Math.abs(acc) > maxDec && u !== 0) acc = -Math.sign(u) * maxDec;
+    }
+    if (brk && !thr && u > 0.05) { var md = u / dt; if (-acc > md) acc = -md; }
+
+    // --- tyre model (bicycle with saturating tyres + load transfer) ---
+    var gripOn = (this.grounded && !rolled) ? 1 : 0;
+    var nF = clamp(CAR.frontShare - this.ax * CAR.cgHeight / (9.81 * CAR.wheelbase), 0.22, 0.8);
+    var nR = 1 - nF;
+    var usage = clamp(Math.abs(acc) / (CAR.grip * 1.15), 0, 0.85);
+    var circle = Math.sqrt(1 - usage * usage);
+    var DF = CAR.grip * nF * circle * gripOn * gs;
+    var DR = CAR.grip * nR * circle * gripOn * gs;
+    if (hb) DR *= CAR.handbrakeRear;
+    else if (thr) DR *= 1 - 0.22 * clamp(1 - au / 38, 0, 1) * Math.min(1, Math.abs(delta) / 0.25 + 0.2);
+    var mov = clamp(au / 2.5, 0, 1);
+    var cd = DM.cos(delta), sd = DM.sin(delta);
+    var vf = v + CAR.a1 * r, vrw = v - CAR.a2 * r;
+    var latF = -u * sd + vf * cd, lonF = u * cd + vf * sd;
+    var alF = DM.atan2(latF, Math.max(Math.abs(lonF), 3));
+    var alR = DM.atan2(vrw, Math.max(au, 3));
+    var ayF = -DF * DM.sin(1.35 * DM.atan(9 * alF)) * cd * mov;
+    var ayR = -DR * DM.sin(1.35 * DM.atan(9 * alR)) * mov;
+
+    // gravity along the slope (road or terrain)
+    var fx0 = DM.sin(this.yaw), fz0 = DM.cos(this.yaw), sl = this.grounded ? 9.81 : 0;
+    var du = acc + v * r - sl * (this.gx * fx0 + this.gz * fz0);
+    var dv = ayF + ayR - u * r - sl * (this.gx * fz0 - this.gz * fx0);
+    var dr = (CAR.a1 * ayF - CAR.a2 * ayR) / CAR.kz - r * (0.35 + 0.03 * au);
+    var low = clamp(1 - au / 4, 0, 1);
+    if (!rolled) { dv -= v * low * 9; dr -= r * low * 5; }
+    if (dmg > 0 && this.grounded) dr += this.dmgSide * 0.2 * dmg * clamp(au / 22, 0, 1);       // a crumpled corner drags the car to one side
+    if (!wasGrounded) { du = 0; dv = 0; dr = (this.steer * 0.9 * smoothstep(40, 100, airPrev) - r) * 3.0; }     // in the air: no tyres, no engine; after a third of a second the wheel swings the nose so you can square up (small crest hops are unaffected)
+
+    u += du * dt; v += dv * dt; r += dr * dt;
+    if (u > CAR.vMax) u = CAR.vMax;
+    this.ax = acc; this.ay = ayF + ayR;
+    this.slideAmt = Math.abs(v) / Math.max(5, au);
+
+    // --- tumbling ---
+    if (rolled) {
+      var sp = DM.hypot(u, v);
+      if (sp > 1e-6) { var ns = Math.max(0, sp - (this.grounded ? 14 : 2) * dt); u *= ns / sp; v *= ns / sp; }
+      r *= 0.98;
+      if (this.restAng === null && Math.abs(this.rollRate) > 0.5) {
+        this.rollAng += this.rollRate * dt; this.rollRate *= DM.exp(-1.0 * dt);
+      } else {
+        if (this.restAng === null) {
+          var q = Math.round(this.rollAng / (Math.PI / 2)) * (Math.PI / 2);
+          var m = ((q % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+          if (m < 1e-6 || Math.abs(m - 2 * Math.PI) < 1e-6) q += this.rollDir * Math.PI / 2;
+          this.restAng = q; this.rollRate = 0;
+        }
+        this.rollAng += (this.restAng - this.rollAng) * Math.min(1, dt * 9);
+      }
+    }
+
+    // --- integrate position ---
+    this.yaw += r * dt;
+    var fx = DM.sin(this.yaw), fz = DM.cos(this.yaw), rx = fz, rz = -fx;
+    if (!wasGrounded) {                                          // airborne: the car turns, the path through the air does not
+      var wvx0 = u * DM.sin(yaw0) + v * DM.cos(yaw0), wvz0 = u * DM.cos(yaw0) - v * DM.sin(yaw0);
+      u = wvx0 * fx + wvz0 * fz; v = wvx0 * fz - wvz0 * fx;
+    }
+    this.x += (u * fx + v * rx) * dt;
+    this.z += (u * fz + v * rz) * dt;
+    this.u = u; this.v = v; this.r = r;
+    if (t.props && t.props.n) { this.collide(t, ev); u = this.u; v = this.v; r = this.r; }
+
+    // --- ground / vertical ---
+    var prevGy = this.gy;
+    var sf = groundAt(t, this.x, this.z, this.idx, this.surf);
+    var wd = (t.water && t.water.length) ? waterDepthAt(t, this.x, this.z) : 0;
+    if (wd > 0.95) sf.gy = Math.max(sf.gy, _wy - 0.5);          // deep water: the car floats
+    var gv = (sf.gy - prevGy) / dt; if (!isFinite(gv) || Math.abs(gv) > 40) gv = 0;
+    this.gy = sf.gy;
+    this.vy -= 9.81 * dt; this.y += this.vy * dt;
+    if (this.y <= sf.gy + 0.04) {
+      if (!this.grounded && this.airTicks > 12) ev.land = Math.max(0, gv - this.vy);
+      this.y = sf.gy; this.vy = gv; this.grounded = true; this.airTicks = 0;
+    } else { this.grounded = false; this.airTicks++; }
+    var lat = sf.lat;
+    this.u = u; this.v = v; this.r = r; this.lat = lat;
+    this.idx = sf.idx; this.s = sf.s;
+    var wetNow = smoothstep(0.08, 0.7, wd);
+    if (wetNow > 0.18 && (this.wet || 0) <= 0.18 && au > 6) ev.splash = au;
+    this.wet = wetNow; this.wd = wd;
+    if (wd > 1.05) this.wetTicks++; else this.wetTicks = Math.max(0, this.wetTicks - 2);
+    if (wasGrounded && !this.grounded && onRampPrev) {
+      this.launchActive = true; this.launchS = sPrev; ev.launch = true;
+      if (this.u > LAUNCH_MIN && this.u < LAUNCH_ASSIST) { var ka = LAUNCH_ASSIST / this.u; this.u = LAUNCH_ASSIST; this.vy *= ka; }      // the rock launches anyone who reaches it at a fair speed as if at its design speed: it is a shortcut, not a test of nerve
+    }
+    if (!wasGrounded && this.grounded) {
+      if (ev.land > 11) { this.damage = Math.min(1, this.damage + clamp((ev.land - 11) / 26, 0, 0.35)); this.crashes++; ev.crash = Math.max(ev.crash, ev.land * 0.6); }
+      if (this.launchActive) {
+        this.launchActive = false; var skipped = this.s - this.launchS;
+        this.lastLanding = { x: this.x, z: this.z, s: this.s, lat: lat, u: u, tick: this.tick };
+        if (airPrev >= 24 && skipped > 40) { this.jumps++; this.skipped += skipped; ev.jump = skipped; }
+      }
+    }
+
+    // slope of the ground under the car (used next tick, and by the renderer)
+    var g1 = groundAt(t, this.x + 0.8, this.z, sf.idx, this.g1), g2 = groundAt(t, this.x, this.z + 0.8, sf.idx, this.g2);
+    this.gx = (g1.gy - sf.gy) / 0.8; this.gz = (g2.gy - sf.gy) / 0.8;
+    var gm = DM.hypot(this.gx, this.gz); if (gm > 1.2) { this.gx *= 1.2 / gm; this.gz *= 1.2 / gm; }          // a ramp lip or pond bank is a cliff, not a slope
+
+    // --- body roll. The car LEANS with lateral g, when it digs in sideways off the tarmac, and on cross-slopes. It only goes over once it is past the
+    //     tipping point and still falling; until then easing off / steering into the slide brings it back (that is a "save"). ---
+    if (this.rolled) { this.lean = this.rollAng; this.leanV = 0; }
+    else if (!this.grounded || sf.onRamp) { this.leanV *= DM.exp(-3 * dt); this.lean += this.leanV * dt; }      // in the air the body keeps its attitude
+    else {
+      var vlat = Math.abs(v), crossS = this.gx * fz - this.gz * fx, offNow = smoothstep(0, 6, Math.max(0, Math.abs(lat) - half)); if (offNow > 0 && t.cuts && t.cuts.length) offNow *= smoothstep(t.cuts[0].w / 2 - 0.5, t.cuts[0].w / 2 + 3.5, cutDist(t, this.x, this.z));
+      var trip = -(v > 0 ? 1 : -1) * clamp(vlat - 4, 0, 24) * offNow * 0.034 * clamp(au / 8, 0, 1);               // dug-in wheels: the body wants to go over in the direction of the slide
+      if (ev.land > 3 && vlat > 3) this.leanV += -(v > 0 ? 1 : -1) * clamp(ev.land, 0, 25) * 0.045;               // landing sideways
+      var tgtL = this.ay * 0.0070 + DM.atan(crossS) * 0.9 * (0.4 + 0.6 * offNow) + trip + this.steer * 0.24 * clamp(au / 15, 0, 1) * clamp((vlat - 1.5) / 5, 0, 1);   // steering moves weight: into the slide lifts the body back, the wrong way tips it further
+      this.leanV += (16 * (tgtL - this.lean) - 5.5 * this.leanV) * dt; this.lean += this.leanV * dt;
+      var aL = Math.abs(this.lean);
+      if (racing && ((aL > 0.58 && this.lean * this.leanV > 0.3) || aL > 0.92)) this.tip(this.lean >= 0 ? 1 : -1, ev);
+      else {
+        if (aL > this.leanPeak) this.leanPeak = aL;
+        if (this.leanPeak > 0.36 && aL < 0.14) { this.saves++; ev.save = this.leanPeak; this.leanPeak = 0; }
+        else if (aL < 0.1 && this.leanPeak <= 0.36) this.leanPeak = 0;
+      }
+    }
+
+    // --- out of bounds: put the car back automatically ---
+    if (racing && this.y < sf.y - 14 && Math.abs(lat) > half) { this.recover(); ev.fell = true; return ev; }      // went over a cliff: put back on the road
+    if (racing && Math.abs(lat) > OOB) { this.recover(); ev.oob = true; return ev; }
+    if (racing && this.wetTicks > 140) { this.recover(); ev.drown = true; return ev; }      // sunk in deep water: put back on the road
+
+    // --- gates (strict order; must be crossed on the course, without skipping along the grass) ---
+    if (racing) {
+      var ci = t.checkpoints[this.nextCk], cs = t.S[ci];
+      var prevS = this._prevS === undefined ? this.s : this._prevS;
+      if (prevS < cs && this.s >= cs && Math.abs(this.s - prevS) < 12 && Math.abs(lat) <= half + GATE_SLACK) {
+        this.lastCkIdx = ci; ev.ckpt = true;
+        if (this.nextCk === t.checkpoints.length - 1) {
+          var span = this.s - prevS, frac = span > 1e-6 ? clamp((cs - prevS) / span, 0, 1) : 1;
+          this.finishMs = Math.round((this.raceTick - 1 + frac) * dt * 1000);
+          this.phase = 'finished'; ev.finished = true;
+        }
+        this.nextCk++;
+      }
+      this.missed = this.phase === 'racing' && this.grounded && this.s > t.S[t.checkpoints[this.nextCk]] + 10;
+    }
+    this._prevS = this.s;
+    return ev;
+  };
+
+  /** past the point of no return: start the tumble from the current lean, in the direction it was falling */
+  Sim.prototype.tip = function (dirL, ev) {
+    var au = Math.abs(this.u);
+    this.rolled = true; this.rollDir = dirL; this.restAng = null; this.rollAng = this.lean;
+    this.rollRate = dirL * clamp(3.2 + Math.abs(this.leanV) * 1.0 + au * 0.04, 3.5, 8);
+    this.vy += 2.4; this.grounded = false; this.airTicks = 0; ev.rolled = true;
+  };
+  /* rock launch (v27): a rock met at a glancing angle lifts the car off the ground, like riding up its face, and does not hurt it; a steeper or harder hit is exactly as before */
+  var ROCK_POP_MAX_HIT = 16, ROCK_POP_ANGLE = 0.58, ROCK_POP_MIN_V = 12, ROCK_POP_K = 0.22, ROCK_POP_MIN_LIFT = 2.0, ROCK_POP_MAX_LIFT = 8.5, ROCK_POP_COOLDOWN = 120;      // glancing = meeting the rock at under ~30 degrees to its face (impact/along-speed <= 0.58), fast, and not a hard hit
+  var CIRC = [1.8, 0.45, -0.95, -2.15];         // four contact circles down the length of the car (offsets from the centre of gravity)
+  /** trees and rocks: solid. Push the car out, bounce it, spin it, dent it. Deterministic like everything else. */
+  Sim.prototype.collide = function (t, ev) {
+    var P = t.props, yaw = this.yaw, fx = DM.sin(yaw), fz = DM.cos(yaw), rx = fz, rz = -fx, hit = 0, pop = null;
+    if (this.rockCd > 0) this.rockCd--;
+    for (var ci = 0; ci < 4; ci++) {
+      var cx = this.x + fx * CIRC[ci], cz = this.z + fz * CIRC[ci], gx = Math.floor(cx / PCELL), gz = Math.floor(cz / PCELL);
+      for (var a = -1; a <= 1; a++) for (var b = -1; b <= 1; b++) {
+        var list = P.grid[(gx + a) + ',' + (gz + b)]; if (!list) continue;
+        for (var q = 0; q < list.length; q++) {
+          var p = list[q], dx = cx - P.x[p], dz = cz - P.z[p], rr = 0.98 + P.r[p], d2 = dx * dx + dz * dz;
+          if (d2 >= rr * rr || this.y > P.y[p] + P.h[p]) continue;
+          var d = Math.sqrt(d2) || 1e-3, nx = dx / d, nz = dz / d, pen = rr - d;
+          this.x += nx * pen; this.z += nz * pen; cx += nx * pen; cz += nz * pen;
+          var wvx = this.u * fx + this.v * rx, wvz = this.u * fz + this.v * rz, vn = wvx * nx + wvz * nz;
+          if (vn < 0) {
+            var rock = P.kind[p] === 1, e = rock ? 0.18 : 0.08, j = -(1 + e) * vn, gl = false;
+            if (rock) { var s2 = wvx * wvx + wvz * wvz, vtn = Math.sqrt(Math.max(0, s2 - vn * vn));       // speed ALONG the rock's face, before the bounce
+              if (vtn >= ROCK_POP_MIN_V && -vn <= ROCK_POP_MAX_HIT && -vn <= ROCK_POP_ANGLE * vtn) { gl = true; if (!pop || vtn > pop.vt) pop = { vt: vtn, imp: -vn }; } }
+            wvx += j * nx; wvz += j * nz; wvx *= 0.97; wvz *= 0.97;
+            this.u = wvx * fx + wvz * fz; this.v = wvx * rx + wvz * rz;
+            var relx = cx - this.x, relz = cz - this.z, tq = relz * nx - relx * nz;
+            this.r = clamp(this.r + tq * j * 0.06, -3, 3);
+            var impact = -vn;
+            if (impact > hit && !gl) {                                  // a glancing rock contact is not a crash: no damage, no dent
+              hit = impact;
+              var lx = (cx - this.x) * rx + (cz - this.z) * rz, lz = (cx - this.x) * fx + (cz - this.z) * fz;
+              this.lastImpact = { x: lx, z: lz, nx: nx * rx + nz * rz, nz: nx * fx + nz * fz, m: impact, rock: rock };
+            }
+          }
+        }
+      }
+    }
+    if (hit > 2) {
+      ev.crash = Math.max(ev.crash, hit);
+      if (hit > 3.5) {
+        this.damage = Math.min(1, this.damage + clamp((hit - 3) / 22, 0, 0.45));
+        this.crashes++; var li = this.lastImpact; this.dents.push({ x: li.x, y: 0.68, z: li.z, nx: li.nx, nz: li.nz, m: Math.min(1, hit / 22) });
+        if (this.dents.length > 10) this.dents.shift();
+        if (Math.abs(li.x) > 0.3) this.dmgSide = li.x > 0 ? -1 : 1;
+      }
+      if (hit > 6 && this.grounded && !this.rolled) {              // a hit from the side rocks the car over; a head-on hit does not
+        var nxl = this.lastImpact.nx; this.leanV += nxl * clamp(hit * 0.16, 0, 5);
+        if (hit > 26 && Math.abs(nxl) > 0.5) this.tip(nxl > 0 ? 1 : -1, ev);
+      }
+    }
+    if (pop && hit <= ROCK_POP_MAX_HIT && this.grounded && !this.rolled && this.rockCd === 0 && pop.vt >= ROCK_POP_MIN_V) {
+      var lift = clamp(ROCK_POP_K * pop.vt, ROCK_POP_MIN_LIFT, ROCK_POP_MAX_LIFT) * (1 - 0.35 * pop.imp / ROCK_POP_MAX_HIT);
+      this.vy += lift; this.grounded = false; this.airTicks = 0; this.rockCd = ROCK_POP_COOLDOWN; ev.pop = lift;
+    }
+  };
+
+  Sim.prototype.timeMs = function () { return Math.floor(this.raceTick * DT * 1000); };
+  Sim.prototype.speedKmh = function () { return DM.hypot(this.u, this.v) * 3.6; };
+  Sim.prototype.speedMph = function () { return DM.hypot(this.u, this.v) * 2.23694; };
+
+
+  /* ---------------- cross-engine canary ----------------
+     A fingerprint of (1) the deterministic math library and (2) a scripted physics run (grass slide, rollover, recovery, collisions off) on a synthetic road.
+     The browser and the verifying server each compute it; if the strings differ, this engine does not reproduce the simulation and its runs must go to manual review
+     instead of being rejected as cheats. Cheap (~15 ms). */
+  function hashBits(h, x) {
+    var dv = hashBits.dv || (hashBits.dv = new DataView(new ArrayBuffer(8)));
+    dv.setFloat64(0, x, false);
+    for (var q = 0; q < 2; q++) { h ^= dv.getUint32(q * 4, false); h = Math.imul(h, 16777619) >>> 0; h ^= h >>> 15; }
+    return h >>> 0;
+  }
+  function canary() {
+    var h = 2166136261, i, x;
+    for (i = 0; i < 240; i++) {
+      x = i * 0.731 - 80;
+      h = hashBits(h, DM.sin(x)); h = hashBits(h, DM.cos(x * 1.3)); h = hashBits(h, DM.atan(x * 0.17)); h = hashBits(h, DM.atan2(x, 41.5 - i));
+      h = hashBits(h, DM.exp(x / 11)); h = hashBits(h, DM.log(i + 1.5)); h = hashBits(h, DM.pow(i / 50 + 0.01, 2.2)); h = hashBits(h, DM.hypot(x, i + 0.5));
+    }
+    var N = 1700, X = [], Z = [], Y = [], TX = [], TZ = [], S = [], K = [];
+    for (i = 0; i < N; i++) { X.push(0); Z.push(i * 3); Y.push(0); TX.push(0); TZ.push(1); S.push(i * 3); K.push(0); }
+    var t = { N: N, ds: 3, X: X, Z: Z, Y: Y, TX: TX, TZ: TZ, S: S, K: K, width: 16, startIdx: 5, finishIdx: N - 60, checkpoints: [800, N - 60], length: (N - 60) * 3 };
+    finalizeTrack(t);
+    var sim = new Sim(t), seed = 12345, bits;
+    for (i = 0; i < 1500; i++) {
+      seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff;
+      bits = i < 360 ? 0 : (((seed >> 8) & 7) < 6 ? B_THR : 0) | (((seed >> 11) & 3) === 0 ? B_LEFT : (((seed >> 11) & 3) === 1 ? B_RIGHT : 0)) | (((seed >> 14) & 31) === 0 ? B_HB : 0) | (((seed >> 19) & 63) === 0 ? B_BRK : 0);
+      if (i === 700) { sim.x = 14; sim.u = 30; sim.v = 18; }               // a sideways slide on the grass: lean, tip, tumble
+      if (i === 1100) bits |= B_RECOVER;
+      sim.step(bits);
+    }
+    [sim.x, sim.z, sim.yaw, sim.u, sim.v, sim.r, sim.y, sim.lean, sim.leanV, sim.rollAng, sim.damage].forEach(function (v) { h = hashBits(h, v); });
+    return (h >>> 0).toString(16);
+  }
+
+  /** Replays an input log [[tick,bits],...] and returns final state hash + finish time. */
+  function replay(track, log, maxTicks, cdTicks) {
+    var sim = new Sim(track), li = 0, bits = 0; if (cdTicks) { sim.cdTicks = cdTicks; sim.reset(); }
+    for (var k = 1; k <= maxTicks; k++) {
+      while (li < log.length && log[li][0] <= k) { bits = log[li][1]; li++; }
+      sim.step(bits);
+      if (sim.phase === 'finished' && sim.raceTick > 0 && k > sim.cdTicks + 700 && Math.abs(sim.u) < 0.1) break;
+    }
+    return { finishMs: sim.finishMs, x: sim.x, z: sim.z, yaw: sim.yaw, u: sim.u, ticks: sim.tick, ckpt: sim.nextCk, damage: sim.damage, jumps: sim.jumps, skipped: sim.skipped, crashes: sim.crashes };
+  }
+
+  /* ---------------- Chicago race-date helpers (DST aware, no hard-coded offsets) ---------------- */
+  var _fmt = null;
+  function chicagoParts(ms) {
+    if (!_fmt) _fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    var o = {}, p = _fmt.formatToParts(new Date(ms));
+    for (var i = 0; i < p.length; i++) if (p[i].type !== 'literal') o[p[i].type] = parseInt(p[i].value, 10);
+    return o;
+  }
+  function chicagoDate(ms) { var p = chicagoParts(ms); return p.year + '-' + String(p.month).padStart(2, '0') + '-' + String(p.day).padStart(2, '0'); }
+  function msUntilChicagoMidnight(ms) {
+    var p = chicagoParts(ms), today = chicagoDate(ms);
+    var guess = ms + (86400 - (p.hour * 3600 + p.minute * 60 + p.second)) * 1000;
+    // correct for 23h / 25h days around DST changes
+    for (var i = 0; i < 4; i++) {
+      if (chicagoDate(guess) === today) guess += 60 * 60 * 1000;
+      else if (chicagoDate(guess - 1000) !== today) guess -= 60 * 60 * 1000;
+      else break;
+    }
+    return guess - ms;
+  }
+
+  function fmtTime(ms) {
+    if (ms < 0 || !isFinite(ms)) return '--:--.---';
+    var m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000), r = Math.floor(ms % 1000);
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '.' + String(r).padStart(3, '0');
+  }
+
+  return {
+    DM: DM, canary: canary, DT: DT, CAR: CAR, DS: DS, OOB: OOB, GATE_SLACK: GATE_SLACK, COUNTDOWN_TICKS: COUNTDOWN_TICKS,
+    version: 'v27',
+    BITS: { THR: B_THR, BRK: B_BRK, LEFT: B_LEFT, RIGHT: B_RIGHT, HB: B_HB, RECOVER: B_RECOVER },
+    hashSeed: hashSeed, mulberry32: mulberry32, smoothstep: smoothstep, clamp: clamp,
+    generateTrack: generateTrack, finalizeTrack: finalizeTrack, validateTrack: validate, nearest: nearest, surface: surface, groundAt: groundAt, terrainH: terrainH, rampY: rampY, waterDepthAt: waterDepthAt, cutDist: cutDist, PCELL: PCELL, launchTest: launchTest,
+    internals: { CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
+    Sim: Sim, replay: replay, chicagoDate: chicagoDate, msUntilChicagoMidnight: msUntilChicagoMidnight, fmtTime: fmtTime,
+    BIOMES: BIOMES
+  };
+})();
+if (typeof module !== 'undefined') module.exports = TGKCore;
+
+ return TGKCore; })();
 
 var TGKCores = (function () {
   'use strict';
-  var cur = TGKCore, NEW_FROM = '2026-11-26';
+  var cur = TGKCore, NEW_FROM = '2026-11-26', V28_FROM = '2026-12-03';
   /** the frozen v26 core with the current interface (anything it lacks falls back to the current helper) */
   function adapt(L, tag) { var A = {}, k; for (k in cur) A[k] = cur[k]; for (k in L) A[k] = L[k]; A.version = tag; return A; }
-  var V26 = adapt(TGKCoreV26, 'v26');
+  var V26 = adapt(TGKCoreV26, 'v26'), V27 = adapt(TGKCoreV27, 'v27');
   /** which core to use for a race day: days before NEW_FROM keep the physics they were raced on, so every run already on a leaderboard keeps replaying and verifying */
-  function resolve(date) { return { core: (typeof date === 'string' && date < NEW_FROM) ? V26 : cur, attempt: undefined, legacy: false }; }
-  return { current: cur, resolve: resolve, pinned: function () { return false; }, newFrom: NEW_FROM, V26: V26 };
+  function resolve(date) { var d = typeof date === 'string' ? date : '9999'; return { core: d < NEW_FROM ? V26 : (d < V28_FROM ? V27 : cur), attempt: undefined, legacy: false }; }
+  return { current: cur, resolve: resolve, pinned: function () { return false; }, newFrom: NEW_FROM, v28From: V28_FROM, V26: V26, V27: V27 };
 })();
 if (typeof module !== 'undefined') module.exports = TGKCores;
 
