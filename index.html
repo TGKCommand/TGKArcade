@@ -2003,7 +2003,7 @@ var TGKCore = (function () {
     this.tick = 0; this.phase = 'countdown'; this.raceTick = 0;
     this.nextCk = 0; this.lastCkIdx = i; this.finishMs = -1;
     this.ax = 0; this.ay = 0; this.prevBits = 0; this._prevS = undefined;
-    this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.rollDir = 1;
+    this.rolled = false; this.stuck = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.rollDir = 1;
     this.missed = false; this.offroad = 0; this.slideAmt = 0; this.recoveries = 0;
     this.lean = 0; this.leanV = 0; this.leanPeak = 0; this.saves = 0;
     this.damage = 0; this.dents = []; this.crashes = 0; this.dmgSide = 1; this.jumps = 0; this.skipped = 0;
@@ -2018,7 +2018,7 @@ var TGKCore = (function () {
     var sf = groundAt(t, this.x, this.z, i, this.surf);
     this.y = sf.gy + 0.1; this.gy = sf.gy; this.vy = 0; this.grounded = false; this.airTicks = 0;
     this.idx = i; this.s = sf.s; this.lat = 0; this.recoveries++; this._prevS = this.s;
-    this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null;
+    this.rolled = false; this.stuck = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null;
     this.wetTicks = 0; this.wet = 0; this.launchActive = false; this.lean = 0; this.leanV = 0; this.leanPeak = 0;
     this.events.recovered = true;
   };
@@ -2046,7 +2046,9 @@ var TGKCore = (function () {
     var rolled = this.rolled;
     var thr = (bits & B_THR) !== 0, brk = (bits & B_BRK) !== 0, hb = (bits & B_HB) !== 0;
     var tgt = ((bits & B_RIGHT) ? 1 : 0) - ((bits & B_LEFT) ? 1 : 0);
-    if (rolled) { thr = false; brk = false; hb = false; tgt = 0; }
+    var roll2 = typeof t.raceDate === 'string' && t.raceDate >= ROLL2.from; this.roll2 = roll2;
+    var tc = 1;                                                    // tyre contact while rolling: 1 on the wheels, 0 on its side or roof, nothing in the air
+    if (rolled) { if (roll2 && !this.stuck) { tc = this.grounded ? clamp(DM.cos(this.rollAng) * 1.15, 0, 1) : 0; } else { thr = false; brk = false; hb = false; tgt = 0; } }
     var u = this.u, v = this.v, r = this.r;
     var au = Math.abs(u);
 
@@ -2060,7 +2062,7 @@ var TGKCore = (function () {
     var d = tgt - this.steer, step = rate * dt;
     this.steer += clamp(d, -step, step);
     var lim = CAR.steerMax / (1 + DM.pow(au / CAR.steerSpeed, 1.5)) + CAR.steerMin;
-    var delta = this.steer * lim;
+    var delta = this.steer * lim * tc;
 
     // --- longitudinal force request ---
     var acc = 0, drive = 0;
@@ -2068,11 +2070,11 @@ var TGKCore = (function () {
       if (u >= -0.5) {
         drive = CAR.engine * (1 - DM.pow(Math.max(u, 0) / CAR.vMax, 2.2));
         drive = Math.min(drive, CAR.tractionLaunch) * (0.6 + 0.4 * gs) * (1 - 0.22 * dmg) * (1 - 0.35 * wet);
-        acc += drive;
-      } else acc += CAR.brake * gs;
+        acc += drive * tc;
+      } else acc += CAR.brake * gs * tc;
     } else if (brk) {
-      if (u > 0.4) acc -= CAR.brake * (0.5 + 0.5 * gs);
-      else acc -= CAR.reverseAcc * Math.max(0, 1 - DM.pow(Math.max(-u, 0) / CAR.vReverse, 1.5));
+      if (u > 0.4) acc -= CAR.brake * (0.5 + 0.5 * gs) * tc;
+      else acc -= CAR.reverseAcc * Math.max(0, 1 - DM.pow(Math.max(-u, 0) / CAR.vReverse, 1.5)) * tc;
     }
     if (!thr && !brk && au > 0.05) acc -= Math.sign(u) * CAR.engineBrake;
     if (au > 0.05) acc -= Math.sign(u) * (CAR.rollRes + CAR.drag * au * au + 4.2 * off + wet * (7 + au * 0.32));
@@ -2084,7 +2086,7 @@ var TGKCore = (function () {
     if (brk && !thr && u > 0.05) { var md = u / dt; if (-acc > md) acc = -md; }
 
     // --- tyre model (bicycle with saturating tyres + load transfer) ---
-    var gripOn = (this.grounded && !rolled) ? 1 : 0;
+    var gripOn = this.grounded ? (rolled ? ((roll2 && !this.stuck) ? tc : 0) : 1) : 0;       // while it rolls, grip follows how much of the tyres is still on the ground (the original: none at all)
     var nF = clamp(CAR.frontShare - this.ax * CAR.cgHeight / (9.81 * CAR.wheelbase), 0.22, 0.8);
     var nR = 1 - nF;
     var usage = clamp(Math.abs(acc) / (CAR.grip * 1.15), 0, 0.85);
@@ -2120,9 +2122,24 @@ var TGKCore = (function () {
     // --- tumbling ---
     if (rolled) {
       var sp = DM.hypot(u, v);
-      if (sp > 1e-6) { var ns = Math.max(0, sp - (this.grounded ? 14 : 2) * dt); u *= ns / sp; v *= ns / sp; }
-      r *= 0.98;
-      if (this.restAng === null && Math.abs(this.rollRate) > 0.5) {
+      if (sp > 1e-6) { var ns = Math.max(0, sp - (this.grounded ? 14 * (roll2 ? 1 - 0.85 * tc : 1) : 2) * dt); u *= ns / sp; v *= ns / sp; }       // tyres on the ground slide far less than a body does
+      r *= roll2 ? 1 - 0.02 * (1 - tc) : 0.98;
+      if (roll2) {
+        if (this.restAng === null && (Math.abs(this.rollRate) > 0.5 || !this.grounded)) {
+          this.rollAng += this.rollRate * dt; this.rollRate *= DM.exp(-1.0 * dt);
+        } else {
+          if (this.restAng === null) {                                 // wheels and roof are the only stable resting places: it falls whichever way it is past
+            var wh = DM.cos(this.rollAng) >= 0;
+            this.restAng = wh ? Math.round(this.rollAng / (2 * Math.PI)) * 2 * Math.PI : Math.round((this.rollAng - Math.PI) / (2 * Math.PI)) * 2 * Math.PI + Math.PI; this.rollRate = 0;
+          }
+          this.rollAng += (this.restAng - this.rollAng) * Math.min(1, dt * 9);
+          if (this.grounded && Math.abs(this.restAng - this.rollAng) < 0.05) {
+            var mq = ((this.restAng % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            if (mq < 1e-6 || Math.abs(mq - 2 * Math.PI) < 1e-6) { this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.lean = 0; this.leanV = 0; }     // back on its wheels: just a car
+            else this.stuck = true;                                    // on its roof: no power, press R
+          }
+        }
+      } else if (this.restAng === null && Math.abs(this.rollRate) > 0.5) {
         this.rollAng += this.rollRate * dt; this.rollRate *= DM.exp(-1.0 * dt);
       } else {
         var rollFix = typeof t.raceDate === 'string' && t.raceDate >= ROLLFIX.from;
@@ -2135,7 +2152,7 @@ var TGKCore = (function () {
         this.rollAng += (this.restAng - this.rollAng) * Math.min(1, dt * 9);
         if (rollFix && this.grounded && Math.abs(this.restAng - this.rollAng) < 0.05) {                         // settled: if that is wheels-down, it is just a car again
           var mm = ((this.restAng % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-          if (mm < 1e-6 || Math.abs(mm - 2 * Math.PI) < 1e-6) { this.rolled = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.lean = 0; this.leanV = 0; }
+          if (mm < 1e-6 || Math.abs(mm - 2 * Math.PI) < 1e-6) { this.rolled = false; this.stuck = false; this.rollAng = 0; this.rollRate = 0; this.restAng = null; this.lean = 0; this.leanV = 0; }
         }
       }
     }
@@ -2237,10 +2254,11 @@ var TGKCore = (function () {
   Sim.prototype.tip = function (dirL, ev) {
     var au = Math.abs(this.u);
     this.rolled = true; this.rollDir = dirL; this.restAng = null; this.rollAng = this.lean;
-    this.rollRate = dirL * clamp(3.2 + Math.abs(this.leanV) * 1.0 + au * 0.04, 3.5, 8);
+    this.rollRate = this.roll2 ? dirL * clamp(0.4 + Math.abs(this.leanV) * 0.9 + au * 0.06, 0.6, 8) : dirL * clamp(3.2 + Math.abs(this.leanV) * 1.0 + au * 0.04, 3.5, 8);
     this.vy += 2.4; this.grounded = false; this.airTicks = 0; ev.rolled = true;
   };
   /* rock launch (v27, made to really launch in v28): a rock met at a glancing angle lifts the car off the ground, like riding up its face, and does not hurt it; a steeper or harder hit is exactly as before */
+  var ROLL2 = { from: '2026-11-28' };      // (v28) the full roll model: tyres keep working while the car rolls, a partly-over car falls back onto its wheels and drives on, and ONLY a car left upside down loses power and asks for a reset
   var ROLLFIX = { from: '2026-11-27' };    // a car that rolls over and comes to rest back on its WHEELS drives on (before this date it was always pushed over onto its side and locked until the driver pressed R)
   var JUMP = { from: '2026-11-27' };       // JUMPING: rock launches and the fly-over-water rule apply to race days on or after this date; every earlier day keeps the original physics exactly. Set it to '2099-01-01' to switch jumping off again.
   var ROCK_POP_MAX_HIT = 16, ROCK_POP_ANGLE = 0.58, ROCK_POP_MIN_V = 12, ROCK_POP_K = 0.22, ROCK_POP_MIN_LIFT = 3.5, ROCK_POP_MAX_LIFT = 8.5, ROCK_POP_COOLDOWN = 120;      // glancing = meeting the rock at under ~30 degrees to its face (impact/along-speed <= 0.58), fast, and not a hard hit
@@ -2379,7 +2397,7 @@ var TGKCore = (function () {
     BITS: { THR: B_THR, BRK: B_BRK, LEFT: B_LEFT, RIGHT: B_RIGHT, HB: B_HB, RECOVER: B_RECOVER },
     hashSeed: hashSeed, mulberry32: mulberry32, smoothstep: smoothstep, clamp: clamp,
     generateTrack: generateTrack, finalizeTrack: finalizeTrack, validateTrack: validate, nearest: nearest, surface: surface, groundAt: groundAt, terrainH: terrainH, rampY: rampY, waterDepthAt: waterDepthAt, cutDist: cutDist, PCELL: PCELL, launchTest: launchTest,
-    internals: { ROLLFIX: ROLLFIX, strongPilot: strongPilot, JUMP: JUMP, reroll: REROLL, CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
+    internals: { ROLL2: ROLL2, ROLLFIX: ROLLFIX, strongPilot: strongPilot, JUMP: JUMP, reroll: REROLL, CUTP: CUTP, planCuts: planCuts, cutGain: cutGain, cutPilot: cutPilot, jumpGain: jumpGain, landingPilot: landingPilot, speedProfile: speedProfile, endToEnd: endToEnd, jumpPilot: jumpPilot, autoSteer: autoSteer, candidate: candidate, validate: validate, prepTrack: prepTrack, findShortcutCandidates: findShortcutCandidates, buildFeatures: buildFeatures, designRamp: designRamp, launchTest: launchTest, buildTerrain: buildTerrain },
     Sim: Sim, replay: replay, chicagoDate: chicagoDate, msUntilChicagoMidnight: msUntilChicagoMidnight, fmtTime: fmtTime,
     BIOMES: BIOMES
   };
@@ -8146,7 +8164,7 @@ var TGKPages = (function () {
     var lat = (gnd && au > 5) ? C.clamp((sl - 0.13) / 0.32, 0, 1) : 0, brk = (gnd && sim.u > 8 && sim.ax < -13) ? C.clamp((-sim.ax - 13) / 8, 0, 1) : 0;
     var hbk = (gnd && (lastBits & B.HB) && au > 4) ? 1 : 0, launch = (gnd && sim.ax > 7.2 && au < 10) ? C.clamp((sim.ax - 7.2) / 2.5, 0, 1) * (1 - au / 10) : 0;
     var aL = sim.rolled ? 0 : Math.abs(sim.lean);
-    aud.update({ mph: sim.speedMph(), speed: Math.hypot(sim.u, sim.v), throttle: ((lastBits & B.THR) && !(lastBits & B.BRK) && !sim.rolled && sim.phase !== 'finished') ? 1 : 0, reverse: sim.u < -0.5,
+    aud.update({ mph: sim.speedMph(), speed: Math.hypot(sim.u, sim.v), throttle: ((lastBits & B.THR) && !(lastBits & B.BRK) && !(sim.roll2 ? sim.stuck : sim.rolled) && sim.phase !== 'finished') ? 1 : 0, reverse: sim.u < -0.5,
                  grounded: gnd, offroad: sim.offroad, wet: sim.wet, slip: Math.max(lat, hbk, brk * 0.8, launch * 0.9), damage: sim.damage, warn: aL > 0.34 && sim.grounded, active: true });
   }
 
@@ -8725,7 +8743,8 @@ var TGKPages = (function () {
     var aL = sim.rolled ? 0 : Math.abs(sim.lean), tiltOn = aL > 0.14 && sim.grounded;
     if (tiltOn !== hud.tilt) { $('tilt').classList.toggle('on', tiltOn); hud.tilt = tiltOn; }
     if (tiltOn) { $('tiltMark').style.left = (50 - C.clamp(sim.lean / 0.95, -1, 1) * 50) + '%'; $('tilt').classList.toggle('hot', aL > 0.34); }
-    var ban = sim.rolled ? 'Rolled! Press R to recover' : (aL > 0.34 && sim.grounded ? 'TIPPING! Steer into the slide and ease off' : (sim.missed ? 'Missed a gate. Get back on the road' : ''));
+    var dead = sim.roll2 ? sim.stuck : sim.rolled;                            // the full roll model: only a car left upside down is out of the race until R
+    var ban = dead ? (sim.roll2 ? 'Upside down. Press R to reset' : 'Rolled! Press R to recover') : (aL > 0.34 && sim.grounded ? 'TIPPING! Steer into the slide and ease off' : (sim.missed ? 'Missed a gate. Get back on the road' : ''));
     if (ban !== hud.ban) { $('banner').firstChild.textContent = ban; $('banner').classList.toggle('on', !!ban); hud.ban = ban; }
     if (sim.phase === 'countdown') {
       var left = Math.ceil((sim.cdTicks - sim.tick) / 120); var s = left > 0 ? String(left) : '';
